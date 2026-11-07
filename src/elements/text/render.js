@@ -12,6 +12,7 @@ export function resolveText(template, meta = {}, now = new Date()) {
     title: meta.title || '', artist: meta.artist || '', time: fmtTime(t), duration: d ? fmtTime(d) : '∞',
     remaining: d ? fmtTime(Math.max(0, d - t)) : '∞', progress: d ? `${Math.round((t / d) * 100)}%` : '',
     date: now.toLocaleDateString(), clock: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    ArtistOrTitle: meta.artist && meta.title ? `${meta.artist} - ${meta.title}` : meta.title || meta.artist || '',
   };
   return template.replace(/\{(\w+)\}/g, (m, k) => (k in map ? map[k] : m));
 }

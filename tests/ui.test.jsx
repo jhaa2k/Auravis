@@ -18,6 +18,10 @@ describe('React UI renders without runtime errors', () => {
     const html = renderToString(<App />);
     expect(html).toContain('Auravis');
     expect(html).toContain('Elements');
+    expect(html).toContain('Export');
+    expect(html).toContain('1920');
+    expect(html).toContain('1080');
+    expect(html).toContain('FPS');
   });
   it('property panel renders every property of every element type', () => {
     for (const def of listDefinitions()) {
@@ -25,6 +29,7 @@ describe('React UI renders without runtime errors', () => {
       actions.select(el.id);
       const html = renderToString(<PropertiesPanel />);
       expect(html, def.type).toContain(def.label);
+      for (const section of def.sections) expect(html, `${def.type}: ${section.name}`).toContain(section.name);
     }
   });
   it('property panel shows every section label of an Image (sections open)', () => {
@@ -35,7 +40,8 @@ describe('React UI renders without runtime errors', () => {
   });
   it('layers, transport and settings', () => {
     expect(renderToString(<LayerList />)).toContain('Add');
-    expect(renderToString(<TransportBar />)).toContain('Demo');
+    expect(renderToString(<TransportBar />)).toContain('Open');
+    expect(renderToString(<TransportBar />)).not.toContain('Demo');
     expect(renderToString(<SettingsPanel />)).toContain('Export video');
   });
 });

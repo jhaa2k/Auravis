@@ -25,9 +25,10 @@ export class SpectrumProvider {
     this.sampleRate = 48000;
   }
 
-  update(props, mags, sampleRate, dt) {
+  update(props, mags, sampleRate, dt, timeDomain = new Float32Array(0)) {
     const issues = (this.issues = []);
     this.sampleRate = sampleRate;
+    const sampleProvider = props.sampleProvider || 'spectrum';
     let n = props.fftSize;
     if (!FFT_SIZES.includes(n)) { issues.push(['error', `Invalid FFT size ${n}: using 2048`]); n = 2048; }
     const nyq = sampleRate / 2;
@@ -36,6 +37,15 @@ export class SpectrumProvider {
       issues.push(['error', `Invalid frequency range ${Math.round(lo)}–${Math.round(hi)} Hz: using ${Math.round(lo)}–${Math.round(Math.min(nyq, lo * 2))} Hz`]);
       hi = Math.min(nyq, lo * 2);
       if (!(hi > lo)) lo = hi / 2;
+    }
+    const focusedRange = { bass: [20, 250], mid: [250, 4000], treble: [4000, 16000] }[sampleProvider];
+    if (focusedRange) {
+      const rangeLo = Math.min(focusedRange[0], nyq * 0.5);
+      const rangeHi = Math.min(focusedRange[1], nyq);
+      lo = Math.max(lo, rangeLo);
+      hi = Math.min(hi, rangeHi);
+      if (!(hi > lo * 1.05)) { lo = rangeLo; hi = rangeHi; }
+      if (!(hi > lo)) { lo = Math.max(20, nyq * 0.25); hi = nyq; }
     }
     const bins = n / 2;
     this.binHz = sampleRate / n;
@@ -61,49 +71,65 @@ export class SpectrumProvider {
     const M = Math.max(1, Math.ceil(U / (mf * rep)));
 
     // 3) Frequency mapping: log↔linear blend (Hz Linear Factor) and Freq Shift
-    const sh = clamp(props.freqShift, -1, 1), lin = props.hzLinearFactor;
+    const sh = clamp(props.freqShift, -1, 1), lin = sampleProvider === 'spectrum2' ? 1 : props.hzLinearFactor;
     const mapU = (u) => (sh > 0 ? sh : 0) + (1 + (sh < 0 ? sh : 0) - (sh > 0 ? sh : 0)) * u;
     const freqAt = (u) => {
       const uu = mapU(u);
       const lf = lo * Math.pow(hi / lo, uu), nf = lo + (hi - lo) * uu;
       return lf + (nf - lf) * lin;
     };
-    const base = new Float32Array(M);
-    for (let j = 0; j < M; j++) {
-      const f0 = freqAt(j / M), f1 = freqAt((j + 1) / M), fc = freqAt((j + 0.5) / M);
-      const b0 = f0 / this.binHz, b1 = f1 / this.binHz;
-      let mag;
-      if (b1 - b0 < 1) {
-        const idx = fc / this.binHz, i0 = Math.min(bins - 2, Math.floor(idx));
-        mag = lerp(pre[i0], pre[i0 + 1], clamp(idx - i0, 0, 1));
-      } else {
-        mag = 0;
-        for (let b = Math.max(0, Math.ceil(b0)); b <= Math.min(bins - 1, Math.floor(b1)); b++) mag = Math.max(mag, pre[b]);
-      }
-      base[j] = toNorm(mag, props.aWeight ? aWeightDb(fc) : 0); // real A-weighting at the band centre frequency
-    }
-
-    // 4) Neighbourhood filter
-    const R = Math.round(props.filterRadius), fs = props.filterStrength;
-    if (R > 0 && fs > 0) {
-      const f = new Float32Array(M);
+    let base = new Float32Array(M);
+    if (sampleProvider.startsWith('waveform')) {
+      const td = timeDomain || [];
       for (let j = 0; j < M; j++) {
-        let acc = 0, wsum = 0;
-        for (let k = -R; k <= R; k++) {
-          const w = R + 1 - Math.abs(k), idx = j + k;
-          if (idx < 0 || idx >= M) continue;
-          acc += base[idx] * w; wsum += w;
+        const from = Math.floor((j * td.length) / M), to = Math.max(from + 1, Math.floor(((j + 1) * td.length) / M));
+        let sumSquares = 0, sumAbsolute = 0, peak = 0, count = 0;
+        for (let i = from; i < Math.min(to, td.length); i++) {
+          const value = Math.abs(td[i]);
+          sumSquares += value * value;
+          sumAbsolute += value;
+          peak = Math.max(peak, value);
+          count++;
         }
-        f[j] = lerp(base[j], acc / wsum, fs);
+        const magnitude = sampleProvider === 'waveformPeak' ? peak
+          : sampleProvider === 'waveform2' ? sumAbsolute / Math.max(1, count)
+            : Math.sqrt(sumSquares / Math.max(1, count));
+        base[j] = clamp(magnitude, 0, 1);
       }
-      base.set(f);
+    } else {
+      for (let j = 0; j < M; j++) {
+        const f0 = freqAt(j / M), f1 = freqAt((j + 1) / M), fc = freqAt((j + 0.5) / M);
+        const b0 = f0 / this.binHz, b1 = f1 / this.binHz;
+        let mag;
+        if (b1 - b0 < 1) {
+          const idx = fc / this.binHz, i0 = Math.min(bins - 2, Math.floor(idx));
+          mag = lerp(pre[i0], pre[i0 + 1], clamp(idx - i0, 0, 1));
+        } else {
+          mag = 0;
+          for (let b = Math.max(0, Math.ceil(b0)); b <= Math.min(bins - 1, Math.floor(b1)); b++) mag = Math.max(mag, pre[b]);
+        }
+        base[j] = toNorm(mag, aWeightDb(fc) * props.aWeight);
+      }
+
+      const R = Math.round(props.filterRadius), fs = props.filterStrength;
+      if (R > 0 && fs > 0) {
+        const filtered = new Float32Array(M);
+        for (let j = 0; j < M; j++) {
+          let acc = 0, wsum = 0;
+          for (let k = -R; k <= R; k++) {
+            const w = R + 1 - Math.abs(k), idx = j + k;
+            if (idx < 0 || idx >= M) continue;
+            acc += base[idx] * w; wsum += w;
+          }
+          filtered[j] = lerp(base[j], acc / wsum, fs);
+        }
+        base = filtered;
+      }
     }
 
-    // 5) Output Multiplier
     const om = props.outputMultiplier;
     for (let j = 0; j < M; j++) base[j] = clamp(base[j] * om, 0, 8);
 
-    // 6) Mirror (positions only — values are copied, energy is never summed), Repeat, gaps
     let seq = base;
     if (props.mirrorSamples) { seq = new Float32Array(M * 2); for (let j = 0; j < M; j++) { seq[M - 1 - j] = base[j]; seq[M + j] = base[j]; } }
     const L = seq.length * rep;
@@ -116,7 +142,7 @@ export class SpectrumProvider {
     const a = expAlpha(props.smooth, dt);
     for (let i = 0; i < N; i++) this.samples[i] += (tg[i] - this.samples[i]) * a;
 
-    // 8) Band energies from the raw spectrum (independent of Lower/Higher Hz and gaps)
+    // Band measurements remain available regardless of the selected sample signal.
     const band = (f0, f1) => {
       const b0 = Math.max(0, Math.floor(f0 / this.binHz)), b1 = Math.min(bins - 1, Math.max(b0, Math.floor(f1 / this.binHz)));
       let e = 0;
@@ -128,14 +154,17 @@ export class SpectrumProvider {
     this.treble = band(4000, Math.min(16000, nyq));
 
     // 9) Beat: signal-derived onset (positive flux of the selected bar range vs. its slow baseline)
-    let first = clamp(Math.round(props.beatRangeBarFirst), 0, N - 1), last = clamp(Math.round(props.beatRangeBarLast), 0, N - 1);
+    const barIndex = (value) => value <= 1 ? Math.round(value * (N - 1)) : Math.round(value);
+    let first = clamp(barIndex(props.beatRangeBarFirst), 0, N - 1), last = clamp(barIndex(props.beatRangeBarLast), 0, N - 1);
     if (first > last) { [first, last] = [last, first]; issues.push(['warning', 'Beat Range Bar First was greater than Last: swapped']); }
     let avg = 0;
     for (let i = first; i <= last; i++) avg += tg[i];
     avg /= last - first + 1;
     const flux = Math.max(0, avg - this.beatBase);
     this.beatBase += (avg - this.beatBase) * (1 - Math.pow(0.97, dt * 60));
-    const vl = props.beatRangeValueLower, vh = Math.max(props.beatRangeValueHigher, vl + 1e-4);
+    const thresholdScale = props.beatRangeValueHigher > 2 ? 0.01 : 1;
+    const vl = props.beatRangeValueLower * thresholdScale;
+    const vh = Math.max(props.beatRangeValueHigher * thresholdScale, vl + 1e-4);
     const raw = clamp((flux - vl) / (vh - vl), 0, 1);
     const bs = props.beatSmooth;
     this.beat = raw > this.beat ? this.beat + (raw - this.beat) * (1 - bs * 0.5) : Math.max(raw, this.beat * Math.pow(bs, dt * 60));

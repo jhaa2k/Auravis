@@ -11,7 +11,7 @@ const provProps = (o = {}) => ({ ...defaultProps(getDefinition('audioProvider'))
 const run = (props, td = sine(1000), dt = 1 / 60, frames = 30) => {
   const p = new SpectrumProvider(), n = props.fftSize, out = new Float32Array(n / 2);
   const mags = magnitudeSpectrum(td, n, out);
-  for (let i = 0; i < frames; i++) p.update(props, mags, 48000, dt);
+  for (let i = 0; i < frames; i++) p.update(props, mags, 48000, dt, td);
   return p;
 };
 
@@ -44,6 +44,30 @@ describe('SpectrumProvider', () => {
     expect(p.samples.length).toBe(48);
     expect(Math.max(...p.samples)).toBeGreaterThan(0.3);
     expect(Math.min(...p.samples)).toBeGreaterThanOrEqual(0);
+  });
+  it('offers multiple spectrum and waveform sample providers', () => {
+    const options = getDefinition('audioProvider').sections[0].props.find((p) => p.key === 'sampleProvider').options;
+    expect(options.length).toBeGreaterThanOrEqual(6);
+    expect(options.map((o) => o.value)).toEqual(expect.arrayContaining(['spectrum2', 'waveform', 'waveform2', 'waveformPeak', 'bass', 'mid', 'treble']));
+  });
+  it('Spectrum 2 maps frequencies linearly', () => {
+    const common = { sampleOutCount: 64, lowerHz: 100, higherHz: 10000, hzLinearFactor: 0, smooth: 0, filterStrength: 0, preSmooth: 0 };
+    const log = run(provProps({ ...common, sampleProvider: 'spectrum' }));
+    const linear = run(provProps({ ...common, sampleProvider: 'spectrum2' }));
+    const peakIndex = (samples) => samples.reduce((best, value, i) => value > samples[best] ? i : best, 0);
+    expect(peakIndex(log.samples)).toBeGreaterThan(20);
+    expect(peakIndex(linear.samples)).toBeLessThan(12);
+  });
+  it('waveform providers return normalized RMS, average and peak samples', () => {
+    const td = sine(1000, 8192, 48000, 0.8);
+    const common = { sampleOutCount: 32, smooth: 0, mirrorSamples: false, repeatSamples: 1 };
+    const rms = run(provProps({ ...common, sampleProvider: 'waveform' }), td);
+    const average = run(provProps({ ...common, sampleProvider: 'waveform2' }), td);
+    const peak = run(provProps({ ...common, sampleProvider: 'waveformPeak' }), td);
+    expect(average.samples).toHaveLength(32);
+    expect(average.samples.every((v) => Number.isFinite(v) && v >= 0 && v <= 8)).toBe(true);
+    expect(Math.max(...rms.samples)).toBeGreaterThan(Math.max(...average.samples));
+    expect(Math.max(...peak.samples)).toBeGreaterThan(Math.max(...rms.samples));
   });
   it('puts the energy of a 1 kHz tone near the matching output sample (log map)', () => {
     const p = run(provProps({ sampleOutCount: 64, lowerHz: 100, higherHz: 10000, hzLinearFactor: 0, smooth: 0, filterStrength: 0, preSmooth: 0 }));

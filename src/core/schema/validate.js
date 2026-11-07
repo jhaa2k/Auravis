@@ -34,6 +34,8 @@ export function sanitizeMeasure(v, def) {
 export function sanitizeValue(p, v) {
   switch (p.type) {
     case 'number': {
+      if (p.key === 'aWeight' && typeof v === 'boolean') v = Number(v);
+      if ((p.key === 'beatRangeBarFirst' || p.key === 'beatRangeBarLast') && isNum(v) && v > 1) v /= 64;
       if (!isNum(v)) return { value: p.default, error: `${p.label}: not a number` };
       const c = clamp(v, p.min ?? -Infinity, p.max ?? Infinity);
       return c !== v ? { value: c, error: `${p.label}: clamped to ${c}` } : { value: v };
@@ -55,6 +57,11 @@ export function sanitizeValue(p, v) {
     case 'text': return { value: typeof v === 'string' ? v.slice(0, p.maxLength) : p.default };
     case 'textarea': return { value: typeof v === 'string' ? v.slice(0, p.maxLength) : p.default };
     case 'vec2': {
+      if (p.key === 'splitAmount' && isNum(v)) v = [v, 0];
+      if (p.key === 'layer1Scale' || p.key === 'layer2Scale' || p.key === 'layer3Scale') {
+        if (isNum(v)) v = [v, v];
+      }
+      if (p.key === 'gravity' && isNum(v)) v = [0, v];
       if (!Array.isArray(v) || v.length < 2 || !isNum(v[0]) || !isNum(v[1])) return { value: [...p.default], error: `${p.label}: invalid vector` };
       return { value: [clamp(v[0], p.min, p.max), clamp(v[1], p.min, p.max)] };
     }

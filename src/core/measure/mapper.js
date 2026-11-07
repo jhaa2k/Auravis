@@ -28,19 +28,35 @@ export function mapValue(cfg, input) {
   return (cfg.outMin + n * (cfg.outMax - cfg.outMin)) * cfg.multiplier + cfg.offset;
 }
 
-/** Reads the configured source out of the analysis frame. Returns NaN when the provider is missing. */
-export function sourceValue(cfg, audio) {
+/** Reads the configured source from the analysis frame or track metadata. */
+export function sourceValue(cfg, audio, meta = {}) {
+  const providers = audio.providers || [];
+  const time = Number.isFinite(meta.time) ? meta.time : 0;
+  const duration = Number.isFinite(meta.duration) ? meta.duration : 0;
   switch (cfg.source) {
+    case 'nothing': return 0;
+    case 'totalTime': return time;
+    case 'totalTimeBackward': return Math.max(0, duration - time);
+    case 'totalTimeWhenPlaying': return meta.playing ? time : 0;
+    case 'trackPosition': return duration > 0 ? clamp(time / duration, 0, 1) : 0;
+    case 'constantShakeRotMore': return (Math.sin(time * Math.PI * 2) + 1) / 2;
+    case 'constantShakeRotLess': return (1 - Math.sin(time * Math.PI * 2)) / 2;
     case 'rms': return audio.rms01;
     case 'peak': return audio.peak01;
     case 'left': return audio.left01;
     case 'right': return audio.right01;
     case 'level': return audio.level01;
   }
-  const prov = audio.providers[cfg.providerIndex - 1];
+  const prov = providers[cfg.providerIndex - 1];
   if (!prov) return NaN;
   const o = prov.out;
+  const beat = o.beat;
   switch (cfg.source) {
+    case 'totalTimeAndBeat': return time + beat;
+    case 'beatRandomShake': return beat * (Math.sin(time * 97.31 + Math.floor(time * 13) * 17.17) + 1) / 2;
+    case 'beatCamShakeRotMore': return beat;
+    case 'beatCamShakeRotLess': return 1 - beat;
+    case 'beatTriggerAnim': return beat;
     case 'spectrum': return o.samples.length ? o.samples[clamp(cfg.band | 0, 0, o.samples.length - 1)] : 0;
     case 'band': return o.valueAtHz(cfg.hz);
     case 'bass': return o.bass;
@@ -54,7 +70,7 @@ export function sourceValue(cfg, audio) {
 /** Stateful (smoothed) evaluation used by the renderer. */
 export function evaluateMeasure(rc, elId, key, cfg) {
   if (!cfg || !cfg.enabled) return null;
-  const input = sourceValue(cfg, rc.audio);
+  const input = sourceValue(cfg, rc.audio, rc.meta);
   if (Number.isNaN(input)) {
     rc.diag(elId, 'warning', `${key}: Audio Provider ${cfg.providerIndex} does not exist`);
     return cfg.outMin * cfg.multiplier + cfg.offset;

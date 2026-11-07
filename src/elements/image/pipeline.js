@@ -35,7 +35,7 @@ export function buildTexture(src, p, mask) {
 
   x.save();
   x.translate(bx, by); x.scale(bw / 100, bh / 100);
-  x.clip(getShapePath(SHAPE_PATH[p.shape] || p.shape));
+  if (p.shape !== 'none') x.clip(getShapePath(SHAPE_PATH[p.shape] || p.shape));
   x.setTransform(1, 0, 0, 1, 0, 0);
   if (mode === 'contain' && p.blurredBorder) {
     const bg = createCanvas(TEX, TEX), bgx = get2d(bg), out = createCanvas(TEX, TEX);

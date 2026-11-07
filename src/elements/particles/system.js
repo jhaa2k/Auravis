@@ -80,7 +80,7 @@ export class ParticleSystem {
     this.acc -= n;
     for (n = Math.min(n, cap); n > 0 && this.count < cap; n--) this.spawn(p);
 
-    const focal = REF_H / 2 / Math.tan((clamp(p.perspectiveFov, 10, 140) * DEG) / 2);
+    const focal = REF_H / 2 / Math.tan((clamp(p.perspectiveFov, 10, 180) * DEG) / 2);
     const [fx, fy] = p.forceFieldPosition, fs = p.forceFieldStrength, ft = p.forceField;
     const flen = Math.hypot(fx, fy);
     let tick = false;
@@ -89,7 +89,8 @@ export class ParticleSystem {
     for (let i = this.count - 1; i >= 0; i--) {
       this.age[i] += dt;
       if (this.age[i] >= this.life[i]) { this.remove(i); continue; }
-      this.vy[i] += p.gravity * dt;
+      this.vx[i] += p.gravity[0] * dt;
+      this.vy[i] += p.gravity[1] * dt;
       if (ft !== 'none') {
         let ax = 0, ay = 0;
         if (ft === 'directional') { const l = flen || 1; ax = flen ? fx / l : 1; ay = flen ? fy / l : 0; }

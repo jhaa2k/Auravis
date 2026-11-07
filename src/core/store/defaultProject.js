@@ -5,7 +5,7 @@ export const DEFAULT_SETTINGS = {
   width: 1920, height: 1080, background: '#0d0d12', quality: 'medium', fps: 60, adaptive: true,
 };
 
-/** The project a new user sees: an audio-reactive scene that works immediately with the demo track. */
+/** The starter audio-reactive scene a new user sees. */
 export function defaultElements() {
   const list = [];
   const add = (type, over = {}) => { const e = createElementData(type, list, over); list.push(e); return e; };

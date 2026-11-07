@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import '../src/elements/index.js';
-import { mapValue, applyCurve } from '../src/core/measure/mapper.js';
+import { mapValue, applyCurve, sourceValue } from '../src/core/measure/mapper.js';
+import { MEASURE_SOURCES } from '../src/core/measure/sources.js';
 import { makeMeasure } from '../src/core/schema/measureConfig.js';
 import { listDefinitions, getDefinition, createElementData } from '../src/core/schema/registry.js';
 import { allProps, sanitizeValue, sanitizeProps, defaultProps } from '../src/core/schema/validate.js';
@@ -15,6 +16,20 @@ import { ParticleSystem } from '../src/elements/particles/system.js';
 
 describe('measurement mapping', () => {
   const m = (o) => makeMeasure({ enabled: true, ...o });
+  it('includes the reference measurement choices and evaluates time and beat sources', () => {
+    expect(MEASURE_SOURCES.map((s) => s.label)).toEqual(expect.arrayContaining([
+      'Nothing', 'Beat', 'TotalTime', 'TotalTimeBackward', 'TotalTimeWhenPlaying', 'TotalTimeAndBeat',
+      'TrackPosition', 'BeatRandomShake', 'BeatCamShakeRotMore', 'BeatCamShakeRotLess',
+      'ConstantShakeRotMore', 'ConstantShakeRotLess', 'BeatTriggerAnim',
+    ]));
+    const meta = { time: 5, duration: 20, playing: true };
+    const audio = { providers: [{ out: { beat: 0.25 } }] };
+    expect(sourceValue(m({ source: 'nothing' }), audio, meta)).toBe(0);
+    expect(sourceValue(m({ source: 'totalTime' }), audio, meta)).toBe(5);
+    expect(sourceValue(m({ source: 'totalTimeBackward' }), audio, meta)).toBe(15);
+    expect(sourceValue(m({ source: 'trackPosition' }), audio, meta)).toBe(0.25);
+    expect(sourceValue(m({ source: 'beatCamShakeRotLess' }), audio, meta)).toBe(0.75);
+  });
   it('normalizes and maps to the output range', () => {
     expect(mapValue(m({ inMin: 0, inMax: 1, outMin: 10, outMax: 20 }), 0.5)).toBeCloseTo(15);
     expect(mapValue(m({ inMin: 0.2, inMax: 0.6, outMin: 0, outMax: 100 }), 0.4)).toBeCloseTo(50);
@@ -67,7 +82,7 @@ describe('schema', () => {
   });
   it('drops unknown keys and fills missing ones', () => {
     const { props } = sanitizeProps(getDefinition('text'), { fontSize: 9999, bogus: 1 });
-    expect(props.fontSize).toBe(600); expect(props.bogus).toBeUndefined(); expect(props.text).toBe('{title}');
+    expect(props.fontSize).toBe(600); expect(props.bogus).toBeUndefined(); expect(props.text).toBe('{ArtistOrTitle}');
   });
 });
 
@@ -133,6 +148,7 @@ describe('misc engine rules', () => {
   });
   it('resolves text placeholders and keeps unknown ones', () => {
     expect(resolveText('{artist} – {title} {time}/{duration} {x}', { artist: 'A', title: 'T', time: 65, duration: 130 })).toBe('A – T 1:05/2:10 {x}');
+    expect(resolveText('{ArtistOrTitle}', { artist: 'A', title: 'T' })).toBe('A - T');
   });
   it('particle pool respects its limit, recycles and keeps arrays consistent', () => {
     const p = defaultProps(getDefinition('particles')), sys = new ParticleSystem(() => 0.5);

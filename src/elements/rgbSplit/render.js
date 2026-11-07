@@ -22,8 +22,10 @@ export function renderRgbSplit(rc, el) {
   const s = wctx.getImageData(0, 0, w, h).data;
 
   const cols = [p.splitColor0, p.splitColor1, p.splitColor2].map(parseColor);
-  const amount = (p.splitAmount + (rc.measure(el, 'measureSplitAmount') || 0)) * p.splitMultiplier;
-  const d = amount * rc.scale * ws;
+  const splitAmount = Array.isArray(p.splitAmount) ? p.splitAmount : [p.splitAmount, 0];
+  const amount = (splitAmount[0] + (rc.measure(el, 'measureSplitAmount') || 0)) * p.splitMultiplier;
+  const amountY = splitAmount[1] * p.splitMultiplier;
+  const dx = amount * rc.scale * ws, dy = amountY * rc.scale * ws;
 
   const proc = rc.pool.take(w, h), pctx = get2d(proc);
   pctx.globalCompositeOperation = 'lighter';
@@ -38,7 +40,7 @@ export function renderRgbSplit(rc, el) {
       o[i] = v * r; o[i + 1] = v * g; o[i + 2] = v * b; o[i + 3] = s[i + 3] * c.a;
     }
     tctx.putImageData(st.img, 0, 0);
-    pctx.drawImage(tmp, (ch - 1) * d, 0);
+    pctx.drawImage(tmp, (ch - 1) * dx, (ch - 1) * dy);
   }
   finishEffect(rc, el, src, tintBuffer(rc, proc, p.color, false), T);
 }

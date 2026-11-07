@@ -13,17 +13,17 @@ const segment = (n, def) => section(`Segment ${n}`, [
 ]);
 
 export const sections = [
-  general({ position: [0, 260] }),
+  general({ position: [-96, 54], blendMode: 'alpha', scaleIsUniform: true, tag: 'Viz File .Com' }),
   section('Bars', [
     bool('flipInput', 'Flip Input', false),
-    num('heightScale', 'Height Scale', 1, 0, 8, 0.01),
-    num('minHeightScale', 'Min Height Scale', 0.02, 0, 1, 0.005),
+    num('heightScale', 'Height Scale', 10, 0, 20, 0.01),
+    num('minHeightScale', 'Min Height Scale', 0, 0, 1, 0.005),
     num('maxHeightScale', 'Max Height Scale', 1, 0, 2, 0.01),
-    sel('shapePath', 'Shape Path', 'rounded', BAR_SHAPES),
+    sel('shapePath', 'Shape Path', 'horizontalLine', BAR_SHAPES),
     area('customShapePath', 'Custom Shape Path', 'M0 100L50 0L100 100Z', { hint: 'SVG path data in a 100×100 box (used when Shape Path = Custom)' }),
     num('colorBlendOffset', 'Color Blend Offset', 0, -2, 2, 0.01),
   ]),
-  segment(1, { enabled: true, from: '#ff9a6bff', to: '#c4306cff', fixed: false, mult: 1, mirror: true }),
+  segment(1, { enabled: true, from: '#ffffffff', to: '#ffffffff', fixed: false, mult: 1, mirror: false }),
   segment(2, { enabled: false, from: '#ffffff33', to: '#ffffff11', fixed: true, mult: 0.12, mirror: true }),
   section('Behaviour', [
     num('softness', 'Softness', 0.5, 0, 0.98, 0.01),

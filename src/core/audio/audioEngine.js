@@ -1,5 +1,5 @@
-import { DemoTrack } from './demoTrack.js';
 import { clamp } from '../utils/math.js';
+import { attachNativeMedia, requestNativeNotificationPermission, syncNativeMedia } from './nativeMedia.js';
 
 const TD = 8192;
 const dbNorm = (lin) => clamp((20 * Math.log10(lin + 1e-9) + 60) / 60, 0, 1);
@@ -21,8 +21,9 @@ export class AudioEngine {
     if (this.el) { this.el.crossOrigin = 'anonymous'; this.el.preload = 'auto'; }
     this.tracks = [];
     this.index = -1;
-    this.mode = 'none'; // none | file | demo
+    this.mode = 'none'; // none | file
     this.playing = false;
+    this.pausedForFocus = false;
     this.volume = 0.9;
     this.shuffle = false;
     this.repeat = false;
@@ -32,6 +33,10 @@ export class AudioEngine {
     this.tl = new Float32Array(2048);
     this.frame = this.silent();
     if (this.el) this.el.addEventListener('ended', () => this.onEnded());
+    attachNativeMedia(this);
+    this.mediaSyncTimer = setInterval(() => {
+      if (this.playing) this.syncMediaSession();
+    }, 1000);
   }
 
   silent() {
@@ -41,15 +46,33 @@ export class AudioEngine {
   // ---- state / subscription (React uses useSyncExternalStore) ----
   makeSnapshot() {
     const t = this.tracks[this.index];
-    const demo = this.mode === 'demo';
     return {
       playing: this.playing, mode: this.mode, volume: this.volume, shuffle: this.shuffle, repeat: this.repeat,
-      title: demo ? 'Auravis Demo Track' : t?.title || '', artist: demo ? 'Built-in generator' : t?.artist || '',
+      title: t?.title || '', artist: t?.artist || '',
       tracks: this.tracks.map((x) => ({ title: x.title, artist: x.artist })), index: this.index,
       hasAudio: this.mode !== 'none',
     };
   }
-  emit() { this.snapshot = this.makeSnapshot(); this.listeners.forEach((l) => l()); }
+  emit() {
+    this.snapshot = this.makeSnapshot();
+    this.syncMediaSession();
+    this.listeners.forEach((l) => l());
+  }
+  syncMediaSession() {
+    const track = this.tracks[this.index];
+    syncNativeMedia({
+      hasAudio: this.mode !== 'none',
+      title: track?.title || '',
+      artist: track?.artist || '',
+      album: track?.album || '',
+      duration: this.duration,
+      position: this.currentTime,
+      playing: this.playing,
+      pausedForFocus: this.pausedForFocus,
+      shuffle: this.shuffle,
+      repeat: this.repeat,
+    });
+  }
   subscribe = (fn) => { this.listeners.add(fn); return () => this.listeners.delete(fn); };
   getSnapshot = () => this.snapshot;
 
@@ -73,7 +96,6 @@ export class AudioEngine {
     this.mix.connect(this.vol); this.vol.connect(ctx.destination); this.vol.connect(this.recordDest);
     this.mediaSource = ctx.createMediaElementSource(this.el);
     this.mediaSource.connect(this.mix);
-    this.demo = new DemoTrack(ctx, this.mix);
     return ctx;
   }
 
@@ -93,29 +115,21 @@ export class AudioEngine {
   }
   load(i, autoplay = false) {
     if (!this.tracks.length) return;
-    this.demo?.stop(true);
     this.index = ((i % this.tracks.length) + this.tracks.length) % this.tracks.length;
     this.mode = 'file';
     this.el.src = this.tracks[this.index].url;
     this.el.load();
     this.playing = false;
+    this.pausedForFocus = false;
     this.emit();
     if (autoplay) this.play();
-  }
-  startDemo() {
-    this.ensureContext();
-    this.el.pause();
-    this.mode = 'demo';
-    this.demo.stop(true);
-    this.playing = false;
-    this.play();
   }
   removeTrack(i) {
     const t = this.tracks[i];
     if (!t) return;
     URL.revokeObjectURL(t.url);
     this.tracks.splice(i, 1);
-    if (i === this.index) { this.el.pause(); this.el.removeAttribute('src'); this.index = -1; this.mode = 'none'; this.playing = false; if (this.tracks.length) return this.load(Math.min(i, this.tracks.length - 1)); }
+    if (i === this.index) { this.el.pause(); this.el.removeAttribute('src'); this.index = -1; this.mode = 'none'; this.playing = false; this.pausedForFocus = false; if (this.tracks.length) return this.load(Math.min(i, this.tracks.length - 1)); }
     else if (i < this.index) this.index--;
     this.emit();
   }
@@ -123,14 +137,30 @@ export class AudioEngine {
   // ---- transport ----
   async play() {
     if (this.mode === 'none') return;
-    const ctx = this.ensureContext();
-    if (ctx.state === 'suspended') await ctx.resume();
-    if (this.mode === 'demo') this.demo.start(); else await this.el.play().catch(() => {});
-    this.playing = true; this.emit();
+    try {
+      await requestNativeNotificationPermission();
+      const ctx = this.ensureContext();
+      if (ctx.state === 'suspended') await ctx.resume();
+      await this.el.play();
+    } catch (error) {
+      this.playing = false;
+      this.pausedForFocus = false;
+      this.emit();
+      window.dispatchEvent(new CustomEvent('auravis:playback-error', {
+        detail: { message: error.message || 'Could not play this audio file.' },
+      }));
+      return false;
+    }
+    this.playing = true;
+    this.pausedForFocus = false;
+    this.emit();
+    return true;
   }
-  pause() {
-    if (this.mode === 'demo') this.demo?.stop(); else this.el.pause();
-    this.playing = false; this.emit();
+  pause({ focusLoss = false } = {}) {
+    this.el?.pause();
+    this.playing = false;
+    this.pausedForFocus = focusLoss;
+    this.emit();
   }
   toggle() { return this.playing ? this.pause() : this.play(); }
   seek(t) { if (this.mode === 'file' && Number.isFinite(this.el.duration)) this.el.currentTime = clamp(t, 0, this.el.duration); }
@@ -144,11 +174,11 @@ export class AudioEngine {
     else if (this.tracks.length > 1) this.next();
     else { this.playing = false; this.emit(); }
   }
-  get currentTime() { return this.mode === 'demo' ? this.demo?.time || 0 : this.el?.currentTime || 0; }
-  get duration() { return this.mode === 'demo' ? Infinity : Number.isFinite(this.el?.duration) ? this.el.duration : 0; }
+  get currentTime() { return this.el?.currentTime || 0; }
+  get duration() { return Number.isFinite(this.el?.duration) ? this.el.duration : 0; }
   get meta() {
     const s = this.snapshot;
-    return { title: s.title, artist: s.artist, time: this.currentTime, duration: this.duration };
+    return { title: s.title, artist: s.artist, time: this.currentTime, duration: this.duration, playing: s.playing };
   }
 
   // ---- analysis: called once per rendered frame ----

@@ -21,18 +21,18 @@ export default function TransportBar() {
     <div className="transport">
       <div className="now">
         <Icon name="music" size={18} />
-        <div><b>{a.title || 'No audio loaded'}</b><small>{a.artist || (a.hasAudio ? '' : 'Open files or try the demo track')}</small></div>
+        <div><b>{a.title || 'No audio loaded'}</b><small>{a.artist || (a.hasAudio ? '' : 'Open an audio file to begin')}</small></div>
       </div>
       <div className="controls">
         <button className="icon-btn" title="Previous" onClick={() => audio.prev()} disabled={a.tracks.length < 1}><Icon name="prev" fill /></button>
-        <button className="play" title={a.playing ? 'Pause (Space)' : 'Play (Space)'} onClick={() => (a.hasAudio ? audio.toggle() : audio.startDemo())} aria-label={a.playing ? 'Pause' : 'Play'}><Icon name={a.playing ? 'pause' : 'play'} size={22} fill /></button>
+        <button className="play" title={a.playing ? 'Pause' : 'Play'} onClick={() => audio.toggle()} disabled={!a.hasAudio} aria-label={a.playing ? 'Pause' : 'Play'}><Icon name={a.playing ? 'pause' : 'play'} size={22} fill /></button>
         <button className="icon-btn" title="Next" onClick={() => audio.next()} disabled={a.tracks.length < 1}><Icon name="next" fill /></button>
       </div>
       <div className="seek">
         <span>{fmtTime(t.time)}</span>
         <input className="range" type="range" min={0} max={finite ? t.dur : 1} step={0.1} value={finite ? Math.min(t.time, t.dur) : 0} disabled={!finite}
           style={{ '--pct': finite ? `${(t.time / t.dur) * 100}%` : '0%' }} onChange={(e) => { audio.seek(+e.target.value); setT({ ...t, time: +e.target.value }); }} aria-label="Seek" />
-        <span>{finite ? fmtTime(t.dur) : '∞'}</span>
+        <span>{finite ? fmtTime(t.dur) : '0:00'}</span>
       </div>
       <div className="extras">
         <button className={`icon-btn ${a.shuffle ? 'active' : ''}`} title="Shuffle" onClick={() => audio.toggleShuffle()}><Icon name="shuffle" /></button>
@@ -40,7 +40,6 @@ export default function TransportBar() {
         <Icon name="volume" size={16} />
         <input className="range vol" type="range" min={0} max={1} step={0.01} value={a.volume} style={{ '--pct': `${a.volume * 100}%` }} onChange={(e) => audio.setVolume(+e.target.value)} aria-label="Volume" />
         <button className="btn small" onClick={() => file.current.click()}><Icon name="upload" size={14} />Open</button>
-        <button className="btn small ghost" onClick={() => audio.startDemo()}><Icon name="demo" size={13} fill />Demo</button>
         <input ref={file} type="file" accept="audio/*" multiple hidden onChange={(e) => { onFiles([...e.target.files]); e.target.value = ''; }} />
       </div>
     </div>

@@ -20,7 +20,7 @@ function inside(T, lx, ly) {
   return u >= 0 && u <= T.bw && v >= 0 && v <= T.bh;
 }
 
-export default function PreviewPanel() {
+export default function PreviewPanel({ onOpenSettings }) {
   const canvasRef = useRef(null), wrapRef = useRef(null);
   const settings = useApp((s) => s.project.settings);
   const selectedId = useApp((s) => s.selectedId);
@@ -91,6 +91,11 @@ export default function PreviewPanel() {
   const pts = box ? box.map((p) => `${(p[0] / width) * 100},${(p[1] / height) * 100}`).join(' ') : null;
   return (
     <div className="preview" ref={wrapRef}>
+      <div className="preview-meta">
+        <span className="preview-live"><span />Preview</span>
+        <button className="preview-size" onClick={onOpenSettings} title="Open canvas and performance settings">{width} × {height}</button>
+        <span className="preview-fps">{fps} FPS</span>
+      </div>
       <div className="stage" style={{ aspectRatio: `${width} / ${height}`, '--ar': width / height }}>
         <canvas ref={canvasRef} aria-label="Visualization preview" />
         <div className="hit" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} />

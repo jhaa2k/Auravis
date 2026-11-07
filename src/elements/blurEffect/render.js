@@ -40,10 +40,10 @@ export function renderBlurEffect(rc, el) {
     const blurred = rc.pool.take(W, H);
     blurCanvas(src.canvas, blurred, base * RADIUS_STEP[k - 1], rc.q.blurDivider);
     const layer = tintBuffer(rc, blurred, p[`layer${k}Color`], false);
-    const s = p[`layer${k}Scale`];
+    const [sx, sy] = p[`layer${k}Scale`];
     pctx.save();
     pctx.globalAlpha = c.a;
-    pctx.translate(W / 2, H / 2); pctx.scale(s, s); pctx.translate(-W / 2, -H / 2);
+    pctx.translate(W / 2, H / 2); pctx.scale(sx, sy); pctx.translate(-W / 2, -H / 2);
     pctx.drawImage(layer, 0, 0);
     pctx.restore();
   }

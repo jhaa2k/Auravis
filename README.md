@@ -8,7 +8,7 @@ elements, drive any property from the audio with the measurement system, save pr
 ```bash
 npm install
 npm run dev      # http://localhost:5173
-npm test         # 63 tests: DSP, schema, store, every element through the real compositor, React UI
+npm test         # tests: DSP, schema, store, exporter, every element through the real compositor, React UI
 npm run build    # production build in dist/
 ```
 
@@ -33,12 +33,14 @@ GitHub Actions also builds it on pushes to `main`; download `auravis-debug-apk` 
 - Every `Measure …` property is a full mapping editor: source → input range → curve → output range → multiplier/offset → smoothing.
 - Drag on the canvas to move, drag the orange handle to scale. `Space` play/pause, `Ctrl+Z` undo, `Ctrl+D` duplicate.
 - **Projects**: save/load/duplicate/rename/delete in the browser, import/export `.auravis.json` (images and fonts embedded). The working session autosaves.
-- **Export**: Project tab → Record (real-time canvas + audio via MediaRecorder).
+- **Export**: Settings → Export video to choose canvas ratio, resolution, frame rate, supported video format, quality, duration, and save location. Cancel during recording or saving; retry failed saves, or open/share a completed file. Android 10+ saves to `Movies/Auravis`; Android 9 and earlier use the Android Files picker. Browser builds use the browser download flow. Available encoders and codecs depend on the device.
+- **Android playback**: Media notifications and system media controls can play/pause, seek, skip tracks, shuffle, and repeat. On Android 13+, notification permission is requested at playback. Playback is owned by the WebView, so it may not survive Android terminating the app process.
+- **Audio Provider**: choose Spectrum, linear Spectrum 2, RMS/Average/Peak Waveform, or Bass/Midrange/Treble Spectrum samples.
 
 ## Code map
 | Folder | Purpose |
 |---|---|
-| `src/core/audio` | AudioEngine, FFT (Hann, Web Worker), A-weighting, **SpectrumProvider** pipeline, demo track |
+| `src/core/audio` | AudioEngine, FFT (Hann, Web Worker), A-weighting, **SpectrumProvider** pipeline |
 | `src/core/measure` | measurement sources + mapping/smoothing engine |
 | `src/core/schema` | property DSL, validation/sanitising, element registry |
 | `src/core/render` | compositor loop, render context, transform system, blur, masks, shapes, effect helpers |

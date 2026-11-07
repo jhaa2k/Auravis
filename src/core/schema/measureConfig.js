@@ -1,6 +1,6 @@
 export const makeMeasure = (o = {}) => ({
   enabled: false,
-  source: 'bass',
+  source: 'nothing',
   band: 0,
   hz: 1000,
   providerIndex: 1,
@@ -14,7 +14,7 @@ export const makeMeasure = (o = {}) => ({
   curve: 'linear',
   invert: false,
   axis: 'xy',
-  a: 1,
-  b: 1,
+  a: 0.5,
+  b: 0.5,
   ...o,
 });

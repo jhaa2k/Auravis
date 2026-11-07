@@ -20,6 +20,7 @@ export class Visualizer {
     this.providers = new Map();
     this.fps = 0; this.last = 0; this.slow = 0; this.running = false;
     this.scaleOverride = null;
+    this.fpsOverride = null;
     this.hudListeners = new Set();
   }
 
@@ -30,7 +31,7 @@ export class Visualizer {
       if (!this.running) return;
       this.raf = requestAnimationFrame(loop);
       const s = this.store.getState().project.settings;
-      if (this.last && now - this.last < 1000 / s.fps - 2) return;
+      if (this.last && now - this.last < 1000 / (this.fpsOverride || s.fps) - 2) return;
       const dt = this.last ? Math.min(0.1, (now - this.last) / 1000) : 1 / 60;
       this.last = now;
       const t0 = performance.now();
@@ -64,7 +65,7 @@ export class Visualizer {
       if (!inst) this.providers.set(el.id, (inst = new SpectrumProvider()));
       const size = FFT_SIZES.includes(el.props.fftSize) ? el.props.fftSize : 2048;
       const mags = this.fft.request(size, frame.td);
-      inst.update(el.props, mags, frame.sampleRate, dt);
+      inst.update(el.props, mags, frame.sampleRate, dt, frame.td);
       for (const [lvl, msg] of inst.issues) this.diagnostics.add(el.id, lvl, msg);
       list.push({ id: el.id, el, out: inst });
     }

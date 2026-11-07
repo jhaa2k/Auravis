@@ -26,10 +26,10 @@ describe('full default scene', () => {
 
 describe('elements render individually', () => {
   const cases = [
-    ['image', {}],
+    ['image', { visible: true }],
     ['barsSegments', { segment2Enabled: true, shapePath: 'capsule' }],
-    ['particles', { spawnTime: 0.002, countLimit: 300 }],
-    ['text', { text: 'Auravis {title}' }],
+    ['particles', { visible: true, spawnTime: 0.002, countLimit: 300, particleScale: 4, fadeInSize: 12, endSize: 12 }],
+    ['text', { visible: true, text: 'Auravis {title}', fontSize: 32 }],
   ];
   for (const [type, over] of cases) {
     it(`${type} draws visible content`, () => {
@@ -75,11 +75,11 @@ describe('effects', () => {
   const withBase = (h, type, over) => {
     const prov = h.store.getState().elements.find((e) => e.type === 'audioProvider');
     const bars = createElementData('barsSegments', [prov], { tag: 'B' });
-    const fx = createElementData(type, [prov, bars], over);
+    const fx = createElementData(type, [prov, bars], { visible: true, ...over });
     h.store.setState((s) => ({ ...s, elements: [prov, bars, fx] }));
     return { bars, fx };
   };
-  for (const [type, over] of [['rgbSplit', { splitAmount: 30 }], ['blurEffect', { blurRadius: 20 }], ['motionBlur', { motionSource: 'composition' }]]) {
+  for (const [type, over] of [['rgbSplit', { splitAmount: 30, splitMultiplier: 1 }], ['blurEffect', { blurRadius: 20 }], ['motionBlur', { motionSource: 'composition' }]]) {
     it(`${type} renders on the composition without errors`, () => {
       const h = harness(); withBase(h, type, over); h.frames(20);
       expect(h.coverage()).toBeGreaterThan(0.002);
@@ -87,7 +87,7 @@ describe('effects', () => {
     });
   }
   it('RGB split can target a hidden element', () => {
-    const h = harness(); const { bars, fx } = withBase(h, 'rgbSplit', { splitAmount: 20 });
+    const h = harness(); const { bars, fx } = withBase(h, 'rgbSplit', { splitAmount: 20, splitMultiplier: 1 });
     h.actions.updateProps(bars.id, { visible: false }); h.actions.updateProps(fx.id, { targetImage: bars.id }); h.frames(15);
     expect(h.coverage()).toBeGreaterThan(0.002);
   });
@@ -99,7 +99,9 @@ describe('effects', () => {
     expect(Math.abs(split - h.coverage())).toBeLessThan(0.03); // only resampling softness differs
   });
   it('blur effect spreads energy (more lit pixels than the source)', () => {
-    const h = harness(); const { fx } = withBase(h, 'blurEffect', { blurRadius: 60, layer2Color: '#ffffffff', showUnblurredContent: false });
+    const h = harness(); const { fx } = withBase(h, 'blurEffect', {
+      blurRadius: 60, layer2Color: '#ffffffff', layer2Scale: [1.05, 1.05], layer3Scale: [1.12, 1.12], showUnblurredContent: false,
+    });
     h.frames(12); const blurred = h.coverage();
     h.actions.updateProps(fx.id, { visible: false }); h.frames(12);
     expect(blurred).toBeGreaterThan(h.coverage());
