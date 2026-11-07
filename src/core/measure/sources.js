@@ -1,0 +1,28 @@
+export const MEASURE_SOURCES = [
+  { value: 'spectrum', label: 'Spectrum Samples' },
+  { value: 'band', label: 'Individual Frequency Band' },
+  { value: 'bass', label: 'Bass' },
+  { value: 'mid', label: 'Midrange' },
+  { value: 'treble', label: 'Treble' },
+  { value: 'beat', label: 'Beat' },
+  { value: 'rms', label: 'RMS' },
+  { value: 'peak', label: 'Peak Amplitude' },
+  { value: 'level', label: 'Overall Audio Level' },
+  { value: 'left', label: 'Left Channel' },
+  { value: 'right', label: 'Right Channel' },
+];
+export const MEASURE_CURVES = [
+  { value: 'linear', label: 'Linear' },
+  { value: 'easeIn', label: 'Ease In' },
+  { value: 'easeOut', label: 'Ease Out' },
+  { value: 'smooth', label: 'Smooth' },
+  { value: 'exp', label: 'Exponential' },
+  { value: 'log', label: 'Logarithmic' },
+  { value: 'sine', label: 'Sine' },
+  { value: 'step', label: 'Step' },
+];
+export const MEASURE_AXES = [
+  { value: 'x', label: 'Horizontal' },
+  { value: 'y', label: 'Vertical' },
+  { value: 'xy', label: 'Both' },
+];

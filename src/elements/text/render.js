@@ -1,0 +1,49 @@
+import { createCanvas, get2d } from '../../core/platform.js';
+import { computeTransform, applyTransform } from '../../core/render/transform.js';
+import { setBlend } from '../../core/render/effectUtils.js';
+import { cssOf } from '../../core/utils/color.js';
+import { fontStore, FONT_FALLBACK } from '../../core/assets/fontStore.js';
+import { fmtTime } from '../../core/utils/math.js';
+
+/** Replaces dynamic placeholders with live track / clock data. Unknown placeholders are kept verbatim. */
+export function resolveText(template, meta = {}, now = new Date()) {
+  const d = Number.isFinite(meta.duration) ? meta.duration : 0, t = meta.time || 0;
+  const map = {
+    title: meta.title || '', artist: meta.artist || '', time: fmtTime(t), duration: d ? fmtTime(d) : '∞',
+    remaining: d ? fmtTime(Math.max(0, d - t)) : '∞', progress: d ? `${Math.round((t / d) * 100)}%` : '',
+    date: now.toLocaleDateString(), clock: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  };
+  return template.replace(/\{(\w+)\}/g, (m, k) => (k in map ? map[k] : m));
+}
+
+export function renderText(rc, el) {
+  const p = el.props;
+  const str = resolveText(p.text, rc.meta);
+  if (!str.trim()) return;
+  if (!fontStore.isAvailable(p.typeFace)) rc.diag(el.id, 'warning', `Font "${p.typeFace}" is not available: using a fallback font`);
+  const font = `${p.fontStyle} ${p.fontWeight} ${p.fontSize}px "${p.typeFace}", ${FONT_FALLBACK}`;
+  const sig = `${str}|${font}|${p.color}|${p.textAlign}|${fontStore.version}|${rc.scale}`;
+  let e = rc.cache.get(`txt:${el.id}`);
+  if (!e || e.sig !== sig) {
+    const k = Math.max(rc.scale, 0.5);
+    const meas = get2d(createCanvas(8, 8));
+    meas.font = font;
+    const lines = str.split('\n'), lh = p.fontSize * 1.25, pad = p.fontSize * 0.3;
+    const w = Math.ceil(Math.max(...lines.map((l) => meas.measureText(l).width)) + pad * 2), h = Math.ceil(lines.length * lh + pad * 2);
+    const c = createCanvas(w * k, h * k), x = get2d(c);
+    x.scale(k, k);
+    x.font = font; x.fillStyle = cssOf(p.color); x.textBaseline = 'middle'; x.textAlign = p.textAlign;
+    const ox = p.textAlign === 'left' ? pad : p.textAlign === 'right' ? w - pad : w / 2;
+    lines.forEach((l, i) => x.fillText(l, ox, pad + lh * (i + 0.5)));
+    e = { sig, canvas: c, w, h };
+    rc.cache.set(`txt:${el.id}`, e);
+  }
+  const T = computeTransform(rc, el, e.w, e.h);
+  rc.record(el, T);
+  const ctx = rc.ctx;
+  ctx.save();
+  setBlend(ctx, p, 1);
+  applyTransform(ctx, T);
+  ctx.drawImage(e.canvas, 0, 0, e.w, e.h);
+  ctx.restore();
+}
