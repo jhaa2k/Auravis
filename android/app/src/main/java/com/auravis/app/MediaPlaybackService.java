@@ -163,7 +163,6 @@ public class MediaPlaybackService extends Service {
         long stateActions = PlaybackState.ACTION_PLAY | PlaybackState.ACTION_PAUSE | PlaybackState.ACTION_PLAY_PAUSE |
             PlaybackState.ACTION_SKIP_TO_PREVIOUS | PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_SEEK_TO |
             PlaybackState.ACTION_STOP;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) stateActions |= PlaybackState.ACTION_SET_SHUFFLE_MODE;
         int state = playing ? PlaybackState.STATE_PLAYING : PlaybackState.STATE_PAUSED;
         mediaSession.setPlaybackState(new PlaybackState.Builder()
             .setActions(stateActions)
