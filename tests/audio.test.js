@@ -52,11 +52,54 @@ describe('AudioEngine playback startup', () => {
     const engine = new AudioEngine();
     engine.mode = 'file';
     const starting = engine.play();
+    const duplicateStart = engine.play();
 
     expect(calls).toEqual(['resume', 'play']);
     finishResume();
     await expect(starting).resolves.toBe(true);
+    await expect(duplicateStart).resolves.toBe(true);
     expect(engine.playing).toBe(true);
+  });
+
+  it('does not restart playback after a pause while audio setup is pending', async () => {
+    let finishResume;
+    let playCalls = 0;
+    let pauseCalls = 0;
+    class FakeAudio {
+      addEventListener() {}
+      play() { playCalls++; return Promise.resolve(); }
+      pause() { pauseCalls++; }
+    }
+    class FakeAudioContext {
+      constructor() {
+        this.state = 'suspended';
+        this.sampleRate = 48000;
+        this.destination = {};
+      }
+      resume() {
+        return new Promise((resolve) => {
+          finishResume = () => { this.state = 'running'; resolve(); };
+        });
+      }
+      createGain() { return { gain: { value: 1 }, connect() {} }; }
+      createAnalyser() { return { connect() {}, fftSize: 0, smoothingTimeConstant: 0 }; }
+      createChannelSplitter() { return { connect() {} }; }
+      createMediaStreamDestination() { return { stream: {} }; }
+      createMediaElementSource() { return { connect() {} }; }
+    }
+
+    vi.stubGlobal('Audio', FakeAudio);
+    vi.stubGlobal('window', { AudioContext: FakeAudioContext });
+    const engine = new AudioEngine();
+    engine.mode = 'file';
+    const starting = engine.play();
+    engine.pause();
+    finishResume();
+
+    await expect(starting).resolves.toBe(false);
+    expect(playCalls).toBe(1);
+    expect(pauseCalls).toBe(1);
+    expect(engine.playing).toBe(false);
   });
 });
 

@@ -389,3 +389,44 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
   .android-app .music-panel .play { width: 36px; height: 36px; }
   .android-app .music-panel .extras .icon-btn { width: 36px; }
 }
+
+.android-app .workspace { display: grid; grid-template-rows: minmax(160px, 42dvh) minmax(0, 1fr); }
+.android-app .col-preview { min-height: 0; padding: 6px 8px; }
+.android-app .col-preview > .preview { justify-content: flex-start; }
+.android-app .preview > .stage { flex: 1; width: min(100%, calc(var(--maxh) * var(--ar))); max-height: 100%; }
+.android-app .tool-dock,
+.android-app .tool-dock.open {
+  position: relative;
+  inset: auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  background: var(--panel);
+  transition: none;
+  border-top: 1px solid #ffffff20;
+}
+.android-app .tool-panel,
+.android-app .tool-panel.open {
+  position: relative;
+  inset: auto;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  transform: none;
+  visibility: visible;
+  opacity: 1;
+  transition: none;
+}
+.android-app .tool-panel-content { min-height: 0; }
+.android-app .tool-panel-content[hidden] { display: none; }
+.android-app .tool-bar { position: relative; inset: auto; flex: none; }
+.android-app .tool-panel-head { min-height: 42px; }
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .android-app .workspace { grid-template-rows: minmax(128px, 38dvh) minmax(150px, 1fr); }
+  .android-app .tool-panel-head { min-height: 36px; }
+  .android-app .tool-bar { height: 54px; }
+  .android-app .tool-button { min-height: 42px; }
+}

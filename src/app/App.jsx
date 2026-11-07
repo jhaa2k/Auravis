@@ -16,7 +16,7 @@ export default function App() {
   const name = useApp((s) => s.project.name);
   const dirty = useApp((s) => s.dirty);
   const canUndo = useApp((s) => s.past.length > 0), canRedo = useApp((s) => s.future.length > 0);
-  const [tool, setTool] = useState(null);
+  const [tool, setTool] = useState('music');
   const [dialog, setDialog] = useState(false);
 
   useEffect(() => {

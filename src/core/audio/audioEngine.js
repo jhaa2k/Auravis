@@ -24,6 +24,8 @@ export class AudioEngine {
     this.mode = 'none'; // none | file
     this.playing = false;
     this.pausedForFocus = false;
+    this.playGeneration = 0;
+    this.playPromise = null;
     this.volume = 0.9;
     this.shuffle = false;
     this.repeat = false;
@@ -32,7 +34,11 @@ export class AudioEngine {
     this.td = new Float32Array(TD);
     this.tl = new Float32Array(2048);
     this.frame = this.silent();
-    if (this.el) this.el.addEventListener('ended', () => this.onEnded());
+    if (this.el) {
+      this.el.addEventListener('ended', () => this.onEnded());
+      this.el.addEventListener('loadedmetadata', () => this.syncMediaSession());
+      this.el.addEventListener('durationchange', () => this.syncMediaSession());
+    }
     attachNativeMedia(this);
   }
 
@@ -112,6 +118,9 @@ export class AudioEngine {
   }
   load(i, autoplay = false) {
     if (!this.tracks.length) return;
+    this.playGeneration++;
+    this.playPromise = null;
+    this.el.pause();
     this.index = ((i % this.tracks.length) + this.tracks.length) % this.tracks.length;
     this.mode = 'file';
     this.el.src = this.tracks[this.index].url;
@@ -142,33 +151,46 @@ export class AudioEngine {
   // ---- transport ----
   async play() {
     if (this.mode === 'none') return;
-    try {
-      const ctx = this.ensureContext();
-      const resume = ctx.state === 'suspended' ? ctx.resume() : Promise.resolve();
-      const playback = this.el.play();
-      requestNativeNotificationPermission();
-      await Promise.all([resume, playback]);
-    } catch (error) {
-      this.playing = false;
-      this.pausedForFocus = false;
-      this.emit();
-      window.dispatchEvent(new CustomEvent('auravis:playback-error', {
-        detail: { message: error.message || 'Could not play this audio file.' },
-      }));
-      return false;
-    }
-    this.playing = true;
-    this.pausedForFocus = false;
-    this.emit();
-    return true;
+    if (this.playPromise) return this.playPromise;
+    const generation = ++this.playGeneration;
+    const attempt = (async () => {
+      try {
+        const ctx = this.ensureContext();
+        const resume = ctx.state === 'suspended' ? ctx.resume() : Promise.resolve();
+        const playback = this.el.play();
+        requestNativeNotificationPermission();
+        await Promise.all([resume, playback]);
+        if (generation !== this.playGeneration || this.mode === 'none') return false;
+        this.playing = true;
+        this.pausedForFocus = false;
+        this.emit();
+        return true;
+      } catch (error) {
+        if (generation !== this.playGeneration) return false;
+        this.el.pause();
+        this.playing = false;
+        this.pausedForFocus = false;
+        this.emit();
+        window.dispatchEvent(new CustomEvent('auravis:playback-error', {
+          detail: { message: error.message || 'Could not play this audio file.' },
+        }));
+        return false;
+      } finally {
+        if (this.playPromise === attempt) this.playPromise = null;
+      }
+    })();
+    this.playPromise = attempt;
+    return attempt;
   }
   pause({ focusLoss = false } = {}) {
+    this.playGeneration++;
+    this.playPromise = null;
     this.el?.pause();
     this.playing = false;
     this.pausedForFocus = focusLoss;
     this.emit();
   }
-  toggle() { return this.playing ? this.pause() : this.play(); }
+  toggle() { return this.playing || this.playPromise ? this.pause() : this.play(); }
   seek(t) {
     if (this.mode !== 'file' || !Number.isFinite(this.el.duration)) return;
     this.el.currentTime = clamp(t, 0, this.el.duration);

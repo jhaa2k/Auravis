@@ -199,11 +199,11 @@ public class MediaPlaybackService extends Service {
             .setStyle(new Notification.MediaStyle()
                 .setMediaSession(mediaSession.getSessionToken())
                 .setShowActionsInCompactView(0, 1, 2));
-        builder.addAction(action(android.R.drawable.ic_media_previous, "Previous", ACTION_PREVIOUS));
-        builder.addAction(action(playing ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play, playing ? "Pause" : "Play", playing ? ACTION_PAUSE : ACTION_PLAY));
-        builder.addAction(action(android.R.drawable.ic_media_next, "Next", ACTION_NEXT));
-        builder.addAction(action(android.R.drawable.ic_menu_rotate, shuffle ? "Turn shuffle off" : "Turn shuffle on", ACTION_SHUFFLE));
-        builder.addAction(action(android.R.drawable.ic_menu_revert, repeat ? "Turn repeat off" : "Turn repeat on", ACTION_REPEAT));
+        builder.addAction(action(R.drawable.ic_media_previous, "Previous", ACTION_PREVIOUS));
+        builder.addAction(action(playing ? R.drawable.ic_media_pause : R.drawable.ic_media_play, playing ? "Pause" : "Play", playing ? ACTION_PAUSE : ACTION_PLAY));
+        builder.addAction(action(R.drawable.ic_media_next, "Next", ACTION_NEXT));
+        builder.addAction(action(R.drawable.ic_media_shuffle, shuffle ? "Turn shuffle off" : "Turn shuffle on", ACTION_SHUFFLE));
+        builder.addAction(action(R.drawable.ic_media_repeat, repeat ? "Turn repeat off" : "Turn repeat on", ACTION_REPEAT));
         return builder.build();
     }
 
