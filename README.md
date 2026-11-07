@@ -28,7 +28,7 @@ GitHub Actions also builds it on pushes to `main`; download `auravis-debug-apk` 
 (`vite.config.js` uses `base: './'`, so any repo name works.)
 
 ## Using it
-- **Demo** button plays a built-in generated track; **Open** loads your own audio files.
+- **Music**: import audio files, browse the track list, and control playback from the Music tab.
 - Add elements with **Add**, select one, edit its properties (every property has a reset button).
 - Every `Measure …` property is a full mapping editor: source → input range → curve → output range → multiplier/offset → smoothing.
 - Drag on the canvas to move, drag the orange handle to scale. `Space` play/pause, `Ctrl+Z` undo, `Ctrl+D` duplicate.

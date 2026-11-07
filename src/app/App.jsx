@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react';
 import { useApp } from './hooks.js';
 import { actions, audio, store, toast } from './services.js';
 import LayerList from '../ui/LayerList.jsx';
+import MusicPanel from '../ui/MusicPanel.jsx';
 import PropertiesPanel from '../ui/PropertiesPanel.jsx';
 import PreviewPanel from '../ui/PreviewPanel.jsx';
-import TransportBar from '../ui/TransportBar.jsx';
 import SettingsPanel from '../ui/SettingsPanel.jsx';
 import ProjectDialog from '../ui/ProjectDialog.jsx';
 import Toasts from '../ui/Toasts.jsx';
 import Icon from '../ui/Icon.jsx';
 
-const TOOLS = [['layers', 'Elements', 'bars'], ['props', 'Properties', 'settings'], ['project', 'Settings', 'settings']];
+const TOOLS = [['music', 'Music', 'music'], ['layers', 'Elements', 'bars'], ['props', 'Properties', 'settings'], ['project', 'Settings', 'settings']];
 
 export default function App() {
   const name = useApp((s) => s.project.name);
@@ -59,7 +59,6 @@ export default function App() {
       <main className="workspace android-workspace">
         <section className="col-preview" aria-label="Fixed preview">
           <PreviewPanel onOpenSettings={() => setTool('project')} />
-          <TransportBar />
         </section>
         <section className={`tool-dock ${tool ? 'open' : ''}`} aria-label="Editor tools">
           <div id="active-tool-panel" className={`tool-panel ${tool ? 'open' : ''}`} aria-hidden={!tool}>
@@ -69,7 +68,8 @@ export default function App() {
                   <strong><Icon name={TOOLS.find(([key]) => key === tool)?.[2]} size={16} />{TOOLS.find(([key]) => key === tool)?.[1]}</strong>
                   <button className="btn small ghost" onClick={() => setTool(null)}><Icon name="close" size={14} />Cancel</button>
                 </header>
-                <div className="tool-panel-content">
+                <div className={`tool-panel-content ${tool === 'music' ? 'music-tool-content' : ''}`}>
+                  {tool === 'music' && <MusicPanel />}
                   {tool === 'layers' && <LayerList />}
                   {tool === 'props' && <PropertiesPanel />}
                   <div hidden={tool !== 'project'}><SettingsPanel /></div>

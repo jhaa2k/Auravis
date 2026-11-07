@@ -34,9 +34,6 @@ export class AudioEngine {
     this.frame = this.silent();
     if (this.el) this.el.addEventListener('ended', () => this.onEnded());
     attachNativeMedia(this);
-    this.mediaSyncTimer = setInterval(() => {
-      if (this.playing) this.syncMediaSession();
-    }, 1000);
   }
 
   silent() {
@@ -49,7 +46,7 @@ export class AudioEngine {
     return {
       playing: this.playing, mode: this.mode, volume: this.volume, shuffle: this.shuffle, repeat: this.repeat,
       title: t?.title || '', artist: t?.artist || '',
-      tracks: this.tracks.map((x) => ({ title: x.title, artist: x.artist })), index: this.index,
+      tracks: this.tracks.map((x) => ({ title: x.title, artist: x.artist, name: x.name })), index: this.index,
       hasAudio: this.mode !== 'none',
     };
   }
@@ -127,10 +124,18 @@ export class AudioEngine {
   removeTrack(i) {
     const t = this.tracks[i];
     if (!t) return;
+    const wasPlaying = this.playing;
     URL.revokeObjectURL(t.url);
     this.tracks.splice(i, 1);
-    if (i === this.index) { this.el.pause(); this.el.removeAttribute('src'); this.index = -1; this.mode = 'none'; this.playing = false; this.pausedForFocus = false; if (this.tracks.length) return this.load(Math.min(i, this.tracks.length - 1)); }
-    else if (i < this.index) this.index--;
+    if (i === this.index) {
+      this.el.pause();
+      this.el.removeAttribute('src');
+      this.index = -1;
+      this.mode = 'none';
+      this.playing = false;
+      this.pausedForFocus = false;
+      if (this.tracks.length) return this.load(Math.min(i, this.tracks.length - 1), wasPlaying);
+    } else if (i < this.index) this.index--;
     this.emit();
   }
 
@@ -138,10 +143,11 @@ export class AudioEngine {
   async play() {
     if (this.mode === 'none') return;
     try {
-      await requestNativeNotificationPermission();
       const ctx = this.ensureContext();
-      if (ctx.state === 'suspended') await ctx.resume();
-      await this.el.play();
+      const resume = ctx.state === 'suspended' ? ctx.resume() : Promise.resolve();
+      const playback = this.el.play();
+      requestNativeNotificationPermission();
+      await Promise.all([resume, playback]);
     } catch (error) {
       this.playing = false;
       this.pausedForFocus = false;
@@ -163,10 +169,19 @@ export class AudioEngine {
     this.emit();
   }
   toggle() { return this.playing ? this.pause() : this.play(); }
-  seek(t) { if (this.mode === 'file' && Number.isFinite(this.el.duration)) this.el.currentTime = clamp(t, 0, this.el.duration); }
+  seek(t) {
+    if (this.mode !== 'file' || !Number.isFinite(this.el.duration)) return;
+    this.el.currentTime = clamp(t, 0, this.el.duration);
+    this.syncMediaSession();
+  }
   next() { if (this.tracks.length) this.load(this.shuffle ? Math.floor(Math.random() * this.tracks.length) : this.index + 1, true); }
   prev() { if (this.currentTime > 3) this.seek(0); else if (this.tracks.length) this.load(this.index - 1, true); }
-  setVolume(v) { this.volume = clamp(v, 0, 1); if (this.vol) this.vol.gain.value = this.volume; this.emit(); }
+  setVolume(v) {
+    this.volume = clamp(v, 0, 1);
+    if (this.vol) this.vol.gain.value = this.volume;
+    this.snapshot = this.makeSnapshot();
+    this.listeners.forEach((listener) => listener());
+  }
   toggleShuffle() { this.shuffle = !this.shuffle; this.emit(); }
   toggleRepeat() { this.repeat = !this.repeat; this.emit(); }
   onEnded() {

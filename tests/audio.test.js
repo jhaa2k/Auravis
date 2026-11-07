@@ -4,6 +4,8 @@ import { aWeightDb } from '../src/core/audio/aWeighting.js';
 import { SpectrumProvider } from '../src/core/audio/spectrumProvider.js';
 import { defaultProps } from '../src/core/schema/validate.js';
 import { getDefinition } from '../src/core/schema/registry.js';
+import { AudioEngine } from '../src/core/audio/audioEngine.js';
+import { afterEach, vi } from 'vitest';
 import '../src/elements/index.js';
 
 const sine = (f, n = 8192, sr = 48000, a = 1) => Float32Array.from({ length: n }, (_, i) => a * Math.sin((2 * Math.PI * f * i) / sr));
@@ -14,6 +16,49 @@ const run = (props, td = sine(1000), dt = 1 / 60, frames = 30) => {
   for (let i = 0; i < frames; i++) p.update(props, mags, 48000, dt, td);
   return p;
 };
+
+afterEach(() => vi.unstubAllGlobals());
+
+describe('AudioEngine playback startup', () => {
+  it('starts the media element immediately instead of waiting for async audio setup', async () => {
+    let finishResume;
+    const calls = [];
+    class FakeAudio {
+      addEventListener() {}
+      play() { calls.push('play'); return Promise.resolve(); }
+      pause() {}
+    }
+    class FakeAudioContext {
+      constructor() {
+        this.state = 'suspended';
+        this.sampleRate = 48000;
+        this.destination = {};
+      }
+      resume() {
+        calls.push('resume');
+        return new Promise((resolve) => {
+          finishResume = () => { this.state = 'running'; resolve(); };
+        });
+      }
+      createGain() { return { gain: { value: 1 }, connect() {} }; }
+      createAnalyser() { return { connect() {}, fftSize: 0, smoothingTimeConstant: 0 }; }
+      createChannelSplitter() { return { connect() {} }; }
+      createMediaStreamDestination() { return { stream: {} }; }
+      createMediaElementSource() { return { connect() {} }; }
+    }
+
+    vi.stubGlobal('Audio', FakeAudio);
+    vi.stubGlobal('window', { AudioContext: FakeAudioContext });
+    const engine = new AudioEngine();
+    engine.mode = 'file';
+    const starting = engine.play();
+
+    expect(calls).toEqual(['resume', 'play']);
+    finishResume();
+    await expect(starting).resolves.toBe(true);
+    expect(engine.playing).toBe(true);
+  });
+});
 
 describe('FFT', () => {
   it('finds the right bin and calibrates amplitude (Hann window)', () => {

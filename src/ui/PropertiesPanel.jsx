@@ -18,7 +18,7 @@ export default function PropertiesPanel() {
   const elements = useApp((s) => s.elements);
   const selectedId = useApp((s) => s.selectedId);
   const diags = useStore(diagStore);
-  const [closed, setClosed] = useState({});
+  const [openSections, setOpenSections] = useState({});
   const el = elements.find((e) => e.id === selectedId);
   if (!el) return <div className="empty">Select an element to edit its properties.</div>;
   const def = getDefinition(el.type);
@@ -47,7 +47,7 @@ export default function PropertiesPanel() {
         </ul>
       )}
       {def.sections.map((section, i) => (
-        <Section key={section.name} section={section} open={!closed[key(i)] && (closed[key(i)] === false || i < 2)} onToggle={() => setClosed((c) => ({ ...c, [key(i)]: c[key(i)] === undefined ? (i < 2) : !c[key(i)] }))}>
+        <Section key={section.name} section={section} open={Boolean(openSections[key(i)])} onToggle={() => setOpenSections((current) => ({ ...current, [key(i)]: !current[key(i)] }))}>
           {section.props.map((p) => (
             <FieldRenderer key={p.key} def={p} el={el} elements={elements} onChange={onChange} onReset={(k) => actions.resetProps(el.id, [k])} onAction={onAction} />
           ))}

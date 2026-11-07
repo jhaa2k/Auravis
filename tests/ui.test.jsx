@@ -10,6 +10,7 @@ import PropertiesPanel from '../src/ui/PropertiesPanel.jsx';
 import SettingsPanel from '../src/ui/SettingsPanel.jsx';
 import LayerList from '../src/ui/LayerList.jsx';
 import TransportBar from '../src/ui/TransportBar.jsx';
+import MusicPanel from '../src/ui/MusicPanel.jsx';
 
 setCanvasFactory((w, h) => nc.createCanvas(w, h));
 
@@ -32,15 +33,17 @@ describe('React UI renders without runtime errors', () => {
       for (const section of def.sections) expect(html, `${def.type}: ${section.name}`).toContain(section.name);
     }
   });
-  it('property panel shows every section label of an Image (sections open)', () => {
+  it('property panel keeps property sections collapsed until opened', () => {
     const el = store.getState().elements.find((e) => e.type === 'image');
     actions.select(el.id);
     const html = renderToString(<PropertiesPanel />);
     for (const s of ['General', 'Image', 'Color', 'Color Key', 'Blur', 'Generated Album Art']) expect(html).toContain(s);
+    expect(html).not.toContain('class="section-body"');
   });
-  it('layers, transport and settings', () => {
+  it('layers, music, transport and settings', () => {
     expect(renderToString(<LayerList />)).toContain('Add');
-    expect(renderToString(<TransportBar />)).toContain('Open');
+    expect(renderToString(<MusicPanel />)).toContain('Import');
+    expect(renderToString(<TransportBar />)).toContain('Playback controls');
     expect(renderToString(<TransportBar />)).not.toContain('Demo');
     expect(renderToString(<SettingsPanel />)).toContain('Export video');
   });

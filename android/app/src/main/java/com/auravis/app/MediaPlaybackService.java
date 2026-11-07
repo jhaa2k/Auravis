@@ -51,6 +51,7 @@ public class MediaPlaybackService extends Service {
     private android.content.BroadcastReceiver noisyReceiver;
     private boolean hasAudioFocus;
     private boolean resumeAfterFocus;
+    private boolean foregroundStarted;
     private String title = "Auravis";
     private String artist = "";
     private String album = "";
@@ -129,10 +130,15 @@ public class MediaPlaybackService extends Service {
             updateAudioFocus();
             publishSessionState();
             Notification notification = buildNotification();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                startForeground(NOTIFICATION_ID, notification, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+            if (!foregroundStarted) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    startForeground(NOTIFICATION_ID, notification, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+                } else {
+                    startForeground(NOTIFICATION_ID, notification);
+                }
+                foregroundStarted = true;
             } else {
-                startForeground(NOTIFICATION_ID, notification);
+                notificationManager.notify(NOTIFICATION_ID, notification);
             }
         } else if (ACTION_PLAY.equals(intent.getAction())) {
             dispatchToWeb("play", 0);
@@ -276,6 +282,7 @@ public class MediaPlaybackService extends Service {
             mediaSession = null;
         }
         stopForeground(true);
+        foregroundStarted = false;
         stopSelf();
     }
 
