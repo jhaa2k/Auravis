@@ -32,7 +32,6 @@ public class NativeMediaPlugin extends Plugin {
                 JSObject event = new JSObject();
                 event.put("action", intent.getStringExtra(MediaPlaybackService.EXTRA_ACTION));
                 event.put("position", intent.getLongExtra(MediaPlaybackService.EXTRA_POSITION, 0) / 1000.0);
-                event.put("focusLoss", intent.getBooleanExtra(MediaPlaybackService.EXTRA_PAUSED_FOR_FOCUS, false));
                 notifyListeners("mediaAction", event);
             }
         };
@@ -55,8 +54,7 @@ public class NativeMediaPlugin extends Plugin {
             .putExtra(MediaPlaybackService.EXTRA_POSITION, Math.max(0L, (long) (call.getDouble("position", 0.0) * 1000)))
             .putExtra(MediaPlaybackService.EXTRA_PLAYING, call.getBoolean("playing", false))
             .putExtra(MediaPlaybackService.EXTRA_SHUFFLE, call.getBoolean("shuffle", false))
-            .putExtra(MediaPlaybackService.EXTRA_REPEAT, call.getBoolean("repeat", false))
-            .putExtra(MediaPlaybackService.EXTRA_PAUSED_FOR_FOCUS, call.getBoolean("pausedForFocus", false));
+            .putExtra(MediaPlaybackService.EXTRA_REPEAT, call.getBoolean("repeat", false));
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ContextCompat.startForegroundService(getContext(), intent);
             else getContext().startService(intent);

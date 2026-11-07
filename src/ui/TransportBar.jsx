@@ -18,6 +18,10 @@ export default function TransportBar() {
   const hasDuration = Number.isFinite(time.duration) && time.duration > 0;
   return (
     <div className="transport" aria-label="Playback controls">
+      <div className="now" title={[state.title, state.artist].filter(Boolean).join(' — ')}>
+        <Icon name="music" size={17} />
+        <div><b>{state.title || 'No track selected'}</b><small>{state.artist || 'Now playing'}</small></div>
+      </div>
       <div className="controls">
         <button className="icon-btn" title="Previous track" onClick={() => audio.prev()} disabled={!state.tracks.length} aria-label="Previous track"><Icon name="prev" fill /></button>
         <button className="play" title={state.playing ? 'Pause' : 'Play'} onClick={() => audio.toggle()} disabled={!state.hasAudio} aria-label={state.playing ? 'Pause' : 'Play'}><Icon name={state.playing ? 'pause' : 'play'} size={22} fill /></button>

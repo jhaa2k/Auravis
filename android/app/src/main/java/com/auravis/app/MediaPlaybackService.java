@@ -8,8 +8,6 @@ import android.app.Service;
 import android.graphics.BitmapFactory;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaMetadata;
 import android.media.session.MediaSession;
@@ -41,16 +39,10 @@ public class MediaPlaybackService extends Service {
     static final String EXTRA_PLAYING = "playing";
     static final String EXTRA_SHUFFLE = "shuffle";
     static final String EXTRA_REPEAT = "repeat";
-    static final String EXTRA_PAUSED_FOR_FOCUS = "pausedForFocus";
-
     private MediaSession mediaSession;
     private NotificationManager notificationManager;
     private PowerManager.WakeLock wakeLock;
-    private AudioManager audioManager;
-    private AudioFocusRequest audioFocusRequest;
     private android.content.BroadcastReceiver noisyReceiver;
-    private boolean hasAudioFocus;
-    private boolean resumeAfterFocus;
     private boolean foregroundStarted;
     private String title = "Auravis";
     private String artist = "";
@@ -61,27 +53,13 @@ public class MediaPlaybackService extends Service {
     private boolean shuffle;
     private boolean repeat;
 
-    private final AudioManager.OnAudioFocusChangeListener focusListener = change -> {
-        if (change == AudioManager.AUDIOFOCUS_GAIN && resumeAfterFocus) {
-            resumeAfterFocus = false;
-            dispatchToWeb("play", 0);
-        } else if (change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-            resumeAfterFocus = playing;
-            dispatchToWeb("pause", 0, true);
-        } else if (change == AudioManager.AUDIOFOCUS_LOSS || change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-            resumeAfterFocus = change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT && playing;
-            dispatchToWeb("pause", 0, resumeAfterFocus);
-        }
-    };
-
     @Override
     public void onCreate() {
         super.onCreate();
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        createNotificationChannel();
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Auravis:MediaPlayback");
+        createNotificationChannel();
         mediaSession = new MediaSession(this, "AuravisMediaSession");
         mediaSession.setCallback(new MediaSession.Callback() {
             @Override public void onPlay() { dispatchToWeb("play", 0); }
@@ -126,8 +104,8 @@ public class MediaPlaybackService extends Service {
             playing = intent.getBooleanExtra(EXTRA_PLAYING, false);
             shuffle = intent.getBooleanExtra(EXTRA_SHUFFLE, false);
             repeat = intent.getBooleanExtra(EXTRA_REPEAT, false);
-            if (!playing && !intent.getBooleanExtra(EXTRA_PAUSED_FOR_FOCUS, false)) resumeAfterFocus = false;
-            updateAudioFocus();
+            if (playing && !wakeLock.isHeld()) wakeLock.acquire();
+            else if (!playing && wakeLock.isHeld()) wakeLock.release();
             publishSessionState();
             Notification notification = buildNotification();
             if (!foregroundStarted) {
@@ -143,7 +121,6 @@ public class MediaPlaybackService extends Service {
         } else if (ACTION_PLAY.equals(intent.getAction())) {
             dispatchToWeb("play", 0);
         } else if (ACTION_PAUSE.equals(intent.getAction())) {
-            resumeAfterFocus = false;
             dispatchToWeb("pause", 0);
         } else if (ACTION_PREVIOUS.equals(intent.getAction())) {
             dispatchToWeb("previous", 0);
@@ -223,58 +200,16 @@ public class MediaPlaybackService extends Service {
         }
     }
 
-    private void updateAudioFocus() {
-        if (playing) {
-            if (!hasAudioFocus) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    if (audioFocusRequest == null) {
-                        AudioAttributes attributes = new AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .build();
-                        audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                            .setAudioAttributes(attributes)
-                            .setOnAudioFocusChangeListener(focusListener)
-                            .setWillPauseWhenDucked(true)
-                            .build();
-                    }
-                    hasAudioFocus = audioManager.requestAudioFocus(audioFocusRequest) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-                } else {
-                    hasAudioFocus = audioManager.requestAudioFocus(focusListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-                }
-            }
-            if (!wakeLock.isHeld()) wakeLock.acquire();
-        } else if (!resumeAfterFocus) {
-            abandonAudioFocus();
-            if (wakeLock.isHeld()) wakeLock.release();
-        } else if (wakeLock.isHeld()) {
-            wakeLock.release();
-        }
-    }
-
-    private void abandonAudioFocus() {
-        if (!hasAudioFocus) return;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && audioFocusRequest != null) audioManager.abandonAudioFocusRequest(audioFocusRequest);
-        else audioManager.abandonAudioFocus(focusListener);
-        hasAudioFocus = false;
-    }
-
     private void dispatchToWeb(String action, long seekPosition) {
-        dispatchToWeb(action, seekPosition, false);
-    }
-
-    private void dispatchToWeb(String action, long seekPosition, boolean focusLoss) {
         Intent intent = new Intent(ACTION_MEDIA_ACTION)
             .setPackage(getPackageName())
             .putExtra(EXTRA_ACTION, action)
-            .putExtra(EXTRA_POSITION, seekPosition)
-            .putExtra(EXTRA_PAUSED_FOR_FOCUS, focusLoss);
+            .putExtra(EXTRA_POSITION, seekPosition);
         sendBroadcast(intent);
     }
 
     private void stopPlaybackService() {
         playing = false;
-        abandonAudioFocus();
         if (wakeLock != null && wakeLock.isHeld()) wakeLock.release();
         if (mediaSession != null) {
             mediaSession.setActive(false);
@@ -288,12 +223,11 @@ public class MediaPlaybackService extends Service {
 
     @Override
     public void onDestroy() {
+        if (wakeLock != null && wakeLock.isHeld()) wakeLock.release();
         if (noisyReceiver != null) {
             unregisterReceiver(noisyReceiver);
             noisyReceiver = null;
         }
-        abandonAudioFocus();
-        if (wakeLock != null && wakeLock.isHeld()) wakeLock.release();
         if (mediaSession != null) {
             mediaSession.setActive(false);
             mediaSession.release();

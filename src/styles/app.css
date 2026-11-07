@@ -394,15 +394,21 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
 .android-app .music-track strong, .android-app .music-track small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .android-app .music-track strong { font-size: 12px; font-weight: 600; }
 .android-app .music-track small { color: var(--muted); font-size: 11px; }
+.android-app .music-track { overflow: hidden; }
+.android-app .music-track strong,
+.android-app .music-track small { display: block; max-width: 100%; }
 .android-app .music-track-list .icon-btn { width: 38px; height: 38px; flex: none; }
 .android-app .music-empty { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 9px; padding: 24px; color: var(--muted); text-align: center; }
 .android-app .music-empty > svg { color: var(--accent); opacity: .8; }
 .android-app .music-empty strong { color: var(--text); font-size: 13px; }
 .android-app .music-empty span { max-width: 240px; font-size: 11px; line-height: 1.5; }
-.android-app .music-panel .transport { flex: none; grid-template-columns: auto minmax(0, 1fr); gap: 7px 8px; padding: 7px 9px; }
-.android-app .music-panel .controls { grid-column: 1; grid-row: 1; }
-.android-app .music-panel .seek { grid-column: 1 / -1; grid-row: 2; }
-.android-app .music-panel .extras { grid-column: 2; grid-row: 1; justify-content: flex-end; gap: 2px; }
+.android-app .music-panel .transport { flex: none; min-width: 0; width: 100%; grid-template-columns: minmax(0, 1fr) auto; gap: 5px 8px; padding: 6px 8px; }
+.android-app .music-panel .now { grid-column: 1 / -1; grid-row: 1; min-width: 0; }
+.android-app .music-panel .now > div { min-width: 0; flex: 1; overflow: hidden; }
+.android-app .music-panel .now b { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.android-app .music-panel .controls { grid-column: 1; grid-row: 2; }
+.android-app .music-panel .seek { grid-column: 1 / -1; grid-row: 3; }
+.android-app .music-panel .extras { grid-column: 2; grid-row: 2; justify-content: flex-end; gap: 2px; }
 .android-app .music-panel .extras .vol { width: clamp(38px, 13vw, 54px); }
 .android-app .music-panel .controls .icon-btn { width: 36px; }
 

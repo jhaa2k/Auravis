@@ -52,8 +52,10 @@ describe('React UI renders without runtime errors', () => {
   it('layers, music, transport and settings', () => {
     expect(renderToString(<LayerList />)).toContain('Add');
     expect(renderToString(<MusicPanel />)).toContain('Import');
-    expect(renderToString(<TransportBar />)).toContain('Playback controls');
-    expect(renderToString(<TransportBar />)).not.toContain('Demo');
+    const transport = renderToString(<TransportBar />);
+    expect(transport).toContain('Playback controls');
+    expect(transport).toContain('No track selected');
+    expect(transport).toContain('class="now"');
     expect(renderToString(<SettingsPanel />)).toContain('Canvas helpers');
     expect(renderToString(<SettingsPanel mode="export" />)).toContain('Export video');
   });

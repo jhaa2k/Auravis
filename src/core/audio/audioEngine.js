@@ -23,7 +23,6 @@ export class AudioEngine {
     this.index = -1;
     this.mode = 'none'; // none | file
     this.playing = false;
-    this.pausedForFocus = false;
     this.playGeneration = 0;
     this.playPromise = null;
     this.volume = 0.9;
@@ -39,7 +38,6 @@ export class AudioEngine {
       this.el.addEventListener('playing', () => {
         if (this.mode !== 'file' || this.el.paused || this.playing) return;
         this.playing = true;
-        this.pausedForFocus = false;
         this.emit();
       });
       this.el.addEventListener('error', () => this.onMediaError());
@@ -78,7 +76,6 @@ export class AudioEngine {
       duration: this.duration,
       position: this.currentTime,
       playing: this.playing,
-      pausedForFocus: this.pausedForFocus,
       shuffle: this.shuffle,
       repeat: this.repeat,
     });
@@ -144,7 +141,6 @@ export class AudioEngine {
     this.el.src = this.tracks[this.index].url;
     this.el.load();
     this.playing = false;
-    this.pausedForFocus = false;
     this.emit();
     if (autoplay) this.play();
   }
@@ -160,7 +156,6 @@ export class AudioEngine {
       this.index = -1;
       this.mode = 'none';
       this.playing = false;
-      this.pausedForFocus = false;
       if (this.tracks.length) return this.load(Math.min(i, this.tracks.length - 1), wasPlaying);
     } else if (i < this.index) this.index--;
     this.emit();
@@ -180,14 +175,12 @@ export class AudioEngine {
         await Promise.all([resume, playback]);
         if (generation !== this.playGeneration || this.mode === 'none') return false;
         this.playing = true;
-        this.pausedForFocus = false;
         this.emit();
         return true;
       } catch (error) {
         if (generation !== this.playGeneration) return false;
         this.el.pause();
         this.playing = false;
-        this.pausedForFocus = false;
         this.emit();
         if (!this.mediaError) this.reportPlaybackError(error);
         return false;
@@ -207,7 +200,6 @@ export class AudioEngine {
     if (!error || this.mode !== 'file') return;
     this.mediaError = true;
     this.playing = false;
-    this.pausedForFocus = false;
     this.emit();
     const messages = {
       1: 'Audio playback was interrupted.',
@@ -217,12 +209,11 @@ export class AudioEngine {
     };
     this.reportPlaybackError({ message: messages[error.code] || 'Could not play this audio file.' });
   }
-  pause({ focusLoss = false } = {}) {
+  pause() {
     this.playGeneration++;
     this.playPromise = null;
     this.el?.pause();
     this.playing = false;
-    this.pausedForFocus = focusLoss;
     this.emit();
   }
   toggle() { return this.playing || this.playPromise ? this.pause() : this.play(); }

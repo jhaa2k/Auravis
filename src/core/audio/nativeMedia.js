@@ -8,9 +8,9 @@ let permissionRequested = false;
 export function attachNativeMedia(engine) {
   if (!isAndroid || audio) return;
   audio = engine;
-  NativeMedia.addListener('mediaAction', ({ action, position, focusLoss }) => {
+  NativeMedia.addListener('mediaAction', ({ action, position }) => {
     if (action === 'play') audio.play();
-    else if (action === 'pause') audio.pause({ focusLoss: Boolean(focusLoss) });
+    else if (action === 'pause') audio.pause();
     else if (action === 'stop') audio.pause();
     else if (action === 'next') audio.next();
     else if (action === 'previous') audio.prev();
