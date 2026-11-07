@@ -11,6 +11,7 @@ import SettingsPanel from '../src/ui/SettingsPanel.jsx';
 import LayerList from '../src/ui/LayerList.jsx';
 import TransportBar from '../src/ui/TransportBar.jsx';
 import MusicPanel from '../src/ui/MusicPanel.jsx';
+import FieldRenderer from '../src/ui/fields/FieldRenderer.jsx';
 
 setCanvasFactory((w, h) => nc.createCanvas(w, h));
 
@@ -40,11 +41,20 @@ describe('React UI renders without runtime errors', () => {
     for (const s of ['General', 'Image', 'Color', 'Color Key', 'Blur', 'Generated Album Art']) expect(html).toContain(s);
     expect(html).not.toContain('class="section-body"');
   });
+  it('uses double-tap slider reset instead of showing the slider reset button', () => {
+    const definition = listDefinitions().find((item) => item.sections.some((section) => section.props.some((property) => ['number', 'int'].includes(property.type) && !property.dynamic)));
+    const property = definition.sections.flatMap((section) => section.props).find((item) => ['number', 'int'].includes(item.type) && !item.dynamic);
+    const changedValue = property.default === property.min ? property.default + property.step : property.default - property.step;
+    const html = renderToString(<FieldRenderer def={property} el={{ props: { [property.key]: changedValue } }} elements={[]} onChange={() => {}} onReset={() => {}} onAction={() => {}} />);
+    expect(html).toContain('Double-tap to reset to default');
+    expect(html).not.toContain(`aria-label="Reset ${property.label}"`);
+  });
   it('layers, music, transport and settings', () => {
     expect(renderToString(<LayerList />)).toContain('Add');
     expect(renderToString(<MusicPanel />)).toContain('Import');
     expect(renderToString(<TransportBar />)).toContain('Playback controls');
     expect(renderToString(<TransportBar />)).not.toContain('Demo');
-    expect(renderToString(<SettingsPanel />)).toContain('Export video');
+    expect(renderToString(<SettingsPanel />)).toContain('Canvas helpers');
+    expect(renderToString(<SettingsPanel mode="export" />)).toContain('Export video');
   });
 });

@@ -20,6 +20,32 @@ const run = (props, td = sine(1000), dt = 1 / 60, frames = 30) => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('AudioEngine playback startup', () => {
+  it('clears playback state and reports unsupported media errors', () => {
+    const listeners = {};
+    const dispatchEvent = vi.fn();
+    class FakeAudio {
+      constructor() { this.error = { code: 4 }; this.paused = true; }
+      addEventListener(name, callback) { listeners[name] = callback; }
+    }
+    class FakeCustomEvent {
+      constructor(type, options) { this.type = type; this.detail = options.detail; }
+    }
+    vi.stubGlobal('Audio', FakeAudio);
+    vi.stubGlobal('CustomEvent', FakeCustomEvent);
+    vi.stubGlobal('window', { dispatchEvent });
+    const engine = new AudioEngine();
+    engine.mode = 'file';
+    engine.playing = true;
+
+    listeners.error();
+
+    expect(engine.getSnapshot().playing).toBe(false);
+    expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({
+      type: 'auravis:playback-error',
+      detail: { message: 'This audio format is not supported.' },
+    }));
+  });
+
   it('starts the media element immediately instead of waiting for async audio setup', async () => {
     let finishResume;
     const calls = [];

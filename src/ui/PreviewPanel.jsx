@@ -20,7 +20,7 @@ function inside(T, lx, ly) {
   return u >= 0 && u <= T.bw && v >= 0 && v <= T.bh;
 }
 
-export default function PreviewPanel({ onOpenSettings }) {
+export default function PreviewPanel({ onOpenSettings, preferences }) {
   const canvasRef = useRef(null), wrapRef = useRef(null);
   const settings = useApp((s) => s.project.settings);
   const selectedId = useApp((s) => s.selectedId);
@@ -82,7 +82,11 @@ export default function PreviewPanel({ onOpenSettings }) {
     const d = drag.current;
     if (!d) return;
     const p = toLogical(ev);
-    if (d.mode === 'move') actions.updateProps(d.id, { position: [Math.round(d.pos[0] + p.x - d.p0.x), Math.round(d.pos[1] + p.y - d.p0.y)] }, 'drag');
+    if (d.mode === 'move') {
+      let x = Math.round(d.pos[0] + p.x - d.p0.x), y = Math.round(d.pos[1] + p.y - d.p0.y);
+      if (preferences?.snap) { x = Math.round(x / 10) * 10; y = Math.round(y / 10) * 10; }
+      actions.updateProps(d.id, { position: [x, y] }, 'drag');
+    }
     else { const r = Math.hypot(p.x - d.origin[0], p.y - d.origin[1]) / d.d0; actions.updateProps(d.id, { scale: [d.scale[0] * r, d.scale[1] * r] }, 'drag'); }
   };
   const onUp = () => { drag.current = null; };
@@ -102,6 +106,12 @@ export default function PreviewPanel({ onOpenSettings }) {
         {pts && (
           <svg className="sel" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
             <polygon points={pts} vectorEffect="non-scaling-stroke" />
+          </svg>
+        )}
+        {(preferences?.guides || preferences?.safeArea) && (
+          <svg className="preview-guides" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            {preferences.guides && <g className="guide-lines"><path d="M33.333 0v100M66.667 0v100M0 33.333h100M0 66.667h100" /></g>}
+            {preferences.safeArea && <rect className="safe-area-line" x="10" y="10" width="80" height="80" />}
           </svg>
         )}
         {box && !store.getState().elements.find((e) => e.id === selectedId)?.locked && getDefinition(store.getState().elements.find((e) => e.id === selectedId)?.type || 'image')?.kind === 'visual' && (

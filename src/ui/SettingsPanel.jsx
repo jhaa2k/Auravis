@@ -6,7 +6,7 @@ import { QUALITY } from '../core/render/quality.js';
 import { startRecording, supportedExportFormats } from '../core/export/recorder.js';
 import { openExport, saveExport, shareExport } from '../core/export/download.js';
 import { requestNativeNotificationPermission } from '../core/audio/nativeMedia.js';
-import { ColorInput, Toggle } from './fields/primitives.jsx';
+import { Toggle } from './fields/primitives.jsx';
 import Icon from './Icon.jsx';
 
 const RESOLUTIONS = [480, 720, 1080, 1440, 2160];
@@ -20,16 +20,16 @@ const ASPECTS = [
 ];
 const QUALITY_BITRATES = { low: 2_000_000, medium: 5_000_000, high: 8_000_000, ultra: 14_000_000 };
 const fmt = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
+const DEFAULT_PREFERENCES = { theme: 'dark', guides: true, safeArea: false, snap: false };
 
 function initialAspect(width, height) {
   const ratio = width / height;
   return ASPECTS.find((a) => a.ratio && Math.abs(a.ratio - ratio) < 0.015)?.value || 'custom';
 }
 
-export default function SettingsPanel() {
+export default function SettingsPanel({ mode = 'settings', preferences = DEFAULT_PREFERENCES, onPreferencesChange = () => {} }) {
   const s = useApp((x) => x.project.settings);
   const [aspect, setAspect] = useState(() => initialAspect(s.width, s.height));
-  const [customSize, setCustomSize] = useState({ width: s.width, height: s.height });
   const [resolution, setResolution] = useState(1080);
   const [fps, setFps] = useState(30);
   const [quality, setQuality] = useState('high');
@@ -49,10 +49,6 @@ export default function SettingsPanel() {
   const saveController = useRef(null);
   const saved = useRef(null);
   const fileName = useRef('');
-  const preset = [
-    { label: '16:9 · 1920×1080', w: 1920, h: 1080 }, { label: '9:16 · 1080×1920', w: 1080, h: 1920 }, { label: '1:1 · 1080×1080', w: 1080, h: 1080 },
-    { label: '4:5 · 1080×1350', w: 1080, h: 1350 }, { label: '21:9 · 2560×1080', w: 2560, h: 1080 },
-  ].findIndex((p) => p.w === s.width && p.h === s.height);
   const isRecording = exportState.status === 'recording';
   const isSaving = exportState.status === 'saving' || exportState.status === 'finalizing';
 
@@ -62,14 +58,7 @@ export default function SettingsPanel() {
     const { ratio } = ASPECTS.find((a) => a.value === value);
     const height = 1080;
     const width = Math.round((height * ratio) / 2) * 2;
-    setCustomSize({ width, height });
     actions.setSettings({ width, height });
-  };
-  const setDimension = (key, value) => {
-    const n = Math.max(2, Math.min(7680, Math.round(Number(value) || 2)));
-    const next = { ...customSize, [key]: n };
-    setCustomSize(next);
-    actions.setSettings(next);
   };
 
   const cleanupRecording = () => {
@@ -215,43 +204,44 @@ export default function SettingsPanel() {
     try { await shareExport(saved.current, fileName.current); } catch (error) { toast(error.message, 'error'); }
   };
 
+  if (mode === 'settings') {
+    return (
+      <div className="props settings app-settings">
+        <section className="section open"><div className="section-head static">Appearance</div>
+          <div className="section-body">
+            <div className="field"><label htmlFor="app-theme">Theme</label>
+              <select id="app-theme" value={preferences.theme} onChange={(event) => onPreferencesChange({ theme: event.target.value })}>
+                <option value="dark">Dark</option><option value="light">Light</option>
+              </select></div>
+          </div>
+        </section>
+        <section className="section open"><div className="section-head static">Preview</div>
+          <div className="section-body">
+            <div className="field"><label>Preview quality</label>
+              <select value={s.quality} onChange={(event) => actions.setSettings({ quality: event.target.value })}>
+                {Object.entries(QUALITY).map(([key, item]) => <option key={key} value={key}>{item.label} ({Math.round(item.scale * 100)}%)</option>)}
+              </select></div>
+            <div className="field"><label>Preview frame rate</label>
+              <select value={s.fps} onChange={(event) => actions.setSettings({ fps: +event.target.value })}>
+                <option value={60}>60 fps</option><option value={30}>30 fps</option>
+              </select></div>
+            <div className="field"><label>Adaptive quality</label><Toggle checked={s.adaptive} onChange={(adaptive) => actions.setSettings({ adaptive })} label="Adaptive quality" /></div>
+          </div>
+        </section>
+        <section className="section open"><div className="section-head static">Canvas helpers</div>
+          <div className="section-body">
+            <div className="field"><label>Composition guides</label><Toggle checked={preferences.guides} onChange={(guides) => onPreferencesChange({ guides })} label="Composition guides" /></div>
+            <div className="field"><label>Safe area</label><Toggle checked={preferences.safeArea} onChange={(safeArea) => onPreferencesChange({ safeArea })} label="Safe area overlay" /></div>
+            <div className="field"><label>Snap while moving</label><Toggle checked={preferences.snap} onChange={(snap) => onPreferencesChange({ snap })} label="Snap elements to grid while moving" /></div>
+            <div className="hint">Guides and safe area appear only in the preview and are never included in exports.</div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   return (
-    <div className="props settings">
-      <section className="section open"><div className="section-head static">Canvas</div>
-        <div className="section-body">
-          <div className="field"><label>Aspect ratio</label>
-            <select value={aspect} onChange={(e) => setAspectRatio(e.target.value)}>
-              {ASPECTS.map((a) => <option key={a.value} value={a.value}>{a.label}</option>)}
-            </select></div>
-          {aspect === 'custom' && <div className="field"><label>Custom canvas size</label>
-            <div className="row-gap">
-              <input aria-label="Custom width" type="number" min="2" max="7680" step="2" value={customSize.width} onChange={(e) => setDimension('width', e.target.value)} />
-              <input aria-label="Custom height" type="number" min="2" max="7680" step="2" value={customSize.height} onChange={(e) => setDimension('height', e.target.value)} />
-            </div></div>}
-          <div className="field"><label>Background</label><ColorInput value={s.background} onChange={(background) => actions.setSettings({ background: background.slice(0, 7) })} /></div>
-          <div className="field"><label>Canvas preset</label>
-            <select value={preset < 0 ? -1 : preset} onChange={(e) => {
-              const p = [
-                { w: 1920, h: 1080 }, { w: 1080, h: 1920 }, { w: 1080, h: 1080 },
-                { w: 1080, h: 1350 }, { w: 2560, h: 1080 },
-              ][+e.target.value];
-              if (p) { setCustomSize(p); actions.setSettings(p); setAspect(initialAspect(p.w, p.h)); }
-            }}>
-              {preset < 0 && <option value={-1}>{s.width}×{s.height}</option>}
-              {['16:9 · 1920×1080', '9:16 · 1080×1920', '1:1 · 1080×1080', '4:5 · 1080×1350', '21:9 · 2560×1080'].map((label, i) => <option key={label} value={i}>{label}</option>)}
-            </select></div>
-        </div>
-      </section>
-      <section className="section open"><div className="section-head static">Performance</div>
-        <div className="section-body">
-          <div className="field"><label>Preview Quality</label>
-            <select value={s.quality} onChange={(e) => actions.setSettings({ quality: e.target.value })}>{Object.entries(QUALITY).map(([k, q]) => <option key={k} value={k}>{q.label} ({Math.round(q.scale * 100)}%)</option>)}</select></div>
-          <div className="field"><label>Preview frame rate</label>
-            <select value={s.fps} onChange={(e) => actions.setSettings({ fps: +e.target.value })}><option value={60}>60 fps</option><option value={30}>30 fps</option></select></div>
-          <div className="field"><label>Adaptive quality</label><Toggle checked={s.adaptive} onChange={(adaptive) => actions.setSettings({ adaptive })} label="Adaptive quality" /></div>
-          <div className="hint">When frames run long the preview steps down one quality tier automatically.</div>
-        </div>
-      </section>
+    <div className="props settings export-panel">
       <section className="section open"><div className="section-head static">Export video</div>
         <div className="section-body">
           <div className="field"><label>Aspect ratio</label>

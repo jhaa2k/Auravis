@@ -36,6 +36,13 @@ export class AudioEngine {
     this.frame = this.silent();
     if (this.el) {
       this.el.addEventListener('ended', () => this.onEnded());
+      this.el.addEventListener('playing', () => {
+        if (this.mode !== 'file' || this.el.paused || this.playing) return;
+        this.playing = true;
+        this.pausedForFocus = false;
+        this.emit();
+      });
+      this.el.addEventListener('error', () => this.onMediaError());
       this.el.addEventListener('loadedmetadata', () => this.syncMediaSession());
       this.el.addEventListener('durationchange', () => this.syncMediaSession());
     }
@@ -85,6 +92,16 @@ export class AudioEngine {
     const C = window.AudioContext || window.webkitAudioContext;
     if (!C) throw new Error('Web Audio is not supported in this browser');
     const ctx = (this.ctx = new C());
+    ctx.addEventListener?.('statechange', () => {
+      if (ctx.state === 'suspended' && this.mode === 'file' && !this.el.paused) {
+        ctx.resume().catch((error) => {
+          if (!this.el.paused && this.mode === 'file') {
+            this.pause();
+            this.reportPlaybackError(error);
+          }
+        });
+      }
+    });
     this.mix = ctx.createGain();
     this.monoAn = ctx.createAnalyser();
     this.monoAn.fftSize = TD; this.monoAn.smoothingTimeConstant = 0;
@@ -121,6 +138,7 @@ export class AudioEngine {
     this.playGeneration++;
     this.playPromise = null;
     this.el.pause();
+    this.mediaError = false;
     this.index = ((i % this.tracks.length) + this.tracks.length) % this.tracks.length;
     this.mode = 'file';
     this.el.src = this.tracks[this.index].url;
@@ -171,9 +189,7 @@ export class AudioEngine {
         this.playing = false;
         this.pausedForFocus = false;
         this.emit();
-        window.dispatchEvent(new CustomEvent('auravis:playback-error', {
-          detail: { message: error.message || 'Could not play this audio file.' },
-        }));
+        if (!this.mediaError) this.reportPlaybackError(error);
         return false;
       } finally {
         if (this.playPromise === attempt) this.playPromise = null;
@@ -181,6 +197,25 @@ export class AudioEngine {
     })();
     this.playPromise = attempt;
     return attempt;
+  }
+  reportPlaybackError(error) {
+    const message = error?.message || 'Could not play this audio file.';
+    window.dispatchEvent(new CustomEvent('auravis:playback-error', { detail: { message } }));
+  }
+  onMediaError() {
+    const error = this.el?.error;
+    if (!error || this.mode !== 'file') return;
+    this.mediaError = true;
+    this.playing = false;
+    this.pausedForFocus = false;
+    this.emit();
+    const messages = {
+      1: 'Audio playback was interrupted.',
+      2: 'Could not load this audio file.',
+      3: 'This audio file could not be decoded.',
+      4: 'This audio format is not supported.',
+    };
+    this.reportPlaybackError({ message: messages[error.code] || 'Could not play this audio file.' });
   }
   pause({ focusLoss = false } = {}) {
     this.playGeneration++;
