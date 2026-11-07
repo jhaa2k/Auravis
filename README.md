@@ -12,6 +12,15 @@ npm test         # 63 tests: DSP, schema, store, every element through the real 
 npm run build    # production build in dist/
 ```
 
+## Build an Android APK
+Install JDK 21 and the Android SDK, set `JAVA_HOME` and `ANDROID_HOME` (or
+`ANDROID_SDK_ROOT`), then run:
+```bash
+npm run android:build
+```
+The installable debug APK is written to `android/app/build/outputs/apk/debug/app-debug.apk`.
+GitHub Actions also builds it on pushes to `main`; download `auravis-debug-apk` from the workflow run's artifacts.
+
 ## Publish on GitHub Pages
 1. Push this folder to a GitHub repo (branch `main`).
 2. **Settings → Pages → Build and deployment → Source: GitHub Actions**.
