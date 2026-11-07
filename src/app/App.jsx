@@ -46,7 +46,7 @@ export default function App() {
   }, [tool]);
 
   return (
-    <div className="app android-app">
+    <div className="app android-app" onContextMenu={(event) => event.preventDefault()}>
       <header className="topbar">
         <div className="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#2a2926" /><path d="M14 40V24M24 50V14M34 38V26M44 46V18M52 38V26" stroke="#ff9a6b" strokeWidth="5" strokeLinecap="round" /></svg><span>Auravis</span></div>
         <button className="project-name" onClick={() => setDialog(true)} title="Open project manager">{name}{dirty ? ' •' : ''}</button>
