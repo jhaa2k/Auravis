@@ -385,7 +385,7 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
 .android-app .music-library-head strong { font-size: 13px; }
 .android-app .music-library-head span { color: var(--muted); font-size: 11px; }
 .android-app .music-library-head .btn { min-height: 38px; }
-.android-app .music-track-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; margin: 0; padding: 4px; }
+.android-app .music-track-list { flex: 1; min-height: 0; overflow-y: hide; overscroll-behavior: contain; list-style: none; margin: 0; padding: 4px; }
 .android-app .music-track-list li { display: flex; align-items: center; gap: 4px; min-height: 54px; padding: 3px 4px 3px 8px; border-bottom: 1px solid #ffffff0c; border-radius: 8px; }
 .android-app .music-track-list li.active { background: linear-gradient(100deg, #3e3028, #332923); }
 .android-app .music-track { display: flex; flex: 1; align-items: center; gap: 10px; min-width: 0; min-height: 44px; padding: 4px 2px; border: 0; background: transparent; text-align: left; }
