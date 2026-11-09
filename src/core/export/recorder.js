@@ -1,5 +1,6 @@
 export const EXPORT_FORMATS = [
   { value: 'video/mp4;codecs=avc1.42E01E,mp4a.40.2', label: 'MP4 · H.264 / AAC', extension: 'mp4' },
+  { value: 'video/mp4', label: 'MP4 · Device codec', extension: 'mp4' },
   { value: 'video/webm;codecs=vp9,opus', label: 'WebM · VP9 / Opus', extension: 'webm' },
   { value: 'video/webm;codecs=vp8,opus', label: 'WebM · VP8 / Opus', extension: 'webm' },
 ];
