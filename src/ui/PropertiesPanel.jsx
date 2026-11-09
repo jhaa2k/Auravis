@@ -26,10 +26,10 @@ export function PositionControls({ element }) {
   const anchorY = Number.isFinite(element.props.anchorY) ? element.props.anchorY : 0.5;
   const locked = Boolean(element.locked);
   const update = (patch) => actions.updateProps(element.id, patch);
-  const nudge = (dx, dy) => update({ position: [position[0] + dx * step, position[1] + dy * step] });
+  const nudge = (dx, dy) => update({ position: [Math.max(-200, Math.min(200, position[0] + dx * step)), Math.max(-200, Math.min(200, position[1] + dy * step))] });
   const number = (value, patch, label, min, max, stepValue = 1) => (
     <label className="quick-number"><span>{label}</span><input type="number" value={value} min={min} max={max} step={stepValue} disabled={locked}
-      onChange={(event) => { const next = Number(event.target.value); if (event.target.value !== '' && Number.isFinite(next)) update(patch(next)); }} /></label>
+      onChange={(event) => { const next = Number(event.target.value); if (event.target.value !== '' && Number.isFinite(next)) update(patch(Math.max(min, Math.min(max, next)))); }} /></label>
   );
   return (
     <section className="quick-position" aria-label="Move and adjust selected element">
@@ -40,8 +40,8 @@ export function PositionControls({ element }) {
       <div className="quick-position-layout">
         <div className="quick-position-values">
           <div className="position-fields">
-            {number(position[0], (v) => ({ position: [v, position[1]] }), 'X · Center 0', -4000, 4000)}
-            {number(position[1], (v) => ({ position: [position[0], v] }), 'Y · Center 0', -4000, 4000)}
+            {number(position[0], (v) => ({ position: [v, position[1]] }), 'X · −200 / 0 / +200', -200, 200)}
+            {number(position[1], (v) => ({ position: [position[0], v] }), 'Y · −200 / 0 / +200', -200, 200)}
             {Object.prototype.hasOwnProperty.call(element.props, 'rotation') && number(rotation, (v) => ({ rotation: v }), 'Rotation', -720, 720, 0.1)}
           </div>
           <div className="position-adjustments">
@@ -49,8 +49,8 @@ export function PositionControls({ element }) {
             {number(scale[1], (v) => ({ scale: [scale[0], Math.max(0.01, v)] }), 'Height', 0.01, 12, 0.01)}
           </div>
           <div className="position-step" aria-label="Movement step">
-            <button type="button" className={step === 1 ? 'active' : ''} aria-pressed={step === 1} disabled={locked} onClick={() => setStep(1)}>1 px</button>
-            <button type="button" className={step === 10 ? 'active' : ''} aria-pressed={step === 10} disabled={locked} onClick={() => setStep(10)}>10 px</button>
+            <button type="button" className={step === 1 ? 'active' : ''} aria-pressed={step === 1} disabled={locked} onClick={() => setStep(1)}>1</button>
+            <button type="button" className={step === 10 ? 'active' : ''} aria-pressed={step === 10} disabled={locked} onClick={() => setStep(10)}>10</button>
           </div>
           <div className="center-point-control">
             <span>Center Point</span>
@@ -70,11 +70,11 @@ export function PositionControls({ element }) {
         </div>
         <div className="position-direction">
           <div className="position-pad" aria-label="Nudge position">
-            <button type="button" title={"Move up " + step + " px"} disabled={locked} onClick={() => nudge(0, -1)}><Icon name="chevron-up" size={18} /></button>
-            <button type="button" title={"Move left " + step + " px"} disabled={locked} onClick={() => nudge(-1, 0)}><Icon name="chevron-left" size={18} /></button>
+            <button type="button" title={"Move −Y " + step + " units"} disabled={locked} onClick={() => nudge(0, -1)}><Icon name="chevron-up" size={18} /></button>
+            <button type="button" title={"Move −X " + step + " units"} disabled={locked} onClick={() => nudge(-1, 0)}><Icon name="chevron-left" size={18} /></button>
             <span aria-hidden="true"><Icon name="move" size={14} /></span>
-            <button type="button" title={"Move right " + step + " px"} disabled={locked} onClick={() => nudge(1, 0)}><Icon name="chevron-right" size={18} /></button>
-            <button type="button" title={"Move down " + step + " px"} disabled={locked} onClick={() => nudge(0, 1)}><Icon name="chevron-down" size={18} /></button>
+            <button type="button" title={"Move +X " + step + " units"} disabled={locked} onClick={() => nudge(1, 0)}><Icon name="chevron-right" size={18} /></button>
+            <button type="button" title={"Move +Y " + step + " units"} disabled={locked} onClick={() => nudge(0, 1)}><Icon name="chevron-down" size={18} /></button>
           </div>
         </div>
       </div>
