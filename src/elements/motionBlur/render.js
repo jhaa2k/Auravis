@@ -45,8 +45,7 @@ export function renderMotionBlur(rc, el) {
   }
   const comp = n ? { dx: cx / n, dy: cy / n } : { dx: 0, dy: 0 };
   let v = p.motionSource === 'transform' ? self : p.motionSource === 'target' ? target : p.motionSource === 'composition' ? comp : { dx: dOffX, dy: dOffY };
-  if (p.relativeMotionMode === 'relativeToComposition') v = { dx: v.dx - comp.dx, dy: v.dy - comp.dy };
-  else if (p.relativeMotionMode === 'relativeToTarget') v = { dx: v.dx - target.dx, dy: v.dy - target.dy };
+  if (p.relativeMotionMode) v = { dx: v.dx - comp.dx, dy: v.dy - comp.dy };
 
   const norm = 1 / 60 / Math.max(rc.dt, 1 / 240);     // frame-rate independent: express as px per 60 fps frame
   st.vx += (v.dx * norm - st.vx) * 0.5; st.vy += (v.dy * norm - st.vy) * 0.5;
