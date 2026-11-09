@@ -3,7 +3,7 @@ import { useApp } from '../app/hooks.js';
 import { actions } from '../app/services.js';
 import { QUALITY } from '../core/render/quality.js';
 import InAppSelect from './InAppSelect.jsx';
-import { Toggle } from './fields/primitives.jsx';
+import { Toggle, Slider } from './fields/primitives.jsx';
 
 const THEMES=[
  {value:'dark',label:'Obsidian · Dark'},
@@ -27,6 +27,12 @@ export default function SettingsPanel(){
   <section className="section open"><div className="section-head static">Appearance</div><div className="section-body">
    <div className="field"><label>App theme</label><InAppSelect value={s.theme||'dark'} options={THEMES} onChange={theme=>actions.setSettings({theme})} ariaLabel="App theme"/></div>
    <div className="hint">Theme changes apply to editor panels, menus and in-app pickers.</div>
+  </div></section>
+  <section className="section open"><div className="section-head static">Live visual effects</div><div className="section-body effect-controls">
+   <div className="hint">These project effects are composited into the preview canvas and are included in video recording.</div>
+   {[
+    ['background','Background'],['cameraZoom','Camera Zoom · Bass Follow'],['vignette','Vignette'],['scanlines','Scanlines'],['filmGrain','Film Grain'],['beatFlash','Beat Flash'],['beatShake','Beat Shake'],['hueJump','Hue Jump per Beat']
+   ].map(([key,label])=><div className="effect-slider" key={key}><div><label>{label}</label><output>{s.effects?.[key]||0}</output></div><Slider value={s.effects?.[key]||0} min={0} max={100} step={1} onChange={v=>actions.setSettings({effects:{...s.effects,[key]:v}})}/></div>)}
   </div></section>
   <section className="section open"><div className="section-head static">Canvas defaults</div><div className="section-body">
    <div className="field"><label>Aspect ratio / size</label><InAppSelect value={size} options={RESOLUTIONS} onChange={setSize} ariaLabel="Canvas size"/></div>
