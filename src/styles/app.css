@@ -891,3 +891,54 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
   .android-app .tool-panel.open > .quick-position .position-pad button,
   .android-app .tool-panel.open > .quick-position .position-pad span { min-width: 24px; min-height: 24px; }
 }
+
+
+/* AUDIOVIS PRO coral dark editor */
+:root{--bg:#1a1a1a;--panel:#242424;--panel2:#303030;--line:#3a3a3a;--text:#fff;--muted:#929292;--accent:#ff704f;--accent2:#ff704f;--danger:#ff5b5b;--radius:14px}
+.android-app{background:#1a1a1a}
+.android-app .topbar{flex:none;min-height:54px;padding:8px 14px;gap:12px;background:#1a1a1a;border-bottom:1px solid #2c2c2c}
+.audiovis-brand{flex:1;padding:0;text-align:left;color:#fff;background:none;border:0;font-size:16px;font-weight:800;letter-spacing:.09em;white-space:nowrap}
+.audiovis-brand b{color:var(--accent);font-weight:800}
+.header-actions{gap:5px}.header-actions .icon-btn{width:34px;height:34px;color:#f4f4f4;border-radius:10px}
+.android-app .col-preview{padding:10px 12px 8px}.android-app .preview-meta{min-height:22px}
+.android-app .preview-live{min-height:20px;padding:0;border:0;border-radius:0;background:none;color:#fff;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.android-app .preview-live>span{display:none}
+.android-app .stage{border-radius:12px;border:1px solid #333;box-shadow:0 14px 40px #0009}
+.android-app .tool-dock{background:#242424;border-top:1px solid #3b3b3b;border-radius:18px 18px 0 0;overflow:hidden}
+.android-app .tool-dock.open{height:min(61dvh,570px)}
+.android-app .tool-panel{inset:0 0 66px;background:#242424}
+.android-app .tool-panel.open{border-radius:18px 18px 0 0}
+.android-app .sheet-grabber{height:19px;flex:none;display:flex;align-items:center;justify-content:center;background:#242424}
+.android-app .sheet-grabber span{display:block;width:38px;height:4px;border-radius:5px;background:#686868}
+.android-app .tool-panel-head{min-height:43px;height:43px;padding:0 15px;background:#242424;border-bottom:1px solid #393939;color:#fff}
+.android-app .tool-panel-head strong{color:#fff;font-size:15px;font-weight:750}
+.android-app .sheet-close{color:#ddd;width:30px;height:30px}
+.android-app .tool-panel-content{background:#242424}
+.android-app .layers{padding:0 12px 12px}
+.android-app .layers .panel-title{padding:9px 0 11px;border:0;flex-wrap:nowrap}
+.android-app .layers .panel-title>span{display:none}
+.android-app .layers .panel-title .row-gap{gap:7px}
+.android-app .layers .panel-title .icon-btn{width:34px;height:34px;border:1px solid #414141;border-radius:9px;background:#303030;color:#eee}
+.android-app .layers .panel-title .icon-btn.danger{color:#ff6868;border-color:#794040}
+.android-app .layers .panel-title .btn.primary{min-height:36px;padding:0 12px;background:var(--accent);color:#1a100d;border:1px solid var(--accent);border-radius:10px;font-weight:750}
+.android-app .layers .layer-list{flex:none;overflow:visible;padding:0;display:flex;flex-direction:column;gap:7px}
+.android-app .layers .layer{min-height:49px;padding:7px 9px;gap:9px;background:#2c2c2c;border:1px solid transparent;border-radius:10px}
+.android-app .layers .layer.selected{background:#492d27;border:1px solid #ff704f;box-shadow:inset 3px 0 0 #ff704f}
+.android-app .layers .layer.selected .layer-name b,.android-app .layers .layer.selected .layer-icon{color:#ff8a70}
+.android-app .layers .layer-name b{color:#f6f6f6;font-weight:650}.android-app .layers .layer-name small{color:#999}
+.android-app .layers .layer .icon-btn{color:#c8c8c8}
+.android-app .layers .stack-note{padding:8px 2px;border:0;font-size:11px}
+.android-app .tool-panel-content>.props{padding:0 12px 14px}
+.android-app .props-head{padding:10px 0}
+.android-app .section{margin:7px 0;border:1px solid #3c3c3c;border-radius:10px;overflow:hidden;background:#2b2b2b}
+.android-app .section-head{min-height:43px;padding:0 12px;color:#fff;font-weight:700}
+.android-app .section.open .section-head{color:#ff927d}
+.android-app .tool-bar{height:66px;padding:5px 5px max(5px,env(safe-area-inset-bottom));gap:0;justify-content:space-around;background:#202020;border-top:1px solid #393939;overflow:hidden}
+.android-app .tool-button{flex:1 1 0;min-width:0;min-height:54px;padding:4px 1px;gap:4px;border-radius:10px;font-size:10px;color:#898989}
+.android-app .tool-button.active{color:#ff795b;background:transparent}
+.android-app .tool-button svg{width:19px;height:19px}
+.android-app .quick-position{display:none!important}
+.android-app .tool-panel.open>.tool-panel-head,.android-app .tool-panel.open>.tool-panel-content{position:static;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.android-app .tool-panel.open>.tool-panel-head{height:43px;min-height:43px}
+.android-app .tool-panel.open>.tool-panel-content{flex:1;min-height:0;overflow-y:auto}
+@media(max-width:380px){.android-app .topbar{padding-left:10px;padding-right:8px}.audiovis-brand{font-size:14px;letter-spacing:.06em}.header-actions .icon-btn{width:30px}.android-app .layers .panel-title .icon-btn{width:30px;height:32px}.android-app .tool-button{font-size:9px}}
