@@ -5,7 +5,7 @@ import { getDefinition } from '../core/schema/registry.js';
 import FieldRenderer from './fields/FieldRenderer.jsx';
 import Icon from './Icon.jsx';
 
-function PositionControls({ element }) {
+export function PositionControls({ element }) {
   const position = Array.isArray(element.props.position) ? element.props.position : null;
   if (!position) return null;
   const update = (x, y) => actions.updateProps(element.id, { position: [x, y] });
