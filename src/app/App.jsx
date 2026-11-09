@@ -12,7 +12,7 @@ import ProjectDialog from '../ui/ProjectDialog.jsx';
 import Toasts from '../ui/Toasts.jsx';
 import Icon from '../ui/Icon.jsx';
 
-const TOOLS = [['music', 'Music', 'music'], ['layers', 'Elements', 'layers'], ['props', 'Properties', 'sliders'], ['presets', 'Presets', 'grid'], ['project', 'Settings', 'settings']];
+const TOOLS = [['music', 'Media', 'music'], ['layers', 'Layers', 'layers'], ['presets', 'Presets', 'heart'], ['audio', 'Audio', 'wave'], ['scene', 'Scene', 'image'], ['export', 'Export', 'download']];
 const DEFAULT_PREFERENCES = { theme: 'dark', guides: true, safeArea: false, snap: false };
 function readPreferences() {
   try {
@@ -33,7 +33,7 @@ export default function App() {
   const dirty = useApp((s) => s.dirty);
   const selectedElement = useApp((s) => s.elements.find((e) => e.id === s.selectedId) || null);
   const canUndo = useApp((s) => s.past.length > 0), canRedo = useApp((s) => s.future.length > 0);
-  const [tool, setTool] = useState('music');
+  const [tool, setTool] = useState('layers');
   const [dialog, setDialog] = useState(false);
   const [preferences, setPreferences] = useState(readPreferences);
   const updatePreferences = (patch) => setPreferences((current) => {
@@ -85,12 +85,12 @@ export default function App() {
   return (
     <div className="app android-app" data-theme={preferences.theme} onContextMenu={(event) => event.preventDefault()}>
       <header className="topbar">
-        <div className="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#2a2926" /><path d="M14 40V24M24 50V14M34 38V26M44 46V18M52 38V26" stroke="#f5f5f5" strokeWidth="5" strokeLinecap="round" /></svg><span>Auravis</span></div>
-        <button className="project-name" onClick={() => setDialog(true)} title="Open project manager">{name}{dirty ? ' •' : ''}</button>
-        <div className="row-gap">
+        <button className="brand audiovis-brand" onClick={() => setDialog(true)}>AUDIOVIS <b>PRO</b></button>
+        
+        <div className="row-gap header-actions">
           <button className="icon-btn" title="Undo (Ctrl+Z)" disabled={!canUndo} onClick={() => actions.undo()}><Icon name="undo" /></button>
           <button className="icon-btn" title="Redo (Ctrl+Shift+Z)" disabled={!canRedo} onClick={() => actions.redo()}><Icon name="redo" /></button>
-          <button className="btn small export-btn" onClick={() => setTool('export')}><Icon name="download" size={15} />Export</button>
+          <button className="icon-btn" title="Split screen" onClick={() => window.dispatchEvent(new CustomEvent('auravis:toggle-split-screen'))}><Icon name="split" /></button><button className="icon-btn" title="Settings" onClick={() => setTool('scene')}><Icon name="settings" /></button>
         </div>
       </header>
       <main className={`workspace android-workspace ${!tool && !selectedElement ? "compact" : "expanded"}`}>
@@ -102,15 +102,15 @@ export default function App() {
             {<PositionControls element={selectedElement} />}
             {tool && (
               <>
-                <header className="tool-panel-head">
-                  <strong><Icon name={TOOLS.find(([key]) => key === tool)?.[2] || 'download'} size={16} />{TOOLS.find(([key]) => key === tool)?.[1] || 'Export'}</strong>
+                <div className="sheet-grabber" aria-hidden="true"><span /></div><header className="tool-panel-head">
+                  <strong>{TOOLS.find(([key]) => key === tool)?.[1] || 'Export'}</strong><button className="icon-btn sheet-close" title="Close panel" onClick={() => setTool(null)}><Icon name="close" /></button>
                 </header>
                 <div className={`tool-panel-content ${tool === 'music' ? 'music-tool-content' : ''}`}>
                   {tool === 'music' && <MusicPanel />}
                   {tool === 'layers' && <LayerList />}
-                  {tool === 'props' && <PropertiesPanel />}
+                  {tool === 'audio' && <PropertiesPanel />}
                   {tool === 'presets' && <PresetPanel />}
-                  {tool === 'project' && <SettingsPanel mode="settings" preferences={preferences} onPreferencesChange={updatePreferences} />}
+                  {tool === 'scene' && <SettingsPanel mode="settings" preferences={preferences} onPreferencesChange={updatePreferences} />}
                   {tool === 'export' && <SettingsPanel mode="export" />}
                 </div>
               </>
