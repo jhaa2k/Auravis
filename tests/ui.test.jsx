@@ -23,7 +23,7 @@ describe('React UI renders without runtime errors', () => {
     expect(html).toContain('Export');
     expect(html).toContain('1920');
     expect(html).toContain('1080');
-    expect(html).toContain('FPS');
+    expect(html).toContain(' fps');
   });
   it('property panel renders every property of every element type', () => {
     for (const def of listDefinitions()) {
@@ -41,20 +41,21 @@ describe('React UI renders without runtime errors', () => {
     for (const s of ['General', 'Image', 'Color', 'Color Key', 'Blur', 'Generated Album Art']) expect(html).toContain(s);
     expect(html).not.toContain('class="section-body"');
   });
-  it('uses double-tap slider reset instead of showing the slider reset button', () => {
+  it('shows a reset control when a numeric property differs from its default', () => {
     const definition = listDefinitions().find((item) => item.sections.some((section) => section.props.some((property) => ['number', 'int'].includes(property.type) && !property.dynamic)));
     const property = definition.sections.flatMap((section) => section.props).find((item) => ['number', 'int'].includes(item.type) && !item.dynamic);
     const changedValue = property.default === property.min ? property.default + property.step : property.default - property.step;
     const html = renderToString(<FieldRenderer def={property} el={{ props: { [property.key]: changedValue } }} elements={[]} onChange={() => {}} onReset={() => {}} onAction={() => {}} />);
-    expect(html).toContain('Double-tap to reset to default');
-    expect(html).not.toContain(`aria-label="Reset ${property.label}"`);
+    expect(html).toContain(`aria-label="Reset ${property.label}"`);
+    expect(html).toContain('title="Reset to default"');
   });
   it('layers, music, transport and settings', () => {
     expect(renderToString(<LayerList />)).toContain('Add');
     expect(renderToString(<MusicPanel />)).toContain('Import');
     const transport = renderToString(<TransportBar />);
-    expect(transport).toContain('Playback controls');
-    expect(transport).toContain('No track selected');
+    expect(transport).toContain('title="Play"');
+    expect(transport).toContain('No audio loaded');
+    expect(transport).toContain('aria-label="Seek track"');
     expect(transport).toContain('class="now"');
     expect(renderToString(<SettingsPanel />)).toContain('Canvas helpers');
     expect(renderToString(<SettingsPanel mode="export" />)).toContain('Export video');
