@@ -11,7 +11,7 @@ const P = {
   download: 'M12 4v12M7 11l5 5 5-5M4 20h16', shuffle: 'M3 7h4l10 10h4M3 17h4l3-3M14 10l3-3h4M18 4l3 3-3 3M18 14l3 3-3 3', repeat: 'M4 11V9a3 3 0 013-3h12l-3-3M20 13v2a3 3 0 01-3 3H5l3 3',
   volume: 'M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 010 7', record: 'M12 7a5 5 0 100 10 5 5 0 000-10z', stop: 'M6 6h12v12H6z', settings: 'M12 9a3 3 0 100 6 3 3 0 000-6zM19 12l2-1-2-4-2 .5-1.5-1L15 4h-4l-.5 2.5-1.5 1L7 7l-2 4 2 1v1l-2 1 2 4 2-.5 1.5 1L11 20h4l.5-2.5 1.5-1 2 .5 2-4-2-1z',
   warn: 'M12 4l10 17H2zM12 10v5M12 18h.01', error: 'M12 3a9 9 0 100 18 9 9 0 000-18zM12 8v5M12 16h.01', close: 'M6 6l12 12M18 6L6 18', chevron: 'M9 6l6 6-6 6', music: 'M9 18V6l11-2v12M9 18a3 3 0 11-6 0 3 3 0 016 0zM20 16a3 3 0 11-6 0 3 3 0 016 0z',
-  list: 'M4 6h16M4 12h16M4 18h16', check: 'M5 12l4 4L19 6', layers: 'M12 3l9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 16l9 5 9-5', demo: 'M5 3l14 9-14 9z', drag: 'M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01', info: 'M12 3a9 9 0 100 18 9 9 0 000-18zM12 11v6M12 8h.01',
+  search: 'M10.8 18a7.2 7.2 0 110-14.4 7.2 7.2 0 010 14.4zM16.2 16.2L21 21', list: 'M4 6h16M4 12h16M4 18h16', check: 'M5 12l4 4L19 6', layers: 'M12 3l9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 16l9 5 9-5', demo: 'M5 3l14 9-14 9z', drag: 'M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01', info: 'M12 3a9 9 0 100 18 9 9 0 000-18zM12 11v6M12 8h.01',
 };
 export default function Icon({ name, size = 18, fill = false, ...rest }) {
   return (
