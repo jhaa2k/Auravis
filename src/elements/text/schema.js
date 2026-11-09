@@ -4,7 +4,7 @@ import { general } from '../shared/general.js';
 export const sections = [
   general({ position: [0, 380] }),
   section('Appearance', [
-    area('text', 'Text', '{ArtistOrTitle}', { hint: 'Placeholders: {ArtistOrTitle} {title} {artist} {time} {duration} {remaining} {progress} {date} {clock}' }),
+    area('text', 'Text', 'Your Text', { hint: 'Placeholders: {ArtistOrTitle} {title} {artist} {time} {duration} {remaining} {progress} {date} {clock}' }),
     col('color', 'Color', '#ffffffff'),
     num('fontSize', 'Font Size', 30, 4, 600, 1, { unit: 'px' }),
     sel('typeFace', 'Type Face', 'Inter', [{ value: 'Inter', label: 'Inter' }], { dynamic: 'fonts' }),
