@@ -11,6 +11,7 @@ import PresetPanel from '../ui/PresetPanel.jsx';
 import ProjectDialog from '../ui/ProjectDialog.jsx';
 import Toasts from '../ui/Toasts.jsx';
 import Icon from '../ui/Icon.jsx';
+import { importProjectFile } from '../core/project/persistence.js';
 
 const NAV = [['music','Music','music'],['elements','Elements','bars'],['properties','Properties','settings'],['scene','Scene','layers'],['settings','Settings','settings']];
 const TITLES = { music:'Music Library', elements:'Elements & Tools', properties:'Properties', scene:'Visual Scenes & Presets', settings:'App Settings', export:'Export Video' };
@@ -68,9 +69,16 @@ export default function App() {
     };
     const warn=e=>{if(store.getState().dirty){e.preventDefault();e.returnValue='';}};
     const openPanel=e=>setOverlay(e.detail||'music');
+    const importFile=async e=>{
+      const file=e.detail?.file;if(!file)return;
+      if(file.name?.toLowerCase().endsWith('.viz')){toast('Avee .viz import needs a real sample file to implement and validate its format. This file was not modified or imported.','warning');return;}
+      try{const p=await importProjectFile(file);actions.loadProject({id:null,name:p.name,version:1,settings:p.settings},p.elements);toast(p.warnings.length?'Imported with '+p.warnings.length+' repaired value(s)':'Imported '+p.name,p.warnings.length?'warning':'info');setOverlay('');}
+      catch(error){toast(error.message||'Could not import this project file','error');}
+    };
     window.addEventListener('auravis:open-panel',openPanel);
+    window.addEventListener('auravis:import-project-file',importFile);
     window.addEventListener('keydown',onKey);window.addEventListener('beforeunload',warn);
-    return()=>{window.removeEventListener('keydown',onKey);window.removeEventListener('beforeunload',warn);window.removeEventListener('auravis:open-panel',openPanel);};
+    return()=>{window.removeEventListener('keydown',onKey);window.removeEventListener('beforeunload',warn);window.removeEventListener('auravis:open-panel',openPanel);window.removeEventListener('auravis:import-project-file',importFile);};
   },[overlay]);
   const openPanel=key=>{if(key==='properties'&&!store.getState().selectedId)setOverlay('elements');else setOverlay(v=>v===key?'':key);};
   return <div className="app modern-app">
