@@ -3,6 +3,7 @@ import { NumberInput, Slider, Toggle, ColorInput } from './primitives.jsx';
 import MeasureField from './MeasureField.jsx';
 import ImageField from './ImageField.jsx';
 import FontField from './FontField.jsx';
+import InAppSelect from '../InAppSelect.jsx';
 import { fontStore } from '../../core/assets/fontStore.js';
 
 /** Options for selects whose choices depend on the project (effect targets, fonts). */
@@ -27,10 +28,7 @@ export default function FieldRenderer({ def, el, elements, onChange, onReset, on
     case 'int':
       if (def.dynamic === 'providers') {
         return row(providers.length ? (
-          <select value={value} onChange={(e) => set(+e.target.value, false)}>
-            {providers.map((p, i) => <option key={p.id} value={i + 1}>{i + 1} · {p.props.tag}</option>)}
-            {value > providers.length && <option value={value}>{value} · missing</option>}
-          </select>
+          <InAppSelect value={value} onChange={(v) => set(+v, false)} ariaLabel={def.label} options={[...providers.map((p, i) => ({value:i+1,label:(i+1)+' · '+p.props.tag})), ...(value>providers.length?[{value,label:value+' · missing'}]:[])]} />
         ) : <span className="warn-text">No Audio Provider in the project</span>);
       }
       return row(<div className="num-row"><Slider value={value} min={def.min} max={def.max} step={def.step} onChange={set} /><NumberInput value={value} min={def.min} max={def.max} step={def.step} onChange={set} /></div>);
@@ -38,9 +36,7 @@ export default function FieldRenderer({ def, el, elements, onChange, onReset, on
     case 'select':
       if (def.dynamic === 'fonts') return row(<FontField value={value} onChange={(v) => set(v, false)} sample={el.props.text?.split('\n')[0]?.slice(0, 24)} />, true);
       return row(
-        <select value={String(value)} onChange={(e) => { const o = optionsFor(def, el, elements).find((x) => String(x.value) === e.target.value); set(o ? o.value : e.target.value, false); }}>
-          {optionsFor(def, el, elements).map((o) => <option key={String(o.value)} value={String(o.value)}>{o.label}</option>)}
-        </select>);
+        <InAppSelect value={value} ariaLabel={def.label} options={optionsFor(def, el, elements)} onChange={(v) => set(v, false)} />);
     case 'color': return row(<ColorInput value={value} onChange={set} />);
     case 'text': return row(<input type="text" value={value} maxLength={def.maxLength} onChange={(e) => set(e.target.value)} placeholder={def.key === 'tag' ? 'Unique name' : ''} />);
     case 'textarea': return row(<textarea rows={def.key === 'text' ? 2 : 3} value={value} maxLength={def.maxLength} spellCheck={false} onChange={(e) => set(e.target.value)} />, true);
