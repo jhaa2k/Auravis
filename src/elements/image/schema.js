@@ -30,7 +30,8 @@ export const sections = [
   ]),
   section('Color Key', [
     bool('colorKeyEnabled', 'Color Key Enabled', false),
-    act('autoDetectColorKey', 'Auto Detect Color Key'),
+    bool('autoDetectColorKey', 'Auto Detect Color Key', true),
+    act('detectColorKeyNow', 'Detect Color Key Now'),
     col('colorKey', 'Color Key', '#00ff00ff'),
     num('transparencyStrength', 'Transparency Strength', 1, 0, 1, 0.01),
     num('opacityStrength', 'Opacity Strength', 1, 0, 1, 0.01),
@@ -41,7 +42,8 @@ export const sections = [
     num('blurRadius', 'Blur Radius', 9, 0, 200, 1),
   ]),
   section('Generated Album Art', [
-    num('generatedAlbumArtHintShiftHue', 'Generated Album Art Hint Shift Hue', 0, 0, 360, 1, { unit: '°' }),
+    bool('generatedAlbumArtHintShiftHue', 'Generated Album Art Hint Shift Hue', false),
+    num('generatedAlbumArtHueShift', 'Hue Shift Amount', 0, 0, 360, 1, { unit: '°' }),
     bool('generatedAlbumArtHintNoText', 'Generated Album Art Hint No Text', false),
     act('generatedAlbumArtHintForceGen', 'Generated Album Art Hint Force Gen'),
     col('generatedAlbumArtColor', 'Generated Album Art Color', '#ffffffff', { hint: 'Colour guidance. Fully transparent = derive from the track' }),
