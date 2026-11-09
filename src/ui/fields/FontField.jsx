@@ -1,6 +1,7 @@
 import { useRef, useState, useSyncExternalStore } from 'react';
 import { fontStore } from '../../core/assets/fontStore.js';
 import Icon from '../Icon.jsx';
+import InAppSelect from '../InAppSelect.jsx';
 
 export default function FontField({ value, onChange, sample }) {
   const input = useRef(null);
@@ -11,10 +12,7 @@ export default function FontField({ value, onChange, sample }) {
   return (
     <div>
       <div className="font-row">
-        <select value={value} onChange={(e) => onChange(e.target.value)}>
-          {missing && <option value={value}>{value} (missing)</option>}
-          {families.map((f) => <option key={f} value={f}>{f}</option>)}
-        </select>
+        <InAppSelect value={value} ariaLabel="Font family" onChange={onChange} options={[...(missing?[{value,label:value+' (missing)'}]:[]),...families.map(f=>({value:f,label:f}))]}/>
         <button className="btn small" onClick={() => input.current.click()} title="Import a TTF / OTF / WOFF font"><Icon name="upload" size={14} />Font</button>
         <input ref={input} type="file" accept=".ttf,.otf,.woff,.woff2" hidden onChange={async (e) => {
           const f = e.target.files[0]; e.target.value = '';
