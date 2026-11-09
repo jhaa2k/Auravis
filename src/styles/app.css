@@ -704,3 +704,6 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
 
 .android-app .quick-position-empty { justify-content: center; min-height: 110px; max-height: 150px; }
 .android-app .quick-position-empty p { margin: 2px 0 0; max-width: 620px; color: #929292; font-size: 12px; line-height: 1.45; }
+
+.android-app .tool-panel.move-tool > .quick-position { flex: 1 1 auto; max-height: none; }
+.android-app .tool-panel.move-tool > .quick-position .quick-position-layout { align-content: center; }
