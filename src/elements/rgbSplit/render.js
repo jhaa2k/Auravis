@@ -37,7 +37,10 @@ export function renderRgbSplit(rc, el) {
     const c = cols[ch], r = c.r / 255, g = c.g / 255, b = c.b / 255;
     for (let i = 0; i < s.length; i += 4) {
       const v = s[i + ch];
-      o[i] = v * r; o[i + 1] = v * g; o[i + 2] = v * b; o[i + 3] = s[i + 3] * c.a;
+      o[i] = ch === 0 ? v * r : 0;
+      o[i + 1] = ch === 1 ? v * g : 0;
+      o[i + 2] = ch === 2 ? v * b : 0;
+      o[i + 3] = s[i + 3] * c.a;
     }
     tctx.putImageData(st.img, 0, 0);
     pctx.drawImage(tmp, (ch - 1) * dx, (ch - 1) * dy);
