@@ -116,7 +116,7 @@ export class Visualizer {
   /** Project-wide post compositor. Runs on the same canvas captured by MediaRecorder. */
   applyProjectEffects(effects, audio, dt, time) {
     const keys = ['background','cameraZoom','vignette','scanlines','filmGrain','beatFlash','beatShake','hueJump','contrast','saturation','warmth','fade'];
-    if (!keys.some((key) => (effects[key] || 0) > 0)) return;
+    if (!keys.some((key) => (Number(effects[key]) || 0) !== 0)) return;
     const canvas = this.canvas;
     if (!canvas || typeof document === 'undefined') return;
     const w = canvas.width, h = canvas.height;
@@ -141,7 +141,7 @@ export class Visualizer {
     const zoom = 1 + (e.cameraZoom / 100) * low * 0.2;
     const shake = (e.beatShake / 100) * state.flash * 10;
     const hue = (state.beatCount * e.hueJump * 0.8) % 360;
-    const needsTransform = zoom > 1.001 || shake > 0.1 || hue > 0.1 || e.contrast > 0 || e.saturation !== 0 || e.warmth !== 0;
+    const needsTransform = zoom > 1.001 || shake > 0.1 || hue > 0.1 || e.contrast !== 0 || e.saturation !== 0 || e.warmth !== 0;
     if (needsTransform) {
       if (!this.postCanvas) this.postCanvas = document.createElement('canvas');
       const copy = this.postCanvas;
