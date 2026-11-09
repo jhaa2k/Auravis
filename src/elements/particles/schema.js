@@ -12,8 +12,7 @@ export const sections = [
     num('perspectiveFov', 'Perspective Fov', 150, 10, 180, 1, { unit: '°' }),
     sel('spawnArea', 'Spawn Area', 'rectangle', [{ value: 'point', label: 'Point' }, { value: 'rectangle', label: 'Rectangle' }, { value: 'circle', label: 'Circle' }]),
     vec2('spawnAreaSize', 'Spawn Area Size', [800, 300], 0, 4000, 1, { unit: 'px' }),
-    sel('vectorRelativeToCenter', 'Vector Relative To Center', 'off', [
-      { value: 'off', label: 'Off (use Vector Angle)' }, { value: 'outward', label: 'Outward' }, { value: 'inward', label: 'Inward' }, { value: 'swirl', label: 'Swirl' }]),
+    bool('vectorRelativeToCenter', 'Vector Relative To Center', false),
     bool('useRandomVector', 'Use Random Vector', false),
     num('vectorAngle', 'Vector Angle', 270, -360, 360, 1, { unit: '°' }),
     num('vectorAngleZ', 'Vector Angle Z', 1, -90, 90, 1, { unit: '°' }),
