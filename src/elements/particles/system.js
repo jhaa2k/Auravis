@@ -51,10 +51,8 @@ export class ParticleSystem {
     const speed = p.speed * (1 + (r() * 2 - 1) * (p.speedRandom / 100));
     let dx, dy, el;
     if (p.useRandomVector) { const a = r() * TAU; dx = Math.cos(a); dy = Math.sin(a); el = Math.asin(r() * 2 - 1); }
-    else if (p.vectorRelativeToCenter !== 'off') {
-      let a = Math.hypot(x, y) < 1e-3 ? r() * TAU : Math.atan2(y, x);
-      if (p.vectorRelativeToCenter === 'inward') a += Math.PI;
-      else if (p.vectorRelativeToCenter === 'swirl') a += Math.PI / 2;
+    else if (p.vectorRelativeToCenter) {
+      const a = Math.hypot(x, y) < 1e-3 ? r() * TAU : Math.atan2(y, x);
       dx = Math.cos(a); dy = Math.sin(a); el = p.vectorAngleZ * DEG;
     } else { const a = p.vectorAngle * DEG; dx = Math.cos(a); dy = -Math.sin(a); el = p.vectorAngleZ * DEG; }
     const ce = Math.cos(el);
