@@ -115,7 +115,7 @@ export class Visualizer {
 
   /** Project-wide post compositor. Runs on the same canvas captured by MediaRecorder. */
   applyProjectEffects(effects, audio, dt, time) {
-    const keys = ['background','cameraZoom','vignette','scanlines','filmGrain','beatFlash','beatShake','hueJump'];
+    const keys = ['background','cameraZoom','vignette','scanlines','filmGrain','beatFlash','beatShake','hueJump','contrast','saturation','warmth','fade'];
     if (!keys.some((key) => (effects[key] || 0) > 0)) return;
     const canvas = this.canvas;
     if (!canvas || typeof document === 'undefined') return;
@@ -141,7 +141,7 @@ export class Visualizer {
     const zoom = 1 + (e.cameraZoom / 100) * low * 0.2;
     const shake = (e.beatShake / 100) * state.flash * 10;
     const hue = (state.beatCount * e.hueJump * 0.8) % 360;
-    const needsTransform = zoom > 1.001 || shake > 0.1 || hue > 0.1;
+    const needsTransform = zoom > 1.001 || shake > 0.1 || hue > 0.1 || e.contrast > 0 || e.saturation !== 0 || e.warmth > 0;
     if (needsTransform) {
       if (!this.postCanvas) this.postCanvas = document.createElement('canvas');
       const copy = this.postCanvas;
@@ -154,7 +154,7 @@ export class Visualizer {
         ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,w,h);
         ctx.translate(w/2 + (Math.sin(time*73)*shake), h/2 + (Math.cos(time*61)*shake));
         ctx.scale(zoom, zoom);
-        if ('filter' in ctx) ctx.filter = `hue-rotate(${hue}deg)`;
+        if ('filter' in ctx) ctx.filter = `hue-rotate(${hue}deg) saturate(${Math.max(0,1+e.saturation/100)}) contrast(${Math.max(0.1,1+e.contrast/100)}) sepia(${e.warmth/100})`;
         ctx.drawImage(copy, -w/2, -h/2, w, h);
         ctx.restore();
         if ('filter' in ctx) ctx.filter = 'none';
@@ -164,6 +164,7 @@ export class Visualizer {
     if (!ctx) return;
     ctx.save(); ctx.setTransform(1,0,0,1,0,0);
     if (e.background) { ctx.globalAlpha = e.background / 100 * 0.28; ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h); }
+    if (e.fade) { ctx.globalAlpha=e.fade/100*0.32;ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h); }
     if (e.vignette) {
       const g = ctx.createRadialGradient(w/2,h/2,Math.min(w,h)*0.18,w/2,h/2,Math.max(w,h)*0.72);
       g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,`rgba(0,0,0,${e.vignette/100*0.82})`);
