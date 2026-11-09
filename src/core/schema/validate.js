@@ -74,6 +74,23 @@ export function sanitizeValue(p, v) {
     case 'measure': return { value: sanitizeMeasure(v, p.default) };
     case 'image': return { value: typeof v === 'string' && v ? v : null };
     case 'action': return { value: isNum(v) ? Math.max(0, Math.round(v)) : 0 };
+    case 'object': {
+      if (p.key !== 'barOverrides' || !v || typeof v !== 'object' || Array.isArray(v)) return { value: {} };
+      const out = {};
+      const allowedShapes = new Set(['rectangle','rounded','capsule','triangle','diamond','circle','chevron','hexagon','star','heart','line','horizontalLine']);
+      for (const [key, raw] of Object.entries(v).slice(0, 1024)) {
+        if (!/^\\d{1,4}$/.test(key) || !raw || typeof raw !== 'object' || Array.isArray(raw)) continue;
+        const item = {};
+        if (typeof raw.enabled === 'boolean') item.enabled = raw.enabled;
+        if (isValidColor(raw.color)) item.color = normalizeColor(raw.color);
+        for (const [name, lo, hi] of [['height',0,8],['width',0.05,2],['offsetX',-800,800],['offsetY',-800,800],['opacity',0,1],['rotation',-180,180]]) {
+          if (isNum(raw[name])) item[name] = clamp(raw[name],lo,hi);
+        }
+        if (allowedShapes.has(raw.shape)) item.shape = raw.shape;
+        if (Object.keys(item).length) out[key] = item;
+      }
+      return { value: out };
+    }
     default: return { value: v };
   }
 }
