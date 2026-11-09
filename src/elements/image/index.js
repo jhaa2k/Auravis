@@ -10,7 +10,7 @@ export default defineElement({
   /** Property actions (buttons). Return a props patch. */
   actions: {
     generatedAlbumArtHintForceGen: (el) => ({ generatedAlbumArtHintForceGen: el.props.generatedAlbumArtHintForceGen + 1 }),
-    autoDetectColorKey: (el, { images, meta, cache }) => {
+    detectColorKeyNow: (el, { images, meta, cache }) => {
       const src = resolveSource({ images, meta, cache, diag() {} }, el);
       if (!src || src === 'keep') return { _error: 'Image not ready yet' };
       const hex = detectKeyColor(src.drawable, src.w, src.h);
