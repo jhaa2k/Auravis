@@ -10,7 +10,7 @@ export default function MeasureField({ def, value, onChange, providers }) {
   const [open, setOpen] = useState(false);
   const set = (patch) => onChange({ ...value, ...patch });
   const src = MEASURE_SOURCES.find((s) => s.value === value.source)?.label;
-  const needsProvider = ['spectrum', 'band', 'bass', 'mid', 'treble', 'beat', 'totalTimeAndBeat', 'beatRandomShake', 'beatCamShakeRotMore', 'beatCamShakeRotLess', 'beatTriggerAnim'].includes(value.source);
+  const needsProvider = !['rms', 'peak', 'left', 'right', 'level'].includes(value.source);
   return (
     <div className={`measure ${value.enabled ? 'on' : ''}`}>
       <div className="measure-head">
