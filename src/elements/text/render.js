@@ -23,7 +23,8 @@ export function renderText(rc, el) {
   if (!str.trim()) return;
   if (!fontStore.isAvailable(p.typeFace)) rc.diag(el.id, 'warning', `Font "${p.typeFace}" is not available: using a fallback font`);
   const font = `${p.fontStyle} ${p.fontWeight} ${p.fontSize}px "${p.typeFace}", ${FONT_FALLBACK}`;
-  const sig = `${str}|${font}|${p.color}|${p.textAlign}|${fontStore.version}|${rc.scale}`;
+  const maxLineWidth = Math.max(32, rc.lw * 0.9);
+  const sig = `${str}|${font}|${p.color}|${p.textAlign}|${fontStore.version}|${rc.scale}|${maxLineWidth}`;
   let e = rc.cache.get(`txt:${el.id}`);
   if (!e || e.sig !== sig) {
     const k = Math.max(rc.scale, 0.5);
@@ -35,7 +36,7 @@ export function renderText(rc, el) {
     x.scale(k, k);
     x.font = font; x.fillStyle = cssOf(p.color); x.textBaseline = 'middle'; x.textAlign = p.textAlign;
     const ox = p.textAlign === 'left' ? pad : p.textAlign === 'right' ? w - pad : w / 2;
-    lines.forEach((l, i) => x.fillText(l, ox, pad + lh * (i + 0.5)));
+    lines.forEach((l, i) => x.fillText(l, ox, pad + lh * (i + 0.5), Math.max(1, w - pad * 2)));
     e = { sig, canvas: c, w, h };
     rc.cache.set(`txt:${el.id}`, e);
   }
