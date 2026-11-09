@@ -6,6 +6,7 @@ import { startRecording } from '../core/export/recorder.js';
 import { ColorInput, Toggle } from './fields/primitives.jsx';
 import { download } from './ProjectDialog.jsx';
 import Icon from './Icon.jsx';
+import InAppSelect from './InAppSelect.jsx';
 
 const PRESETS = [
   { label: '16:9 · 1920×1080', w: 1920, h: 1080 }, { label: '9:16 · 1080×1920', w: 1080, h: 1920 }, { label: '1:1 · 1080×1080', w: 1080, h: 1080 },
@@ -41,19 +42,16 @@ export default function SettingsPanel() {
       <section className="section open"><div className="section-head static">Canvas</div>
         <div className="section-body">
           <div className="field"><label>Aspect / Size</label>
-            <select value={preset} onChange={(e) => { const p = PRESETS[+e.target.value]; if (p) actions.setSettings({ width: p.w, height: p.h }); }}>
-              {preset < 0 && <option value={-1}>{s.width}×{s.height}</option>}
-              {PRESETS.map((p, i) => <option key={p.label} value={i}>{p.label}</option>)}
-            </select></div>
+            <InAppSelect value={preset<0?'custom':preset} ariaLabel="Canvas size" options={[...(preset<0?[{value:'custom',label:s.width+'×'+s.height+' · Custom'}]:[]),...PRESETS.map((p,i)=>({value:i,label:p.label}))]} onChange={v=>{const p=PRESETS[+v];if(p)actions.setSettings({width:p.w,height:p.h});}}/></div>
           <div className="field"><label>Background</label><ColorInput value={s.background} onChange={(background) => actions.setSettings({ background: background.slice(0, 7) })} /></div>
         </div>
       </section>
       <section className="section open"><div className="section-head static">Performance</div>
         <div className="section-body">
           <div className="field"><label>Preview Quality</label>
-            <select value={s.quality} onChange={(e) => actions.setSettings({ quality: e.target.value })}>{Object.entries(QUALITY).map(([k, q]) => <option key={k} value={k}>{q.label} ({Math.round(q.scale * 100)}%)</option>)}</select></div>
+            <InAppSelect value={s.quality} ariaLabel="Preview quality" options={Object.entries(QUALITY).map(([value,q])=>({value,label:q.label+' ('+Math.round(q.scale*100)+'%)'}))} onChange={quality=>actions.setSettings({quality})}/></div>
           <div className="field"><label>Frame Rate</label>
-            <select value={s.fps} onChange={(e) => actions.setSettings({ fps: +e.target.value })}><option value={60}>60 fps</option><option value={30}>30 fps</option></select></div>
+            <InAppSelect value={s.fps} ariaLabel="Frame rate" options={[{value:60,label:'60 fps'},{value:30,label:'30 fps'}]} onChange={fps=>actions.setSettings({fps})}/></div>
           <div className="field"><label>Adaptive quality</label><Toggle checked={s.adaptive} onChange={(adaptive) => actions.setSettings({ adaptive })} label="Adaptive quality" /></div>
           <div className="hint">When frames run long the preview steps down one quality tier automatically.</div>
         </div>
@@ -61,11 +59,7 @@ export default function SettingsPanel() {
       <section className="section open"><div className="section-head static">Export video</div>
         <div className="section-body">
           <div className="field"><label>Render resolution</label>
-            <select value={scale} disabled={!!rec} onChange={(e) => setScale(+e.target.value)}>
-              <option value={0.5}>50% · {Math.round(s.width / 2)}×{Math.round(s.height / 2)}</option>
-              <option value={0.75}>75% · {Math.round(s.width * 0.75)}×{Math.round(s.height * 0.75)}</option>
-              <option value={1}>100% · {s.width}×{s.height}</option>
-            </select></div>
+            <InAppSelect value={scale} disabled={!!rec} ariaLabel="Export resolution" options={[{value:0.5,label:'50% · '+Math.round(s.width/2)+'×'+Math.round(s.height/2)},{value:0.75,label:'75% · '+Math.round(s.width*.75)+'×'+Math.round(s.height*.75)},{value:1,label:'100% · '+s.width+'×'+s.height}]} onChange={setScale}/></div>
           {rec ? <button className="btn danger wide" onClick={stop}><Icon name="stop" size={15} fill />Stop and save</button>
             : <button className="btn primary wide" onClick={start} disabled={!audio.snapshot.hasAudio}><Icon name="record" size={15} fill />Record from the start</button>}
           <div className="hint">{audio.snapshot.hasAudio ? 'Records the canvas and audio in real time (WebM/MP4 depending on your browser).' : 'Load a track or start the demo first.'}</div>
