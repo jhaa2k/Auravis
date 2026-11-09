@@ -49,10 +49,15 @@ describe('elements render individually', () => {
     const provider = h.store.getState().elements.find((e) => e.type === 'audioProvider');
     const quietAudio = { analyze: () => ({ td: new Float32Array(8192), sampleRate: 48000, rms01: 0, peak01: 0, left01: 0, right01: 0, level01: 0 }), meta: {} };
     h.vis.audio = quietAudio;
+    h.actions.updateProps(provider.id, { sampleProvider: 'waveform' });
     h.vis.fft.setExternalSpectrum(2048, new Float32Array(1024).fill(0.6), 44100);
     h.frames(4);
     expect(h.coverage()).toBeGreaterThan(0.002);
+    expect(Math.max(...h.vis.rc.providers[0].out.samples)).toBeGreaterThan(0.1);
     expect(h.vis.fft.externalSampleRate).toBe(44100);
+    const adapted = h.vis.fft.request(4096, new Float32Array(8192));
+    expect(adapted).toHaveLength(2048);
+    expect(adapted[0]).toBeCloseTo(0.6);
   });
   it('bars react to audio: heights follow the provider and Flip Input mirrors them', () => {
     const h = harness(); const el = only(h, 'barsSegments', { softness: 0, segment1Mirror: false });
