@@ -42,7 +42,7 @@ export default function PreviewPanel({ preferences }) {
   return (
     <div className="preview">
       <div className="preview-meta">
-        <span className="preview-live"><span />Preview</span>
+        <span className="preview-live">PREVIEW</span><span className="preview-size">{width}×{height}</span>
       </div>
       <div className="stage" style={{ aspectRatio: `${width} / ${height}`, '--ar': width / height }}>
         <canvas ref={canvasRef} aria-label="Visualization preview" />
