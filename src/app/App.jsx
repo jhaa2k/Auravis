@@ -39,16 +39,23 @@ function MusicLibrary() {
 function MoveAdjust() {
   const id = useApp(s=>s.selectedId), elements = useApp(s=>s.elements), settings = useApp(s=>s.project.settings);
   const el = elements.find(x=>x.id===id);
+  const [snap,setSnap]=useState(false);
   if (!el || !Array.isArray(el.props.position)) return null;
   const x = Math.max(0,Math.min(1,0.5+el.props.position[0]/Math.max(1,settings.width)));
   const y = Math.max(0,Math.min(1,0.5+el.props.position[1]/Math.max(1,settings.height)));
-  const update = (nx,ny)=>actions.updateProps(el.id,{position:[(nx-.5)*settings.width,(ny-.5)*settings.height]},'position');
+  const update = (nx,ny)=>{const q=v=>snap?Math.round(v/.05)*.05:v;actions.updateProps(el.id,{position:[(q(nx)-.5)*settings.width,(q(ny)-.5)*settings.height]},'position');};
+  const scale=Array.isArray(el.props.scale)?Math.max(...el.props.scale):null;
+  const rotation=typeof el.props.rotation==='number'?el.props.rotation:null;
   return <section className="move-adjust">
-    <div className="move-adjust-title"><span><Icon name="motion" size={15}/>Move & Adjust</span><button onClick={()=>actions.updateProps(el.id,{position:[0,0]})}><Icon name="reset" size={14}/>Center</button></div>
+    <div className="move-adjust-title"><span><Icon name="motion" size={15}/>Move & Adjust</span><div className="move-adjust-actions"><button className={snap?'active':''} aria-pressed={snap} onClick={()=>setSnap(v=>!v)}>Snap {snap?'ON':'OFF'}</button><button onClick={()=>actions.updateProps(el.id,{position:[0,0]})}><Icon name="reset" size={14}/>Center</button></div></div>
     <div className="move-adjust-grid">
       <label><span>HORIZONTAL</span><input type="range" min="0" max="1" step=".001" value={x} onChange={e=>update(+e.target.value,y)}/><output>{x.toFixed(3)}</output></label>
       <label><span>VERTICAL</span><input type="range" min="0" max="1" step=".001" value={y} onChange={e=>update(x,+e.target.value)}/><output>{y.toFixed(3)}</output></label>
     </div>
+    {(scale!==null||rotation!==null)&&<div className="move-adjust-extra">
+      {scale!==null&&<label><span>SIZE</span><input type="range" min=".05" max="4" step=".001" value={Math.min(4,Math.max(.05,scale))} onChange={e=>{const v=+e.target.value;actions.updateProps(el.id,{scale:el.props.scaleIsUniform?[v,v]:[v,el.props.scale[1]]},'scale');}}/><output>{scale.toFixed(3)}</output></label>}
+      {rotation!==null&&<label><span>ROTATION</span><input type="range" min="-180" max="180" step=".1" value={rotation} onChange={e=>actions.updateProps(el.id,{rotation:+e.target.value},'rotation')}/><output>{rotation.toFixed(1)}°</output></label>}
+    </div>}
   </section>;
 }
 
