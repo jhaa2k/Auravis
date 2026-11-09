@@ -123,6 +123,14 @@ export class AudioEngine {
     this.recordDest = ctx.createMediaStreamDestination();
     this.mix.connect(this.monoAn); this.mix.connect(split);
     split.connect(this.lAn, 0); split.connect(this.rAn, 1);
+    // Keep the analysis branches pulled by the Web Audio render graph.
+    // A zero-gain sink makes analyser data update without duplicating audible audio.
+    this.analysisKeepAlive = ctx.createGain();
+    this.analysisKeepAlive.gain.value = 0;
+    this.monoAn.connect(this.analysisKeepAlive);
+    this.lAn.connect(this.analysisKeepAlive);
+    this.rAn.connect(this.analysisKeepAlive);
+    this.analysisKeepAlive.connect(ctx.destination);
     this.mix.connect(this.vol); this.vol.connect(ctx.destination); this.vol.connect(this.recordDest);
     this.mediaSource = ctx.createMediaElementSource(this.el);
     this.mediaSource.connect(this.mix);
