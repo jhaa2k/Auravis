@@ -22,6 +22,7 @@ export class Visualizer {
     this.scaleOverride = null;
     this.fpsOverride = null;
     this.hudListeners = new Set();
+    this.effectState = { low: 0, previousLevel: 0, flash: 0, beatCount: 0, lastBeat: -1 };
   }
 
   start() {
@@ -105,9 +106,88 @@ export class Visualizer {
       catch (e) { this.diagnostics.add(el.id, 'error', `Render failed: ${e.message}`); }
     }
     rc.endFrame();
+    this.applyProjectEffects(project.settings.effects || {}, audio, dt, time);
     const d = this.diagnostics.flush();
     if (d) this.onDiagnostics?.(d);
     this.hudListeners.forEach((l) => l());
+  }
+
+
+  /** Project-wide post compositor. Runs on the same canvas captured by MediaRecorder. */
+  applyProjectEffects(effects, audio, dt, time) {
+    const keys = ['background','cameraZoom','vignette','scanlines','filmGrain','beatFlash','beatShake','hueJump'];
+    if (!keys.some((key) => (effects[key] || 0) > 0)) return;
+    const canvas = this.canvas;
+    if (!canvas || typeof document === 'undefined') return;
+    const w = canvas.width, h = canvas.height;
+    if (!w || !h) return;
+    const e = Object.fromEntries(keys.map((key) => [key, Math.max(0, Math.min(100, Number(effects[key]) || 0))]));
+    const state = this.effectState;
+    const td = audio?.td;
+    let low = 0;
+    if (td?.length) {
+      let lp = state.low;
+      const start = Math.max(0, td.length - 2048);
+      for (let i = start; i < td.length; i++) { lp += 0.035 * (td[i] - lp); low += Math.abs(lp); }
+      low = Math.min(1, (low / Math.max(1, td.length - start)) * 5.5);
+      state.low = lp;
+    }
+    const level = Math.max(audio?.level01 || 0, low * 0.8);
+    const onset = level > Math.max(0.2, state.previousLevel * 1.28) && time - state.lastBeat > 0.16;
+    if (onset) { state.flash = 1; state.beatCount++; state.lastBeat = time; }
+    else state.flash = Math.max(0, state.flash - dt * 4.5);
+    state.previousLevel += (level - state.previousLevel) * Math.min(1, dt * 8);
+
+    const zoom = 1 + (e.cameraZoom / 100) * low * 0.2;
+    const shake = (e.beatShake / 100) * state.flash * 10;
+    const hue = (state.beatCount * e.hueJump * 0.8) % 360;
+    const needsTransform = zoom > 1.001 || shake > 0.1 || hue > 0.1;
+    if (needsTransform) {
+      if (!this.postCanvas) this.postCanvas = document.createElement('canvas');
+      const copy = this.postCanvas;
+      if (copy.width !== w || copy.height !== h) { copy.width = w; copy.height = h; }
+      const copyCtx = copy.getContext('2d');
+      if (copyCtx) {
+        copyCtx.clearRect(0, 0, w, h);
+        copyCtx.drawImage(canvas, 0, 0);
+        const ctx = canvas.getContext('2d');
+        ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,w,h);
+        ctx.translate(w/2 + (Math.sin(time*73)*shake), h/2 + (Math.cos(time*61)*shake));
+        ctx.scale(zoom, zoom);
+        if ('filter' in ctx) ctx.filter = `hue-rotate(${hue}deg)`;
+        ctx.drawImage(copy, -w/2, -h/2, w, h);
+        ctx.restore();
+        if ('filter' in ctx) ctx.filter = 'none';
+      }
+    }
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.save(); ctx.setTransform(1,0,0,1,0,0);
+    if (e.background) { ctx.globalAlpha = e.background / 100 * 0.28; ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h); }
+    if (e.vignette) {
+      const g = ctx.createRadialGradient(w/2,h/2,Math.min(w,h)*0.18,w/2,h/2,Math.max(w,h)*0.72);
+      g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,`rgba(0,0,0,${e.vignette/100*0.82})`);
+      ctx.globalAlpha=1;ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+    }
+    if (e.scanlines) {
+      ctx.globalAlpha=e.scanlines/100*0.28;
+      ctx.fillStyle='rgba(0,0,0,0.8)';
+      const step=Math.max(3,Math.round(h/360));
+      for(let y=0;y<h;y+=step)ctx.fillRect(0,y,w,1);
+    }
+    if (e.filmGrain) {
+      let seed=(Math.floor(time*24)*1103515245+12345)>>>0;
+      const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+      ctx.globalAlpha=e.filmGrain/100*0.13;
+      for(let i=0;i<Math.min(1800,Math.round(w*h/1400));i++){
+        const v=rand()>.5?255:0;ctx.fillStyle=`rgb(${v},${v},${v})`;
+        ctx.fillRect(rand()*w,rand()*h,Math.max(1,w/1200),Math.max(1,h/700));
+      }
+    }
+    if (e.beatFlash && state.flash>0) {
+      ctx.globalAlpha=state.flash*e.beatFlash/100*0.42;ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
+    }
+    ctx.restore();
   }
 
   boxOf(id) { return this.rc.prevT.get(id) || this.rc.curT.get(id) || null; }
