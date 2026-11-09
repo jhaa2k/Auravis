@@ -6,13 +6,24 @@ import FieldRenderer from './fields/FieldRenderer.jsx';
 import Icon from './Icon.jsx';
 
 export function PositionControls({ element }) {
+  const [step, setStep] = useState(1);
+  if (!element) return (
+    <section className="quick-position quick-position-empty" aria-label="Move and adjust">
+      <div className="quick-position-head"><span><Icon name="move" size={16} />Move & Adjust</span><small>No layer selected</small></div>
+      <p>Select a visual layer in Elements to edit its position, size, rotation and anchor point.</p>
+    </section>
+  );
+  if (!Array.isArray(element.props.position)) return (
+    <section className="quick-position quick-position-empty" aria-label="Move and adjust">
+      <div className="quick-position-head"><span><Icon name="move" size={16} />Move & Adjust</span><small>{element.type || 'Selected layer'}</small></div>
+      <p>This layer does not have a visual transform. Its settings remain available in Properties.</p>
+    </section>
+  );
   const position = Array.isArray(element.props.position) ? element.props.position : [0, 0];
   const scale = Array.isArray(element.props.scale) ? element.props.scale : [1, 1];
   const rotation = Number(element.props.rotation) || 0;
   const anchorX = Number.isFinite(element.props.anchorX) ? element.props.anchorX : 0.5;
   const anchorY = Number.isFinite(element.props.anchorY) ? element.props.anchorY : 0.5;
-  const [step, setStep] = useState(1);
-  if (!Array.isArray(element.props.position)) return null;
   const locked = Boolean(element.locked);
   const update = (patch) => actions.updateProps(element.id, patch);
   const nudge = (dx, dy) => update({ position: [position[0] + dx * step, position[1] + dy * step] });
