@@ -34,6 +34,7 @@ export function sanitizeMeasure(v, def) {
 export function sanitizeValue(p, v) {
   switch (p.type) {
     case 'number': {
+      if (/^segment[12]FixedHeight$/.test(p.key) && typeof v === 'boolean') v = v ? 1 : 0;
       if (p.key === 'aWeight' && typeof v === 'boolean') v = Number(v);
       if ((p.key === 'beatRangeBarFirst' || p.key === 'beatRangeBarLast') && isNum(v) && v > 1) v /= 64;
       if (!isNum(v)) return { value: p.default, error: `${p.label}: not a number` };
@@ -45,7 +46,11 @@ export function sanitizeValue(p, v) {
       const c = clamp(Math.round(v), p.min ?? -Infinity, p.max ?? Infinity);
       return { value: c };
     }
-    case 'bool': return { value: !!v };
+    case 'bool': {
+      if (p.key === 'relativeMotionMode' && typeof v === 'string') return { value: v !== 'absolute' };
+      if (p.key === 'vectorRelativeToCenter' && typeof v === 'string') return { value: v !== 'off' };
+      return { value: !!v };
+    }
     case 'select': {
       const hit = p.options.find((o) => String(o.value) === String(v));
       if (hit) return { value: hit.value };
