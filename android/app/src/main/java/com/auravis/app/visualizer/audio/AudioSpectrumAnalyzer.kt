@@ -14,6 +14,7 @@ import kotlin.math.sqrt
 
 data class SpectrumFrame(
     val bars: FloatArray,
+    val magnitudes: FloatArray,
     val bass: Float,
     val mid: Float,
     val treble: Float,
@@ -153,7 +154,7 @@ class AudioSpectrumAnalyzer(private val fftSize: Int = 2048) {
 
         val rms = if (available == 0) 0f else sqrt(sumSquares / min(available, 2048))
         val level = (rms * 2.2f).coerceIn(0f, 1f)
-        return SpectrumFrame(smoothedBars.copyOf(), bass, mid, treble, beatValue, level, sampleRate, now)
+        return SpectrumFrame(smoothedBars.copyOf(), magnitudes.copyOf(), bass, mid, treble, beatValue, level, sampleRate, now)
     }
 
     private fun fft() {
