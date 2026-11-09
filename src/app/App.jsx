@@ -43,45 +43,45 @@ function MoveAdjust() {
   const el=elements.find(x=>x.id===id);
   const [unit,setUnit]=useState('px');
   if(!el||!Array.isArray(el.props.position))return null;
-  const [px,py]=el.props.position;
-  const w=settings.width||1080,h=settings.height||1920;
-  const convert=(v,dimension)=>unit==='px'?v:(v/dimension)*100;
-  const toPx=(v,dimension)=>unit==='px'?v:(v/100)*dimension;
-  const left=w/2+px, top=h/2+py, right=w-left, bottom=h-top;
+  const [px,py]=el.props.position,w=settings.width||1080,h=settings.height||1920;
+  const convert=(v,d)=>unit==='px'?v:(v/d)*100;
+  const toPx=(v,d)=>unit==='px'?v:(v/100)*d;
+  const left=w/2+px,top=h/2+py,right=w-left,bottom=h-top;
   const setEdge=(edge,value)=>{
-    const dimension=(edge==='left'||edge==='right')?w:h;
-    const v=toPx(Number(value),dimension);
+    const dim=(edge==='left'||edge==='right')?w:h,v=toPx(Number(value),dim);
     const nx=edge==='left'?v-w/2:edge==='right'?w/2-v:px;
     const ny=edge==='top'?v-h/2:edge==='bottom'?h/2-v:py;
     actions.updateProps(el.id,{position:[nx,ny]},'move-adjust');
   };
-  const scale=Array.isArray(el.props.scale)?el.props.scale:[1,1];
-  const uniform=!!el.props.scaleIsUniform;
-  const rotation=Number(el.props.rotation)||0;
-  const updateScale=(v)=>actions.updateProps(el.id,{scale:uniform?[v,v]:[v,scale[1]]},'move-adjust');
+  const nudge=(dx,dy)=>actions.updateProps(el.id,{position:[px+dx*(unit==='px'?1:w/100),py+dy*(unit==='px'?1:h/100)]},'move-adjust');
+  const scale=Array.isArray(el.props.scale)?el.props.scale:[1,1],uniform=!!el.props.scaleIsUniform,rotation=Number(el.props.rotation)||0;
+  const updateScale=v=>actions.updateProps(el.id,{scale:uniform?[v,v]:[v,scale[1]]},'move-adjust');
   return <section className="move-adjust">
     <div className="move-adjust-title"><span><Icon name="move" size={15}/>Move &amp; Adjust</span><small>{el.props.tag}</small></div>
-    <div className="move-position-grid">
-      <label className="move-edge left"><span>LEFT</span><NumberInput value={convert(left,w)} min={unit==='px'?-w:-100} max={unit==='px'?w:200} step={unit==='px'?1:.1} onChange={v=>setEdge('left',v)}/></label>
-      <label className="move-edge top"><span>TOP</span><NumberInput value={convert(top,h)} min={unit==='px'?-h:-100} max={unit==='px'?h:200} step={unit==='px'?1:.1} onChange={v=>setEdge('top',v)}/></label>
-      <div className="move-cross" aria-hidden="true"><i/><i/><b>+</b></div>
-      <label className="move-edge right"><span>RIGHT</span><NumberInput value={convert(right,w)} min={unit==='px'?-w:-100} max={unit==='px'?w:200} step={unit==='px'?1:.1} onChange={v=>setEdge('right',v)}/></label>
-      <label className="move-edge bottom"><span>BOTTOM</span><NumberInput value={convert(bottom,h)} min={unit==='px'?-h:-100} max={unit==='px'?h:200} step={unit==='px'?1:.1} onChange={v=>setEdge('bottom',v)}/></label>
+    <div className="move-direction-pad" aria-label="Nudge selected element">
+      <span/>
+      <button type="button" aria-label="Move up" onClick={()=>nudge(0,-1)}><Icon name="up" size={15}/></button>
+      <span/>
+      <button type="button" aria-label="Move left" onClick={()=>nudge(-1,0)}><Icon name="left" size={15}/></button>
+      <button type="button" aria-label="Center element" onClick={()=>actions.updateProps(el.id,{position:[0,0]},'move-adjust')}><Icon name="crosshair" size={15}/></button>
+      <button type="button" aria-label="Move right" onClick={()=>nudge(1,0)}><Icon name="right" size={15}/></button>
+      <span/>
+      <button type="button" aria-label="Move down" onClick={()=>nudge(0,1)}><Icon name="down" size={15}/></button>
+      <span/>
+    </div>
+    <div className="move-edge-row">
+      <label className="move-edge"><span>LEFT</span><NumberInput value={convert(left,w)} min={unit==='px'?-w:-100} max={unit==='px'?w:200} step={unit==='px'?1:.1} onChange={v=>setEdge('left',v)}/></label>
+      <label className="move-edge"><span>TOP</span><NumberInput value={convert(top,h)} min={unit==='px'?-h:-100} max={unit==='px'?h:200} step={unit==='px'?1:.1} onChange={v=>setEdge('top',v)}/></label>
+      <label className="move-edge"><span>RIGHT</span><NumberInput value={convert(right,w)} min={unit==='px'?-w:-100} max={unit==='px'?w:200} step={unit==='px'?1:.1} onChange={v=>setEdge('right',v)}/></label>
+      <label className="move-edge"><span>BOTTOM</span><NumberInput value={convert(bottom,h)} min={unit==='px'?-h:-100} max={unit==='px'?h:200} step={unit==='px'?1:.1} onChange={v=>setEdge('bottom',v)}/></label>
     </div>
     <div className="move-wide-select"><span>POSITION UNIT</span><InAppSelect value={unit} options={[{value:'px',label:'Pixels (px)'},{value:'percent',label:'Percentage (%)'}]} onChange={setUnit}/></div>
-    <div className="move-subhead"><b>TRANSFORM</b><button type="button" title="Center element" onClick={()=>actions.updateProps(el.id,{position:[0,0]},'move-adjust')}><Icon name="crosshair" size={14}/></button></div>
-    <div className="move-transform-row">
-      <span>Scale</span><NumberInput value={scale[0]} min={.01} max={12} step={.01} onChange={updateScale}/>
-      <InAppSelect value={uniform?'uniform':'independent'} options={[{value:'uniform',label:'Uniform'},{value:'independent',label:'Independent'}]} onChange={v=>actions.updateProps(el.id,{scaleIsUniform:v==='uniform',scale:v==='uniform'?[scale[0],scale[0]]:scale},'move-adjust')}/>
-    </div>
-    <div className="move-transform-row">
-      <span>Rotation</span><NumberInput value={rotation} min={-720} max={720} step={.1} onChange={v=>actions.updateProps(el.id,{rotation:v},'move-adjust')}/>
-      <InAppSelect value="degrees" options={[{value:'degrees',label:'Degrees (°)'}]} onChange={()=>{}}/>
-    </div>
+    <div className="move-subhead"><b>TRANSFORM</b></div>
+    <div className="move-transform-row"><span>Scale</span><NumberInput value={scale[0]} min={.01} max={12} step={.01} onChange={updateScale}/><InAppSelect value={uniform?'uniform':'independent'} options={[{value:'uniform',label:'Uniform'},{value:'independent',label:'Independent'}]} onChange={v=>actions.updateProps(el.id,{scaleIsUniform:v==='uniform',scale:v==='uniform'?[scale[0],scale[0]]:scale},'move-adjust')}/></div>
+    <div className="move-transform-row"><span>Rotation</span><NumberInput value={rotation} min={-720} max={720} step={.1} onChange={v=>actions.updateProps(el.id,{rotation:v},'move-adjust')}/><InAppSelect value="degrees" options={[{value:'degrees',label:'Degrees (°)'}]} onChange={()=>{}}/></div>
     <div className="move-wide-select"><span>BLEND MODE</span><InAppSelect value={el.props.blendMode||'normal'} options={['normal','alpha','add','multiply','screen','overlay','softLight','hardLight','difference'].map(v=>({value:v,label:v}))} onChange={v=>actions.updateProps(el.id,{blendMode:v},'move-adjust')}/></div>
   </section>;
 }
-
 export default function App() {
   const name=useApp(s=>s.project.name), dirty=useApp(s=>s.dirty);
   const theme=useApp(s=>s.project.settings.theme);
