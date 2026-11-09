@@ -40,7 +40,7 @@ export default function MeasureField({ def, value, onChange, providers }) {
           <Row label="Output Max"><NumberInput value={value.outMax} step={0.01} onChange={(v) => set({ outMax: v })} /></Row>
           <Row label="Multiplier"><NumberInput value={value.multiplier} step={0.1} onChange={(v) => set({ multiplier: v })} /></Row>
           <Row label="Offset"><NumberInput value={value.offset} step={0.1} onChange={(v) => set({ offset: v })} /></Row>
-          <Row label="Smoothing"><Slider value={value.smoothing} min={0} max={0.99} step={0.01} onChange={(v) => set({ smoothing: v })} /></Row>
+          <Row label="Smoothing"><Slider value={value.smoothing} min={0} max={0.99} step={0.01} resetValue={def.default.smoothing} onChange={(v) => set({ smoothing: v })} /></Row>
           <Row label="Response Curve">
             <InAppSelect value={value.curve} ariaLabel="Response curve" options={MEASURE_CURVES} onChange={curve=>set({curve})}/>
           </Row>
