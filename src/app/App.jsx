@@ -83,7 +83,7 @@ export default function App() {
           <PreviewPanel preferences={preferences} />
         </section>
         <section className={`tool-dock ${tool ? 'open' : selectedElement ? 'quick' : 'closed'}`} aria-label="Editor tools">
-          <div id="active-tool-panel" className={`tool-panel ${tool ? 'open' : selectedElement ? 'quick' : ''}`} aria-hidden={!tool && !selectedElement}>
+          <div id="active-tool-panel" className={`tool-panel ${tool ? 'open' : selectedElement ? 'quick' : ''} ${tool === 'move' ? 'move-tool' : ''}`} aria-hidden={!tool && !selectedElement}>
             {<PositionControls element={selectedElement} />}
             {tool && tool !== 'move' && (
               <>
