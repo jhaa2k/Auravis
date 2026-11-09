@@ -8,7 +8,7 @@ export const sections = [
     col('color', 'Color', '#ddddddff', { hint: 'RGB tint of the processed content; alpha = opacity' }),
     sel('targetImage', 'Target Image', 'composition', [{ value: 'composition', label: 'Composition Below' }], { dynamic: 'targets' }),
     bool('showUnblurredContent', 'Show Unblurred Content', false),
-    bool('showUnblurredContentUnder', 'Show Unblurred Content Under', true),
+    bool('showUnblurredContentUnder', 'Show Unblurred Content Under', false),
   ]),
   section('Split Effect', [
     num('splitMultiplier', 'Split Multiplier', 0, 0, 10, 0.01),
