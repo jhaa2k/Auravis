@@ -69,6 +69,22 @@ describe('elements render individually', () => {
     const after = Array.from(h.vis.rc.states.get(el.id).heights);
     expect(after[0]).toBeCloseTo(before[before.length - 1], 1);
   });
+  it('bars render at every supported count from 2 through 90', () => {
+    for (const count of [2, 6, 10, 15, 20, 32, 48, 64, 90]) {
+      const h = harness(); const el = only(h, 'barsSegments', { barCount: count, softness: 0 });
+      h.frames(8);
+      expect(h.vis.rc.states.get(el.id).heights).toHaveLength(count);
+      expect(h.coverage(), `bars count ${count}`).toBeGreaterThan(0.001);
+      expect(Object.values(diag).flat().filter(d => d.level === 'error')).toEqual([]);
+    }
+  });
+  it('radial spectrum renders at low and high supported counts', () => {
+    for (const count of [2, 6, 10, 15, 20, 90]) {
+      const h = harness(); only(h, 'radialSpectrum', { barCount: count, sensitivity: 3 }); h.frames(8);
+      expect(h.coverage(), `radial count ${count}`).toBeGreaterThan(0.001);
+      expect(Object.values(diag).flat().filter(d => d.level === 'error')).toEqual([]);
+    }
+  });
   it('renders validated per-bar visual overrides independently', () => {
     const h = harness();
     const el = only(h, 'barsSegments');
