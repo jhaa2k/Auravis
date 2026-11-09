@@ -8,7 +8,7 @@ import { fontStore } from '../../core/assets/fontStore.js';
 /** Options for selects whose choices depend on the project (effect targets, fonts). */
 function optionsFor(def, el, elements) {
   if (def.dynamic === 'targets') {
-    const list = [{ value: 'composition', label: 'Composition Below' }, ...elements.filter((e) => e.id !== el.id && e.type !== 'audioProvider').map((e) => ({ value: e.id, label: e.props.tag }))];
+    const list = [{ value: 'composition', label: 'Composition Below' }, ...elements.filter((e) => e.id !== el.id && e.type !== 'audioProvider').map((e) => ({ value: e.id, label: e.props.tag || e.type }))];
     if (!list.some((o) => o.value === el.props[def.key])) list.push({ value: el.props[def.key], label: 'Missing target' });
     return list;
   }
@@ -28,7 +28,7 @@ export default function FieldRenderer({ def, el, elements, onChange, onReset, on
       if (def.dynamic === 'providers') {
         return row(providers.length ? (
           <select value={value} onChange={(e) => set(+e.target.value, false)}>
-            {providers.map((p, i) => <option key={p.id} value={i + 1}>{i + 1} · {p.props.tag}</option>)}
+            {providers.map((p, i) => <option key={p.id} value={i + 1}>{i + 1} · {p.props.tag || 'Audio Provider'}</option>)}
             {value > providers.length && <option value={value}>{value} · missing</option>}
           </select>
         ) : <span className="warn-text">No Audio Provider in the project</span>);
