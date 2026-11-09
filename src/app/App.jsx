@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { NumberInput } from '../ui/fields/primitives.jsx';
+import InAppSelect from '../ui/InAppSelect.jsx';
 import { useApp, useStore } from './hooks.js';
 import { actions, audio, store, toast } from './services.js';
 import LayerList from '../ui/LayerList.jsx';
@@ -12,7 +14,6 @@ import ProjectDialog from '../ui/ProjectDialog.jsx';
 import Toasts from '../ui/Toasts.jsx';
 import Icon from '../ui/Icon.jsx';
 import { importProjectFile } from '../core/project/persistence.js';
-import { nativeVisualizer, isNativeVisualizerAvailable } from '../core/audio/nativeVisualizer.js';
 
 const NAV = [['music','Music','music'],['elements','Elements','bars'],['properties','Properties','settings'],['scene','Scene','layers'],['settings','Settings','settings']];
 const TITLES = { music:'Music Library', elements:'Elements & Tools', properties:'Properties', scene:'Visual Scenes & Presets', settings:'App Settings', export:'Export Video' };
@@ -20,40 +21,14 @@ const TITLES = { music:'Music Library', elements:'Elements & Tools', properties:
 function MusicLibrary() {
   const state = useStore({ subscribe: audio.subscribe, getState: audio.getSnapshot });
   const picker = useRef(null);
-  const [nativeTrack, setNativeTrack] = useState('');
-  const [nativePlaying, setNativePlaying] = useState(false);
-  useEffect(() => {
-    if (!isNativeVisualizerAvailable) return;
-    let subscription;
-    nativeVisualizer.addListener('nativePlaybackState', (event) => setNativePlaying(!!event.playing))
-      .then((handle) => { subscription = handle; })
-      .catch((error) => console.error('Native playback listener failed:', error));
-    return () => subscription?.remove();
-  }, []);
-  const importNativeAudio = async () => {
-    try {
-      const selected = await nativeVisualizer.pickAudio();
-      await nativeVisualizer.load(selected.uri, true);
-      setNativeTrack(selected.name || 'Selected audio');
-      toast('Native audio loaded. Spectrum is connected to the visualizer.', 'info');
-    } catch (error) {
-      if (!/cancel|no audio file/i.test(error?.message || '')) toast(error?.message || 'Could not load native audio', 'error');
-    }
-  };
   const importFiles = (files) => { const n = audio.addFiles(files); toast(n ? n + (n === 1 ? ' track imported' : ' tracks imported') : 'No supported audio files found', n ? 'info' : 'warning'); };
   return <div className="music-library">
     <div className="music-import">
       <div className="music-import-icon"><Icon name="music" size={23}/></div>
       <div className="music-import-copy"><b>Your music library</b><small>Import audio from your device. MP3, WAV, OGG, FLAC, M4A and AAC supported.</small></div>
       <button className="btn primary" onClick={() => picker.current?.click()}><Icon name="plus" size={15}/>Import</button>
-      {isNativeVisualizerAvailable && <button className="btn" onClick={importNativeAudio}><Icon name="audio-waveform" size={15}/>Native audio</button>}
       <input ref={picker} type="file" accept="audio/*,.mp3,.wav,.ogg,.flac,.m4a,.aac,.opus" multiple hidden onChange={(e)=>{importFiles([...e.target.files]);e.target.value='';}}/>
     </div>
-    {nativeTrack && isNativeVisualizerAvailable && <div className="music-library-note">
-      <b>Native player:</b> {nativeTrack}
-      <button className="btn small" onClick={() => nativePlaying ? nativeVisualizer.pause() : nativeVisualizer.play()}>{nativePlaying ? 'Pause' : 'Play'}</button>
-      <button className="btn small" onClick={async () => { await nativeVisualizer.release(); setNativeTrack(''); setNativePlaying(false); }}>Stop</button>
-    </div>}
     <div className="music-list-head"><b>Tracks</b><span>{state.tracks.length} {state.tracks.length===1?'track':'tracks'}</span></div>
     {state.tracks.length ? <ul className="music-track-list">{state.tracks.map((t,i)=><li key={t.name+':'+i} className={i===state.index?'current':''}>
       <button className="track-select" onClick={()=>audio.load(i,false)}><span className="track-art"><Icon name={i===state.index&&state.playing?'volume':'music'} size={17}/></span><span className="track-info"><b>{t.title||t.name}</b><small>{t.artist||t.name}</small></span>{i===state.index&&<span className="track-playing">{state.playing?'PLAYING':'SELECTED'}</span>}</button>
@@ -64,25 +39,45 @@ function MusicLibrary() {
 }
 
 function MoveAdjust() {
-  const id = useApp(s=>s.selectedId), elements = useApp(s=>s.elements), settings = useApp(s=>s.project.settings);
-  const el = elements.find(x=>x.id===id);
-  const [snap,setSnap]=useState(false);
-  if (!el || !Array.isArray(el.props.position)) return null;
-  const x = Math.max(0,Math.min(1,0.5+el.props.position[0]/Math.max(1,settings.width)));
-  const y = Math.max(0,Math.min(1,0.5+el.props.position[1]/Math.max(1,settings.height)));
-  const update = (nx,ny)=>{const q=v=>snap?Math.round(v/.05)*.05:v;actions.updateProps(el.id,{position:[(q(nx)-.5)*settings.width,(q(ny)-.5)*settings.height]},'position');};
-  const scale=Array.isArray(el.props.scale)?Math.max(...el.props.scale):null;
-  const rotation=typeof el.props.rotation==='number'?el.props.rotation:null;
+  const id=useApp(s=>s.selectedId), elements=useApp(s=>s.elements), settings=useApp(s=>s.project.settings);
+  const el=elements.find(x=>x.id===id);
+  const [unit,setUnit]=useState('px');
+  if(!el||!Array.isArray(el.props.position))return null;
+  const [px,py]=el.props.position;
+  const w=settings.width||1080,h=settings.height||1920;
+  const convert=v=>unit==='px'?v:v*100;
+  const toPx=v=>unit==='px'?v:v/100;
+  const left=w/2+px, top=h/2+py, right=w-left, bottom=h-top;
+  const setEdge=(edge,value)=>{
+    const v=toPx(Number(value));
+    const nx=edge==='left'?v-w/2:edge==='right'?w/2-v:px;
+    const ny=edge==='top'?v-h/2:edge==='bottom'?h/2-v:py;
+    actions.updateProps(el.id,{position:[nx,ny]},'move-adjust');
+  };
+  const scale=Array.isArray(el.props.scale)?el.props.scale:[1,1];
+  const uniform=!!el.props.scaleIsUniform;
+  const rotation=Number(el.props.rotation)||0;
+  const updateScale=(v)=>actions.updateProps(el.id,{scale:uniform?[v,v]:[v,scale[1]]},'move-adjust');
   return <section className="move-adjust">
-    <div className="move-adjust-title"><span><Icon name="motion" size={15}/>Move & Adjust</span><div className="move-adjust-actions"><button className={snap?'active':''} aria-pressed={snap} onClick={()=>setSnap(v=>!v)}>Snap {snap?'ON':'OFF'}</button><button onClick={()=>actions.updateProps(el.id,{position:[0,0]})}><Icon name="reset" size={14}/>Center</button></div></div>
-    <div className="move-adjust-grid">
-      <label><span>HORIZONTAL</span><input type="range" min="0" max="1" step=".001" value={x} onChange={e=>update(+e.target.value,y)}/><output>{x.toFixed(3)}</output></label>
-      <label><span>VERTICAL</span><input type="range" min="0" max="1" step=".001" value={y} onChange={e=>update(x,+e.target.value)}/><output>{y.toFixed(3)}</output></label>
+    <div className="move-adjust-title"><span><Icon name="move" size={15}/>Move &amp; Adjust</span><small>{el.props.tag}</small></div>
+    <div className="move-position-grid">
+      <label className="move-edge left"><span>LEFT</span><NumberInput value={convert(left)} min={-w} max={unit==='px'?w:100} step={unit==='px'?1:.1} onChange={v=>setEdge('left',v)}/></label>
+      <label className="move-edge top"><span>TOP</span><NumberInput value={convert(top)} min={-h} max={unit==='px'?h:100} step={unit==='px'?1:.1} onChange={v=>setEdge('top',v)}/></label>
+      <div className="move-cross" aria-hidden="true"><i/><i/><b>+</b></div>
+      <label className="move-edge right"><span>RIGHT</span><NumberInput value={convert(right)} min={-w} max={unit==='px'?w:100} step={unit==='px'?1:.1} onChange={v=>setEdge('right',v)}/></label>
+      <label className="move-edge bottom"><span>BOTTOM</span><NumberInput value={convert(bottom)} min={-h} max={unit==='px'?h:100} step={unit==='px'?1:.1} onChange={v=>setEdge('bottom',v)}/></label>
     </div>
-    {(scale!==null||rotation!==null)&&<div className="move-adjust-extra">
-      {scale!==null&&<label><span>SIZE</span><input type="range" min=".05" max="4" step=".001" value={Math.min(4,Math.max(.05,scale))} onChange={e=>{const v=+e.target.value;actions.updateProps(el.id,{scale:el.props.scaleIsUniform?[v,v]:[v,el.props.scale[1]]},'scale');}}/><output>{scale.toFixed(3)}</output></label>}
-      {rotation!==null&&<label><span>ROTATION</span><input type="range" min="-180" max="180" step=".1" value={rotation} onChange={e=>actions.updateProps(el.id,{rotation:+e.target.value},'rotation')}/><output>{rotation.toFixed(1)}°</output></label>}
-    </div>}
+    <div className="move-wide-select"><span>POSITION UNIT</span><InAppSelect value={unit} options={[{value:'px',label:'Pixels (px)'},{value:'percent',label:'Percentage (%)'}]} onChange={setUnit}/></div>
+    <div className="move-subhead"><b>TRANSFORM</b><button type="button" title="Center element" onClick={()=>actions.updateProps(el.id,{position:[0,0]},'move-adjust')}><Icon name="crosshair" size={14}/></button></div>
+    <div className="move-transform-row">
+      <span>Scale</span><NumberInput value={scale[0]} min={.01} max={12} step={.01} onChange={updateScale}/>
+      <InAppSelect value={uniform?'uniform':'independent'} options={[{value:'uniform',label:'Uniform'},{value:'independent',label:'Independent'}]} onChange={v=>actions.updateProps(el.id,{scaleIsUniform:v==='uniform',scale:v==='uniform'?[scale[0],scale[0]]:scale},'move-adjust')}/>
+    </div>
+    <div className="move-transform-row">
+      <span>Rotation</span><NumberInput value={rotation} min={-720} max={720} step={.1} onChange={v=>actions.updateProps(el.id,{rotation:v},'move-adjust')}/>
+      <InAppSelect value="degrees" options={[{value:'degrees',label:'Degrees (°)'}]} onChange={()=>{}}/>
+    </div>
+    <div className="move-wide-select"><span>BLEND MODE</span><InAppSelect value={el.props.blendMode||'normal'} options={['normal','alpha','add','multiply','screen','overlay','softLight','hardLight','difference'].map(v=>({value:v,label:v}))} onChange={v=>actions.updateProps(el.id,{blendMode:v},'move-adjust')}/></div>
   </section>;
 }
 
@@ -93,16 +88,6 @@ export default function App() {
   const canUndo=useApp(s=>s.past.length>0), canRedo=useApp(s=>s.future.length>0);
   const [overlay,setOverlay]=useState(''), [dialog,setDialog]=useState(false);
   useEffect(()=>{
-    const onKey=e=>{
-      const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'')&&document.activeElement.type!=='range'&&document.activeElement.type!=='checkbox';
-      const mod=e.ctrlKey||e.metaKey;
-      if(mod&&e.key.toLowerCase()==='z'&&!typing){e.preventDefault();e.shiftKey?actions.redo():actions.undo();}
-      else if(mod&&e.key.toLowerCase()==='y'&&!typing){e.preventDefault();actions.redo();}
-      else if(mod&&e.key.toLowerCase()==='d'&&!typing){e.preventDefault();const id=store.getState().selectedId;id&&actions.duplicateElement(id);}
-      else if(e.code==='Space'&&!typing&&document.activeElement?.tagName!=='BUTTON'){e.preventDefault();if(audio.snapshot.hasAudio)audio.toggle();}
-      else if((e.key==='Delete'||e.key==='Backspace')&&!typing&&overlay!=='music'){const id=store.getState().selectedId;id&&actions.deleteElement(id);}
-      else if(e.key==='Escape')setOverlay('');
-    };
     const warn=e=>{if(store.getState().dirty){e.preventDefault();e.returnValue='';}};
     const openPanel=e=>setOverlay(e.detail||'music');
     const importFile=async e=>{
@@ -113,8 +98,8 @@ export default function App() {
     };
     window.addEventListener('auravis:open-panel',openPanel);
     window.addEventListener('auravis:import-project-file',importFile);
-    window.addEventListener('keydown',onKey);window.addEventListener('beforeunload',warn);
-    return()=>{window.removeEventListener('keydown',onKey);window.removeEventListener('beforeunload',warn);window.removeEventListener('auravis:open-panel',openPanel);window.removeEventListener('auravis:import-project-file',importFile);};
+    window.addEventListener('beforeunload',warn);
+    return()=>{window.removeEventListener('beforeunload',warn);window.removeEventListener('auravis:open-panel',openPanel);window.removeEventListener('auravis:import-project-file',importFile);};
   },[overlay]);
   const openPanel=key=>{if(key==='properties'&&!store.getState().selectedId)setOverlay('elements');else setOverlay(v=>v===key?'':key);};
   return <div className="app modern-app">
