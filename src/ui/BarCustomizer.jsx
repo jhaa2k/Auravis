@@ -16,6 +16,7 @@ export default function BarCustomizer({ element }) {
   const barIndex=Math.max(0,Math.min(count-1,index));
   const overrides=element.props.barOverrides||{};
   const current=overrides[barIndex]?.[segmentKey]||{};
+  const defaultEnabled=segmentKey==='segment1'||(element.props.segment2Enabled&&element.props.segment2Type!=='none');
   const update=patch=>{
     const bar={...(overrides[barIndex]||{}),[segmentKey]:{...current,...patch}};
     const next={...overrides,[barIndex]:bar};
@@ -34,8 +35,8 @@ export default function BarCustomizer({ element }) {
       <div className="bar-editor-intro">Select a bar and a visual line. Each line keeps its own appearance and transform.</div>
       <div className="field"><label>Bar index · {count} total</label><InAppSelect value={barIndex} options={Array.from({length:count},(_,i)=>({value:i,label:`Bar ${String(i+1).padStart(2,'0')} / ${count}`}))} onChange={v=>setIndex(Number(v))}/></div>
       <div className="field"><label>Visual line</label><InAppSelect value={segmentKey} options={[{value:'segment1',label:'Line 1'},{value:'segment2',label:'Line 2'}]} onChange={setSegmentKey}/></div>
-      <div className="bar-editor-toggle"><span>Enable this line</span><Toggle checked={current.enabled!==false} onChange={v=>update({enabled:v})} label="Enable selected bar line"/></div>
-      <div className="field"><label>Line color</label><ColorInput value={current.color||'#ffffffff'} onChange={v=>update({color:v})}/></div>
+      <div className="bar-editor-toggle"><span>Enable this line</span><Toggle checked={current.enabled??defaultEnabled} onChange={v=>update({enabled:v})} label="Enable selected bar line"/></div>
+      <div className="field"><label>Line color</label><ColorInput value={current.color||element.props[segmentKey+'ColorFrom']||'#ffffffff'} onChange={v=>update({color:v})}/></div>
       <div className="bar-editor-pair">
         <label><span>Height multiplier</span><NumberInput value={current.height??1} min={0} max={8} step={.01} onChange={v=>update({height:v})}/></label>
         <label><span>Width multiplier</span><NumberInput value={current.width??1} min={.05} max={2} step={.01} onChange={v=>update({width:v})}/></label>
