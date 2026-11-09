@@ -34,6 +34,7 @@ export default function App() {
   const selectedElement = useApp((s) => s.elements.find((e) => e.id === s.selectedId) || null);
   const canUndo = useApp((s) => s.past.length > 0), canRedo = useApp((s) => s.future.length > 0);
   const [tool, setTool] = useState('layers');
+  const [splitScreen, setSplitScreen] = useState(false);
   const [dialog, setDialog] = useState(false);
   const [preferences, setPreferences] = useState(readPreferences);
   const updatePreferences = (patch) => setPreferences((current) => {
@@ -90,10 +91,10 @@ export default function App() {
         <div className="row-gap header-actions">
           <button className="icon-btn" title="Undo (Ctrl+Z)" disabled={!canUndo} onClick={() => actions.undo()}><Icon name="undo" /></button>
           <button className="icon-btn" title="Redo (Ctrl+Shift+Z)" disabled={!canRedo} onClick={() => actions.redo()}><Icon name="redo" /></button>
-          <button className="icon-btn" title="Split screen" onClick={() => window.dispatchEvent(new CustomEvent('auravis:toggle-split-screen'))}><Icon name="split" /></button><button className="icon-btn" title="Settings" onClick={() => setTool('scene')}><Icon name="settings" /></button>
+          <button className="icon-btn" title="Split screen" aria-pressed={splitScreen} onClick={() => setSplitScreen((value) => !value)}><Icon name="split" /></button><button className="icon-btn" title="Settings" onClick={() => setTool('scene')}><Icon name="settings" /></button>
         </div>
       </header>
-      <main className={`workspace android-workspace ${!tool && !selectedElement ? "compact" : "expanded"}`}>
+      <main className={`workspace android-workspace ${splitScreen ? "split-preview" : ""} ${!tool && !selectedElement ? "compact" : "expanded"}`}>
         <section className="col-preview" aria-label="Fixed preview">
           <PreviewPanel preferences={preferences} />
         </section>
