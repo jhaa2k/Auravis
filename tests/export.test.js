@@ -33,6 +33,7 @@ function createCapture() {
     tracks: [videoTrack],
     addTrack(track) { this.tracks.push(track); },
     getTracks() { return this.tracks; },
+    getVideoTracks() { return this.tracks.filter((track) => track === videoTrack); },
   };
   const canvas = { captureStream: vi.fn(() => stream) };
   const audioStream = { getAudioTracks: () => [{ clone: () => clonedAudioTrack }] };
