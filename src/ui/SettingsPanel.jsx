@@ -31,8 +31,8 @@ export default function SettingsPanel(){
   <section className="section open"><div className="section-head static">Live visual effects</div><div className="section-body effect-controls">
    <div className="hint">Project-wide effects are composited into the preview and final video.</div>
    {[
-    ['background','Background'],['cameraZoom','Camera Zoom · Bass Follow'],['vignette','Vignette'],['scanlines','Scanlines'],['filmGrain','Film Grain'],['beatFlash','Beat Flash'],['beatShake','Beat Shake'],['hueJump','Hue Jump per Beat']
-   ].map(([key,label])=><div className="effect-slider" key={key}><div><label>{label}</label><output>{s.effects?.[key]||0}</output></div><Slider value={s.effects?.[key]||0} min={0} max={100} step={1} resetValue={0} onChange={v=>actions.setSettings({effects:{...s.effects,[key]:v}})}/></div>)}
+    ['background','Background',0,100],['cameraZoom','Camera Zoom · Bass Follow',0,100],['vignette','Vignette',0,100],['scanlines','Scanlines',0,100],['filmGrain','Film Grain',0,100],['beatFlash','Beat Flash',0,100],['beatShake','Beat Shake',0,100],['hueJump','Hue Jump per Beat',0,100],['contrast','Contrast',-50,100],['saturation','Saturation',-100,100],['warmth','Color Temperature',-100,100],['fade','Matte Fade',0,100]
+   ].map(([key,label,min,max])=><div className="effect-slider" key={key}><div><label>{label}</label><output>{s.effects?.[key]||0}</output></div><Slider value={s.effects?.[key]||0} min={min} max={max} step={1} resetValue={0} onChange={v=>actions.setSettings({effects:{...s.effects,[key]:v}})}/></div>)}
   </div></section>
   <section className="section open"><div className="section-head static">Canvas defaults</div><div className="section-body">
    <div className="field"><label>Aspect ratio / size</label><InAppSelect value={size} options={RESOLUTIONS} onChange={setSize} ariaLabel="Canvas size"/></div>
