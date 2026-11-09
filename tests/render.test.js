@@ -69,6 +69,21 @@ describe('elements render individually', () => {
     const after = Array.from(h.vis.rc.states.get(el.id).heights);
     expect(after[0]).toBeCloseTo(before[before.length - 1], 1);
   });
+  it('renders validated per-bar visual overrides independently', () => {
+    const h = harness();
+    const el = only(h, 'barsSegments');
+    h.actions.updateProps(el.id, { barOverrides: {
+      0: { color: '#ff0000ff', height: 1.8, width: 0.5, opacity: 0.8, shape: 'circle' },
+      1: { enabled: false },
+    } });
+    h.frames(12);
+    const saved = h.store.getState().elements.find((e) => e.id === el.id).props.barOverrides;
+    expect(saved[0].color).toBe('#ff0000ff');
+    expect(saved[0].height).toBe(1.8);
+    expect(saved[1].enabled).toBe(false);
+    expect(h.coverage()).toBeGreaterThan(0.002);
+    expect(Object.values(diag).flat().filter((d) => d.level === 'error')).toEqual([]);
+  });
   it('bars report an invalid Audio Provider Index', () => {
     const h = harness(); only(h, 'barsSegments', { audioProviderIndex: 5 }); h.frames(2);
     expect(Object.values(diag).flat().some((d) => /Audio Provider Index/.test(d.message))).toBe(true);
