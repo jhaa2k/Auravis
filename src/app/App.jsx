@@ -61,6 +61,8 @@ function MoveAdjust() {
 
 export default function App() {
   const name=useApp(s=>s.project.name), dirty=useApp(s=>s.dirty);
+  const theme=useApp(s=>s.project.settings.theme);
+  useEffect(()=>{document.documentElement.dataset.auravisTheme=theme||'dark';},[theme]);
   const canUndo=useApp(s=>s.past.length>0), canRedo=useApp(s=>s.future.length>0);
   const [overlay,setOverlay]=useState(''), [dialog,setDialog]=useState(false);
   useEffect(()=>{
