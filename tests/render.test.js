@@ -73,14 +73,16 @@ describe('elements render individually', () => {
     const h = harness();
     const el = only(h, 'barsSegments');
     h.actions.updateProps(el.id, { barOverrides: {
-      0: { color: '#ff0000ff', height: 1.8, width: 0.5, opacity: 0.8, shape: 'circle' },
-      1: { enabled: false },
+      0: { segment1: { color: '#ff0000ff', height: 1.8, width: 0.5, opacity: 0.8, shape: 'circle' } },
+      1: { segment2: { enabled: true, color: '#00ffffff', shape: 'diamond' } },
+      2: { segment1: { enabled: false } },
     } });
     h.frames(12);
     const saved = h.store.getState().elements.find((e) => e.id === el.id).props.barOverrides;
-    expect(saved[0].color).toBe('#ff0000ff');
-    expect(saved[0].height).toBe(1.8);
-    expect(saved[1].enabled).toBe(false);
+    expect(saved[0].segment1.color).toBe('#ff0000ff');
+    expect(saved[0].segment1.height).toBe(1.8);
+    expect(saved[1].segment2.enabled).toBe(true);
+    expect(saved[2].segment1.enabled).toBe(false);
     expect(h.coverage()).toBeGreaterThan(0.002);
     expect(Object.values(diag).flat().filter((d) => d.level === 'error')).toEqual([]);
   });
