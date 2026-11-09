@@ -99,10 +99,11 @@ describe('store, history and project IO', () => {
   });
   it('coalesces slider drags into one undo step', () => {
     const [s, a] = make();
-    const id = s.getState().elements.find((e) => e.type === 'text').id;
+    const text = s.getState().elements.find((e) => e.type === 'text');
+    const id = text.id, initialFontSize = text.props.fontSize;
     for (let v = 10; v < 20; v++) a.updateProps(id, { fontSize: v }, 'fontSize');
     expect(s.getState().past.length).toBe(1);
-    a.undo(); expect(s.getState().elements.find((e) => e.id === id).props.fontSize).toBe(54);
+    a.undo(); expect(s.getState().elements.find((e) => e.id === id).props.fontSize).toBe(initialFontSize);
   });
   it('prevents duplicate tags when renaming', () => {
     const [s, a] = make();
