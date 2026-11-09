@@ -6,7 +6,7 @@ export const sections = [
   section('Appearance', [
     sel('blendModeContent', 'Blend Mode Content', 'preMulAlpha', BLEND_MODES),
     col('color', 'Color', '#ff0017ff', { hint: 'Tint of the blurred content; alpha = opacity' }),
-    int('sourceCompositionIndex', 'Source Composition Index', 1, 0, 64, 1, { hint: '0 = everything below this layer · N = the N-th element in the stack, rendered alone' }),
+    int('sourceCompositionIndex', 'Source Composition Index', 2, 0, 64, 1, { hint: '0 = everything below this layer · N = the N-th element in the stack, rendered alone' }),
     img('maskImage', 'Mask Image'),
     bool('showUnblurredContent', 'Show Unblurred Content', true),
     bool('showUnblurredContentUnder', 'Show Unblurred Content Under', true),
