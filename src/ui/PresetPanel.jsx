@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import { actions, toast } from '../app/services.js';
 import { defaultElements, DEFAULT_SETTINGS } from '../core/store/defaultProject.js';
-import { createElementData } from '../core/schema/registry.js';
 import Icon from './Icon.jsx';
 
 const PRESETS = [
@@ -68,10 +67,6 @@ function makePreset(preset, index) {
     const fx = createElementData('rgbSplit', elements, { tag: 'RGB Accent', visible: true, splitMultiplier: 0.12, color: secondary });
     elements.push(fx);
   }
-  if (index % 6 === 0) {
-    const fx = createElementData('glow', elements, { tag: 'Soft Glow', visible: true });
-    if (fx) elements.push(fx);
-  }
   return {
     project: { id: null, name, version: 1, settings: { ...DEFAULT_SETTINGS, background } },
     elements,
@@ -100,7 +95,7 @@ export default function PresetPanel() {
         <div><b>Visual Presets</b><small>24 editable starting styles</small></div>
         <button className="btn small" onClick={() => fileRef.current?.click()}><Icon name="upload" size={14} />Import project</button>
         <input ref={fileRef} type="file" accept=".json,.viz,application/json,application/octet-stream" hidden
-          onChange={(e) => { const file = e.target.files?.[0]; if (file) { window.dispatchEvent(new CustomEvent('auravis:import-project-file', { detail: { file } })); } e.target.value = ''; }} />
+          onChange={(e) => { const file = e.target.files?.[0]; if (file) window.dispatchEvent(new CustomEvent('auravis:import-project-file', { detail: { file } })); e.target.value = ''; }} />
       </div>
       <div className="preset-categories" role="group" aria-label="Preset category">
         {categories.map((c) => <button key={c} className={category === c ? 'active' : ''} onClick={() => setCategory(c)}>{c}</button>)}
@@ -115,7 +110,7 @@ export default function PresetPanel() {
           </button>
         ))}
       </div>
-      <p className="preset-note">Presets remain fully editable in Elements and Properties. Import currently accepts Auravis project files; Avee .viz conversion is experimental.</p>
+      <p className="preset-note">Presets remain fully editable in Elements and Properties. Import supports Auravis project files. Avee .viz scene conversion is being added separately; unsupported files are not silently converted.</p>
     </div>
   );
 }
