@@ -57,7 +57,7 @@ export default function PresetPanel(){
  const [live,setLive]=useState({beat:0,bass:0,mid:0,treble:0,level:0,samples:[]});
  const [track,setTrack]=useState(audio.getSnapshot());
  const fileRef=useRef(null),lastTick=useRef(0);
- const categories=['All','Beat','Minimal','Neon','Color'];
+ const categories=['All','Wave','Radial','Electric'];
  const visible=useMemo(()=>PRESETS.map((p,i)=>({p,i})).filter(({p})=>(category==='All'||p[4]===category)&&p[0].toLowerCase().includes(query.trim().toLowerCase())),[category,query]);
  useEffect(()=>{
   const unsub=audio.subscribe(()=>setTrack(audio.getSnapshot()));
