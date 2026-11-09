@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../app/hooks.js';
-import { actions, visualizer } from '../app/services.js';
+import { actions } from '../app/services.js';
 import { BAR_SHAPES } from '../core/render/shapes.js';
 import { ColorInput, NumberInput, Slider, Toggle } from './fields/primitives.jsx';
 import InAppSelect from './InAppSelect.jsx';
@@ -9,10 +9,7 @@ export default function BarCustomizer({ element }) {
   const elements=useApp(s=>s.elements);
   const [index,setIndex]=useState(0);
   const [segmentKey,setSegmentKey]=useState('segment1');
-  const providers=elements.filter(e=>e.type==='audioProvider');
-  const provider=providers[element.props.audioProviderIndex-1];
-  const providerIndex=provider?providers.indexOf(provider):0;
-  const count=visualizer.rc.audio?.providers?.[providerIndex]?.out?.samples?.length||provider?.props.sampleOutCount||96;
+  const count=Math.max(2,Math.min(90,Math.round(element.props.barCount||90)));
   const barIndex=Math.max(0,Math.min(count-1,index));
   const overrides=element.props.barOverrides||{};
   const current=overrides[barIndex]?.[segmentKey]||{};
