@@ -10,7 +10,7 @@ import ProjectDialog from '../ui/ProjectDialog.jsx';
 import Toasts from '../ui/Toasts.jsx';
 import Icon from '../ui/Icon.jsx';
 
-const TOOLS = [['music', 'Music', 'music'], ['layers', 'Elements', 'layers'], ['props', 'Properties', 'sliders'], ['project', 'Settings', 'settings']];
+const TOOLS = [['move', 'Move & Adjust', 'move'], ['music', 'Music', 'music'], ['layers', 'Elements', 'layers'], ['props', 'Properties', 'sliders'], ['project', 'Settings', 'settings']];
 const DEFAULT_PREFERENCES = { theme: 'dark', guides: true, safeArea: false, snap: false };
 function readPreferences() {
   try {
@@ -31,7 +31,7 @@ export default function App() {
   const dirty = useApp((s) => s.dirty);
   const selectedElement = useApp((s) => s.elements.find((e) => e.id === s.selectedId) || null);
   const canUndo = useApp((s) => s.past.length > 0), canRedo = useApp((s) => s.future.length > 0);
-  const [tool, setTool] = useState('music');
+  const [tool, setTool] = useState('move');
   const [dialog, setDialog] = useState(false);
   const [preferences, setPreferences] = useState(readPreferences);
   const updatePreferences = (patch) => setPreferences((current) => {
@@ -49,7 +49,7 @@ export default function App() {
     const onKey = (e) => {
       const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '') && document.activeElement.type !== 'range' && document.activeElement.type !== 'checkbox';
       const mod = e.ctrlKey || e.metaKey;
-      if (e.key === 'Escape' && tool) { setTool(null); }
+      if (e.key === 'Escape' && tool !== 'move') { setTool('move'); }
       else if (mod && e.key.toLowerCase() === 'z' && !typing) { e.preventDefault(); e.shiftKey ? actions.redo() : actions.undo(); }
       else if (mod && e.key.toLowerCase() === 'y' && !typing) { e.preventDefault(); actions.redo(); }
       else if (mod && e.key.toLowerCase() === 'd' && !typing) { e.preventDefault(); const id = store.getState().selectedId; id && actions.duplicateElement(id); }
@@ -84,8 +84,8 @@ export default function App() {
         </section>
         <section className={`tool-dock ${tool ? 'open' : selectedElement ? 'quick' : 'closed'}`} aria-label="Editor tools">
           <div id="active-tool-panel" className={`tool-panel ${tool ? 'open' : selectedElement ? 'quick' : ''}`} aria-hidden={!tool && !selectedElement}>
-            {!tool && selectedElement && <PositionControls element={selectedElement} />}
-            {tool && (
+            {<PositionControls element={selectedElement} />}
+            {tool && tool !== 'move' && (
               <>
                 <header className="tool-panel-head">
                   <strong><Icon name={TOOLS.find(([key]) => key === tool)?.[2] || 'download'} size={16} />{TOOLS.find(([key]) => key === tool)?.[1] || 'Export'}</strong>
@@ -104,7 +104,7 @@ export default function App() {
             {TOOLS.map(([key, label, icon]) => (
               <button key={key} className={`tool-button ${tool === key ? 'active' : ''}`}
                 aria-expanded={tool === key} aria-controls="active-tool-panel"
-                onClick={() => setTool((current) => current === key ? null : key)}>
+                onClick={() => setTool(key)}>
                 <Icon name={icon} size={19} /><span>{label}</span>
               </button>
             ))}
