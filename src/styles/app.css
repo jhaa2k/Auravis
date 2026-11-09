@@ -127,8 +127,8 @@ button:disabled { opacity: .4; cursor: default; }
 .type-badge { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-weight: 600; }
 .empty { padding: 24px; color: var(--muted); text-align: center; }
 .problems { list-style: none; margin: 8px 12px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.problems li { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 8px; font-size: 12.5px; background: #3a2a22; }
-.problems li.error { background: #4a2420; color: #ffb3a8; } .problems li.warning { background: #433617; color: #f6d58a; } .problems li.info { background: #1f3340; color: #a6cde6; }
+.problems li { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 8px; font-size: 12.5px; background: #303030; }
+.problems li.error { background: #383838; color: #eeeeee; } .problems li.warning { background: #343434; color: #dddddd; } .problems li.info { background: #303030; color: #dddddd; }
 .section { margin: 7px 10px; border: 1px solid var(--line); border-radius: 9px; background: #202020; overflow: hidden; }
 .section-head { width: 100%; display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: none; border: 0; text-align: left; font-weight: 600; color: var(--text); }
 .section-head svg { transition: transform .15s; } .section.open > .section-head svg { transform: rotate(90deg); }
@@ -180,7 +180,7 @@ input.num { font-variant-numeric: tabular-nums; }
 
 /* toasts, misc */
 .toasts { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 100; align-items: center; pointer-events: none; }
-.toast { display: flex; gap: 8px; align-items: center; padding: 9px 14px; background: #322f2b; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 30px #0009; max-width: 90vw; }
+.toast { display: flex; gap: 8px; align-items: center; padding: 9px 14px; background: #2f2f2f; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 30px #0009; max-width: 90vw; }
 .toast.error { border-color: var(--danger); } .toast.warning { border-color: var(--warn); }
 kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; font-size: 11px; color: var(--text); }
 
@@ -249,7 +249,7 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
 
 .android-app {
   background:
-    radial-gradient(ellipse at 50% 0, #3a2d241f, transparent 48%),
+    radial-gradient(ellipse at 50% 0, #ffffff0a, transparent 48%),
     var(--bg);
 }
 .android-app .topbar {
@@ -272,7 +272,7 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
 }
 .android-app .tool-button:active { transform: scale(.97); }
 .android-app .tool-button.active {
-  background: linear-gradient(145deg, #49352a, #352a23);
+  background: linear-gradient(145deg, #353535, #303030);
   box-shadow: inset 0 0 0 1px #f5f5f524;
 }
 .android-app[data-theme="light"] {
@@ -286,16 +286,16 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
 .android-app[data-theme="light"] .tool-dock,
 .android-app[data-theme="light"] .tool-panel { background: var(--panel); }
 .android-app[data-theme="light"] .workspace { background: #e9ebef; }
-.android-app[data-theme="light"] .tool-button.active { background: #f8e6dc; box-shadow: inset 0 0 0 1px #d8d8d833; }
+.android-app[data-theme="light"] .tool-button.active { background: #dddddd; box-shadow: inset 0 0 0 1px #d8d8d833; }
 .android-app[data-theme="light"] .transport,
 .android-app[data-theme="light"] .music-library,
 .android-app[data-theme="light"] .measure { background: #f7f8fa; border-color: var(--line); }
-.android-app[data-theme="light"] .music-track-list li.active { background: #f8e6dc; }
+.android-app[data-theme="light"] .music-track-list li.active { background: #dddddd; }
 .android-app[data-theme="light"] .section-head:hover { background: #00000008; }
 .android-app[data-theme="light"] .field label { color: #505762; }
 .android-app[data-theme="light"] .props-head,
 .android-app[data-theme="light"] .section { border-color: var(--line); }
-.android-app[data-theme="light"] .problems li { background: #fff0e8; color: #703b25; }
+.android-app[data-theme="light"] .problems li { background: #eeeeee; color: #555555; }
 .android-app .preview-meta { gap: 7px; }
 .android-app .preview-live,
 .android-app .preview-size,
@@ -330,8 +330,8 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
   transition: background .14s ease, border-color .14s ease;
 }
 .android-app .layer.selected {
-  background: linear-gradient(100deg, #3e3028, #332923);
-  border-color: #80513a;
+  background: linear-gradient(100deg, #333333, #2c2c2c);
+  border-color: #555555;
   box-shadow: inset 2px 0 var(--accent);
 }
 .android-app .section-head { transition: color .14s ease, background .14s ease; }
@@ -341,7 +341,7 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
   background: #1d1d1b;
 }
 .android-app .measure.on {
-  border-color: #80513a;
+  border-color: #555555;
   box-shadow: inset 0 0 0 1px #f5f5f50d;
 }
 .android-app input[type="text"]:focus-visible,
@@ -358,8 +358,8 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
 .android-app .btn:hover:not(:disabled) { transform: translateY(-1px); }
 .android-app .btn:active:not(:disabled) { transform: translateY(0); }
 .android-app .btn.primary:hover:not(:disabled) {
-  background: #f08a60;
-  border-color: #f08a60;
+  background: #f0f0f0;
+  border-color: #f0f0f0;
 }
 .android-app .modal {
   border-color: #ffffff20;
@@ -387,7 +387,7 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
 .android-app .music-library-head .btn { min-height: 38px; }
 .android-app .music-track-list { flex: 1; min-height: 0; overflow-y: hide; overscroll-behavior: contain; list-style: none; margin: 0; padding: 4px; }
 .android-app .music-track-list li { display: flex; align-items: center; gap: 4px; min-height: 54px; padding: 3px 4px 3px 8px; border-bottom: 1px solid #ffffff0c; border-radius: 8px; }
-.android-app .music-track-list li.active { background: linear-gradient(100deg, #3e3028, #332923); }
+.android-app .music-track-list li.active { background: linear-gradient(100deg, #333333, #2c2c2c); }
 .android-app .music-track { display: flex; flex: 1; align-items: center; gap: 10px; min-width: 0; min-height: 44px; padding: 4px 2px; border: 0; background: transparent; text-align: left; }
 .android-app .music-track > svg { flex: none; color: var(--accent); }
 .android-app .music-track > span { display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0; }
@@ -557,7 +557,7 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
   color: var(--muted);
   font-size: 11px;
 }
-.android-app .position-step button.active { border-color: var(--accent); color: var(--accent); background: #49352a55; }
+.android-app .position-step button.active { border-color: var(--accent); color: var(--accent); background: #ffffff20; }
 .android-app .position-direction { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
 .android-app .position-pad {
   display: grid;
@@ -650,7 +650,7 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
 }
 .android-app .center-point-grid button.active {
   border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 22%, var(--panel2));
+  background: #3a3a3a;
 }
 .android-app .center-point-grid button.active i {
   width: 7px;
