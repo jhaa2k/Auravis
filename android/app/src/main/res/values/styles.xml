@@ -17,11 +17,13 @@
 
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#050611</item>
+        <item name="windowSplashScreenBackground">#101114</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/auravis_splash_logo</item>
-        <item name="windowSplashScreenAnimationDuration">650</item>
+        <item name="windowSplashScreenAnimationDuration">450</item>
+        <item name="windowSplashScreenIconBackgroundColor">#101114</item>
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:navigationBarColor">#050611</item>
+        <item name="android:statusBarColor">#101114</item>
+        <item name="android:navigationBarColor">#101114</item>
     </style>
 </resources>
