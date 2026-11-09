@@ -2,7 +2,7 @@ import { sel, num, col, area, section } from '../../core/schema/dsl.js';
 import { general } from '../shared/general.js';
 
 export const sections = [
-  general({ position: [0, 380] }),
+  general({ position: [0, 0] }),
   section('Appearance', [
     area('text', 'Text', '{ArtistOrTitle}', { hint: 'Placeholders: {ArtistOrTitle} {title} {artist} {time} {duration} {remaining} {progress} {date} {clock}' }),
     col('color', 'Color', '#ffffffff'),
