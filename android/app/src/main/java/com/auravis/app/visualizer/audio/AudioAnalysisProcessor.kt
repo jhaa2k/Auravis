@@ -35,7 +35,7 @@ class AudioAnalysisProcessor(
         output.flip()
     }
 
-    override fun onFlush(streamMetadata: AudioProcessor.StreamMetadata) {
+    override fun onFlush() {
         analyzer.reset()
     }
 
