@@ -594,3 +594,45 @@ html,body,#root{width:100%;min-width:0;overflow:hidden}
 .scene-library-foot{margin:0;padding:9px 10px;border-top:1px solid var(--line);color:var(--muted);font-size:9px;line-height:1.55}
 @media(min-width:640px){.scene-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.scene-library-tools{flex-direction:row;align-items:center}.scene-search{max-width:220px;margin-left:auto}.scene-card-art{height:90px}}
 @media(max-width:360px){.scene-library{padding:9px;gap:10px}.scene-grid{gap:6px}.scene-card-art{height:66px}.scene-live-stats span{font-size:6px}}
+
+/* Preview visibility + explicit editor stacking order.
+   The stage is a flex item with absolutely-positioned children, so auto/auto
+   dimensions can collapse on Android WebView. Give it a real height and let
+   aspect-ratio derive the width from the active project dimensions. */
+.modern-preview .stage{
+  position:relative;
+  height:100%;
+  width:auto;
+  min-width:0;
+  min-height:0;
+  max-width:100%;
+  max-height:100%;
+  aspect-ratio:var(--ar);
+  flex:0 1 auto;
+  contain:layout paint;
+}
+.modern-preview .stage canvas{
+  position:absolute;
+  z-index:0;
+  inset:0;
+  display:block;
+  width:100%;
+  height:100%;
+  max-width:none;
+  max-height:none;
+  pointer-events:none;
+}
+.modern-preview .stage .hit{
+  position:absolute;
+  z-index:2;
+  inset:0;
+  background:transparent;
+  pointer-events:auto;
+  touch-action:none;
+}
+.modern-preview .stage .sel{
+  z-index:3;
+  pointer-events:none;
+}
+.modern-preview .stage .handle{z-index:4}
+.modern-preview .stage .hud{z-index:5}
