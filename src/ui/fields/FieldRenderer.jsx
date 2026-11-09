@@ -37,7 +37,7 @@ export default function FieldRenderer({ def, el, elements, onChange, onReset, on
       if (def.dynamic === 'fonts') return row(<FontField value={value} onChange={(v) => set(v, false)} sample={el.props.text?.split('\n')[0]?.slice(0, 24)} />, true);
       return row(
         <InAppSelect value={value} ariaLabel={def.label} options={optionsFor(def, el, elements)} onChange={(v) => set(v, false)} />);
-    case 'color': return row(<ColorInput value={value} onChange={set} />);
+    case 'color': return row(<ColorInput value={value} resetValue={def.default} onChange={set} />);
     case 'text': return row(<input type="text" value={value} maxLength={def.maxLength} onChange={(e) => set(e.target.value)} placeholder={def.key === 'tag' ? 'Unique name' : ''} />);
     case 'textarea': return row(<textarea rows={def.key === 'text' ? 2 : 3} value={value} maxLength={def.maxLength} spellCheck={false} onChange={(e) => set(e.target.value)} />, true);
     case 'vec2': {
