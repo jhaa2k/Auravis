@@ -474,3 +474,23 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
   .android-app .tool-panel-head { min-height: 36px; }
   .android-app .tool-bar { height: 54px; }
 }
+
+
+/* Compact position controls; the preview is a clean, non-interactive monitor. */
+.android-app .stage .hit, .android-app .stage .handle { display: none !important; }
+.android-app .quick-position { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 7px 10px; margin: 8px 10px 10px; padding: 9px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); }
+.android-app .quick-position-head { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.android-app .quick-position-head > span { display: flex; align-items: center; gap: 6px; color: var(--accent); font-size: 12px; font-weight: 650; }
+.android-app .quick-position-head small { color: var(--muted); font-size: 10px; }
+.android-app .position-fields { display: flex; gap: 6px; min-width: 0; }
+.android-app .position-fields label { display: flex; flex: 1; align-items: center; gap: 5px; min-width: 0; color: var(--muted); font-size: 11px; }
+.android-app .position-fields input { width: 100%; min-width: 0; height: 32px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; color: var(--text); background: var(--panel); font: inherit; font-variant-numeric: tabular-nums; }
+.android-app .position-pad { display: grid; grid-template-columns: repeat(3, 29px); grid-template-rows: 26px 26px; gap: 2px; justify-content: center; }
+.android-app .position-pad button { display: grid; place-items: center; min-width: 29px; min-height: 26px; padding: 0; border: 1px solid var(--line); border-radius: 5px; color: var(--text); background: var(--panel); }
+.android-app .position-pad button:first-child { grid-column: 2; }
+.android-app .position-pad button:nth-child(2) { grid-column: 1; grid-row: 2; }
+.android-app .position-pad button:nth-child(3) { grid-column: 3; grid-row: 2; }
+.android-app .position-pad button:nth-child(4) { grid-column: 2; grid-row: 2; }
+.android-app .position-step { grid-column: 1 / -1; display: flex; justify-content: center; gap: 5px; }
+.android-app .position-step button { min-height: 26px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 5px; color: var(--muted); background: transparent; font-size: 10px; }
+.android-app .position-pad button:active, .android-app .position-step button:active { border-color: var(--accent); color: var(--accent); }
