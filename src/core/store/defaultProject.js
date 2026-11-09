@@ -2,7 +2,7 @@ import { createElementData } from '../schema/registry.js';
 import { makeMeasure } from '../schema/measureConfig.js';
 
 export const DEFAULT_SETTINGS = {
-  width: 1920, height: 1080, background: '#0d0d12', quality: 'medium', fps: 60, adaptive: true,
+  width: 1920, height: 1080, background: '#0d0d12', quality: 'medium', fps: 60, adaptive: true, theme: 'dark',
 };
 
 /** The starter audio-reactive scene a new user sees. */
