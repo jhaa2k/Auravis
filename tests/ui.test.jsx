@@ -8,6 +8,7 @@ import { listDefinitions } from '../src/core/schema/registry.js';
 import App from '../src/app/App.jsx';
 import PropertiesPanel from '../src/ui/PropertiesPanel.jsx';
 import SettingsPanel from '../src/ui/SettingsPanel.jsx';
+import ExportPanel from '../src/ui/ExportPanel.jsx';
 import LayerList from '../src/ui/LayerList.jsx';
 import TransportBar from '../src/ui/TransportBar.jsx';
 import MusicPanel from '../src/ui/MusicPanel.jsx';
@@ -41,13 +42,13 @@ describe('React UI renders without runtime errors', () => {
     for (const s of ['General', 'Image', 'Color', 'Color Key', 'Blur', 'Generated Album Art']) expect(html).toContain(s);
     expect(html).not.toContain('class="section-body"');
   });
-  it('shows a reset control when a numeric property differs from its default', () => {
+  it('shows double-tap reset guidance for changed numeric sliders', () => {
     const definition = listDefinitions().find((item) => item.sections.some((section) => section.props.some((property) => ['number', 'int'].includes(property.type) && !property.dynamic)));
     const property = definition.sections.flatMap((section) => section.props).find((item) => ['number', 'int'].includes(item.type) && !item.dynamic);
     const changedValue = property.default === property.min ? property.default + property.step : property.default - property.step;
     const html = renderToString(<FieldRenderer def={property} el={{ props: { [property.key]: changedValue } }} elements={[]} onChange={() => {}} onReset={() => {}} onAction={() => {}} />);
-    expect(html).toContain(`aria-label="Reset ${property.label}"`);
-    expect(html).toContain('title="Reset to default"');
+    expect(html).toContain('title="Double-tap to reset"');
+    expect(html).not.toContain(`aria-label="Reset ${property.label}"`);
   });
   it('layers, music, transport and settings', () => {
     expect(renderToString(<LayerList />)).toContain('Add');
@@ -57,7 +58,13 @@ describe('React UI renders without runtime errors', () => {
     expect(transport).toContain('No audio loaded');
     expect(transport).toContain('aria-label="Seek track"');
     expect(transport).toContain('class="now"');
-    expect(renderToString(<SettingsPanel />)).toContain('Canvas defaults');
-    expect(renderToString(<SettingsPanel mode="export" />)).toContain('Live visual effects');
+    const settings=renderToString(<SettingsPanel />);
+    expect(settings).toContain('Canvas defaults');
+    expect(settings).not.toContain('Keyboard shortcuts');
+    expect(settings).not.toContain('Export video');
+    const exportUi=renderToString(<ExportPanel/>);
+    expect(exportUi).toContain('Video Export');
+    expect(exportUi).not.toContain('Live visual effects');
+    expect(exportUi).not.toContain('Canvas defaults');
   });
 });
