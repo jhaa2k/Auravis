@@ -40,8 +40,8 @@ export function PositionControls({ element }) {
       <div className="quick-position-layout">
         <div className="quick-position-values">
           <div className="position-fields">
-            {number(position[0], (v) => ({ position: [v, position[1]] }), 'X · −200 / 0 / +200', -200, 200)}
-            {number(position[1], (v) => ({ position: [position[0], v] }), 'Y · −200 / 0 / +200', -200, 200)}
+            {number(position[0], (v) => ({ position: [v, position[1]] }), 'X · Left / Centre / Right', -200, 200)}
+            {number(position[1], (v) => ({ position: [position[0], v] }), 'Y · Up / Centre / Down', -200, 200)}
             {Object.prototype.hasOwnProperty.call(element.props, 'rotation') && number(rotation, (v) => ({ rotation: v }), 'Rotation', -720, 720, 0.1)}
           </div>
           <div className="position-adjustments">
