@@ -32,7 +32,7 @@ export default function SettingsPanel(){
    <div className="hint">Project-wide effects are composited into the preview and final video.</div>
    {[
     ['background','Background'],['cameraZoom','Camera Zoom · Bass Follow'],['vignette','Vignette'],['scanlines','Scanlines'],['filmGrain','Film Grain'],['beatFlash','Beat Flash'],['beatShake','Beat Shake'],['hueJump','Hue Jump per Beat']
-   ].map(([key,label])=><div className="effect-slider" key={key}><div><label>{label}</label><output>{s.effects?.[key]||0}</output></div><Slider value={s.effects?.[key]||0} min={0} max={100} step={1} onChange={v=>actions.setSettings({effects:{...s.effects,[key]:v}})}/></div>)}
+   ].map(([key,label])=><div className="effect-slider" key={key}><div><label>{label}</label><output>{s.effects?.[key]||0}</output></div><Slider value={s.effects?.[key]||0} min={0} max={100} step={1} resetValue={0} onChange={v=>actions.setSettings({effects:{...s.effects,[key]:v}})}/></div>)}
   </div></section>
   <section className="section open"><div className="section-head static">Canvas defaults</div><div className="section-body">
    <div className="field"><label>Aspect ratio / size</label><InAppSelect value={size} options={RESOLUTIONS} onChange={setSize} ariaLabel="Canvas size"/></div>
