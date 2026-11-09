@@ -4,7 +4,7 @@ import { actions, store, visualizer } from '../app/services.js';
 import { QUALITY } from '../core/render/quality.js';
 import { getDefinition } from '../core/schema/registry.js';
 
-const HITTABLE = new Set(['image', 'barsSegments', 'text']);
+const HITTABLE = new Set(['image', 'barsSegments', 'text', 'particles']);
 
 /** Screen-space (logical px) corners of an element box. */
 function corners(T) {
