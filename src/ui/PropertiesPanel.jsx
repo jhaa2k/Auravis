@@ -14,8 +14,8 @@ export function PositionControls({ element }) {
     <section className="quick-position" aria-label="Move selected element">
       <div className="quick-position-head"><span><Icon name="move" size={14} />Position</span><small>Precise canvas placement</small></div>
       <div className="position-fields">
-        <label><span>X</span><input type="number" step="1" value={position[0]} onChange={(e) => update(Number(e.target.value) || 0, position[1])} /></label>
-        <label><span>Y</span><input type="number" step="1" value={position[1]} onChange={(e) => update(position[0], Number(e.target.value) || 0)} /></label>
+        <label><span>X</span><input type="number" step="1" defaultValue={position[0]} onBlur={(e) => update(Number(e.target.value) || 0, position[1])} /></label>
+        <label><span>Y</span><input type="number" step="1" defaultValue={position[1]} onBlur={(e) => update(position[0], Number(e.target.value) || 0)} /></label>
       </div>
       <div className="position-pad" aria-label="Nudge position">
         <button type="button" title="Move up 1 px" onClick={() => nudge(0, -1)}><Icon name="chevron-up" size={15} /></button>
