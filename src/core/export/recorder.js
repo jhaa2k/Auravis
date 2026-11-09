@@ -1,6 +1,5 @@
 export const EXPORT_FORMATS = [
   { value: 'video/mp4;codecs=avc1.42E01E,mp4a.40.2', label: 'MP4 · H.264 / AAC', extension: 'mp4' },
-  { value: 'video/mp4;codecs=hvc1,mp4a.40.2', label: 'MP4 · H.265 / AAC', extension: 'mp4' },
   { value: 'video/webm;codecs=vp9,opus', label: 'WebM · VP9 / Opus', extension: 'webm' },
   { value: 'video/webm;codecs=vp8,opus', label: 'WebM · VP8 / Opus', extension: 'webm' },
 ];
@@ -13,7 +12,10 @@ export function supportedExportFormats() {
 export function startRecording({ canvas, audioStream, fps = 60, mimeType, videoBitrate = 8_000_000, audioBitrate = 192_000, timeslice = 1000 }) {
   if (typeof MediaRecorder === 'undefined') throw new Error('Recording is not supported in this browser.');
   if (!mimeType || !MediaRecorder.isTypeSupported(mimeType)) throw new Error('The selected video format is not supported by this device.');
+  if (!canvas || typeof canvas.captureStream !== 'function') throw new Error('This device cannot capture the visualizer canvas.');
+  if (!audioStream || audioStream.getAudioTracks().length === 0) throw new Error('The audio stream is not ready. Reload the track and try again.');
   const stream = canvas.captureStream(fps);
+  if (stream.getVideoTracks().length === 0) { stream.getTracks().forEach((track) => track.stop()); throw new Error('The visualizer video track could not be captured.'); }
   const ownedTracks = [];
   const stopTracks = () => {
     new Set([...stream.getTracks(), ...ownedTracks]).forEach((track) => track.stop());
@@ -28,6 +30,7 @@ export function startRecording({ canvas, audioStream, fps = 60, mimeType, videoB
       stream.addTrack(clone);
     });
     rec = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: videoBitrate, audioBitsPerSecond: audioBitrate });
+    if (!rec.mimeType || !rec.mimeType.startsWith('video/')) throw new Error('The device returned an invalid video format.');
     rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
     rec.onerror = (event) => { recordingError = event.error || new Error('The video encoder failed.'); };
     rec.start(timeslice);
