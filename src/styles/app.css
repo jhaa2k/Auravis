@@ -490,3 +490,41 @@ html,body,#root{width:100%;min-width:0;overflow:hidden}
   .dock-inspector{padding:6px 7px}
   .dock-footer{font-size:7px}
 }
+
+
+/* Thin editor controls + native-popup-free selectors */
+.modern-app input[type="range"],.modern-app .range,.modern-app .move-adjust-grid input[type="range"]{
+  -webkit-appearance:none;appearance:none;height:14px;min-height:14px;background:transparent;cursor:pointer;touch-action:pan-y;
+}
+.modern-app input[type="range"]::-webkit-slider-runnable-track,.modern-app .range::-webkit-slider-runnable-track{
+  height:2px;border:0;border-radius:0;background:linear-gradient(to right,var(--accent) 0 var(--pct,0%),#414550 var(--pct,0%) 100%);
+}
+.modern-app input[type="range"]::-moz-range-track,.modern-app .range::-moz-range-track{height:2px;border:0;border-radius:0;background:#414550}
+.modern-app input[type="range"]::-moz-range-progress,.modern-app .range::-moz-range-progress{height:2px;background:var(--accent)}
+.modern-app input[type="range"]::-webkit-slider-thumb,.modern-app .range::-webkit-slider-thumb{
+  -webkit-appearance:none;width:8px;height:8px;margin-top:-3px;border:1px solid var(--accent);border-radius:50%;background:#171a20;box-shadow:none;
+}
+.modern-app input[type="range"]::-moz-range-thumb,.modern-app .range::-moz-range-thumb{
+  width:7px;height:7px;border:1px solid var(--accent);border-radius:50%;background:#171a20;box-shadow:none;
+}
+.inapp-select{position:relative;width:100%;min-width:0}
+.inapp-select-trigger{width:100%;min-height:36px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:var(--panel2);color:var(--text);font:inherit;font-size:12px;text-align:left}
+.inapp-select-trigger:disabled{opacity:.45}
+.inapp-select-trigger svg{flex:0 0 auto;transform:rotate(90deg);color:var(--muted)}
+.inapp-select.is-open .inapp-select-trigger{border-color:var(--accent)}
+.inapp-select-menu{position:absolute;z-index:150;left:0;right:0;top:calc(100% + 4px);max-height: min(42dvh,300px);overflow:auto;padding:4px;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 14px 38px #0009}
+.inapp-select-menu button{width:100%;min-height:34px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;border:0;border-radius:5px;background:transparent;color:var(--text);font:inherit;font-size:11px;text-align:left}
+.inapp-select-menu button.selected{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent)}
+.inapp-select-menu button:active{background:var(--panel2)}
+.top-export{display:flex;align-items:center;gap:5px;padding:7px 10px;white-space:nowrap}
+.modern-transport .now{display:flex;align-items:center;gap:8px;min-width:0}
+.modern-transport .now-art{width:32px;height:32px;flex:0 0 auto;display:grid;place-items:center;border:1px solid var(--line);border-radius:6px;background:var(--panel2);color:var(--accent)}
+.modern-transport .extras{display:flex;align-items:center;gap:4px}
+.modern-transport .extras .icon-btn{min-width:30px}
+:root[data-auravis-theme="midnight"]{--bg:#080f1c;--panel:#101a2b;--panel2:#17243a;--line:#263752;--text:#edf4ff;--muted:#91a5c2;--accent:#61b8ff;--accent2:#459eff}
+:root[data-auravis-theme="graphite"]{--bg:#141414;--panel:#202020;--panel2:#2a2a2a;--line:#3b3b3b;--text:#f1f1f1;--muted:#a2a2a2;--accent:#c4c4c4;--accent2:#e1e1e1}
+:root[data-auravis-theme="light"]{--bg:#edf0f4;--panel:#ffffff;--panel2:#f2f4f7;--line:#d5dbe4;--text:#171b22;--muted:#687384;--accent:#5968d8;--accent2:#4656c9}
+:root[data-auravis-theme="light"] .modern-topbar,:root[data-auravis-theme="light"] .bottom-nav,:root[data-auravis-theme="light"] .modern-controls{background:var(--panel)}
+:root[data-auravis-theme="light"] .panel-overlay{background:var(--panel);color:var(--text)}
+:root[data-auravis-theme="light"] .dock-playback .modern-transport,:root[data-auravis-theme="light"] .dock-inspector,:root[data-auravis-theme="light"] .move-adjust{background:var(--panel2)}
+:root[data-auravis-theme="light"] .inapp-select-menu{box-shadow:0 14px 38px #17203322}
