@@ -753,3 +753,5 @@ html,body,#root{width:100%;min-width:0;overflow:hidden}
 .filter-card>svg{position:absolute;right:7px;top:7px;padding:2px;border-radius:50%;background:var(--accent);color:#111}
 .filter-foot{margin:0;padding:9px 2px;color:var(--muted);font-size:9px;line-height:1.5}
 @media(min-width:640px){.filter-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.filter-preview{height:100px}}
+
+.filter-head-actions{display:flex;gap:5px;flex:0 0 auto}.filter-head-actions .btn{display:flex;align-items:center;gap:4px}.color-row .range{flex:1;min-width:0}
