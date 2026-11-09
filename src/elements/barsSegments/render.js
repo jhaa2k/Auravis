@@ -40,14 +40,22 @@ export function renderBars(rc, el) {
   const p = el.props;
   const prov = rc.providers[p.audioProviderIndex - 1];
   if (!prov) { rc.diag(el.id, 'error', `Invalid Audio Provider Index ${p.audioProviderIndex}: add or select an existing Audio Provider`); return; }
-  const samples = prov.out.samples, N = samples.length;
-  if (!N) return;
+  const source = prov.out.samples;
+  if (!source?.length) return;
+  const N = clamp(Math.round(p.barCount || 90), 2, 90);
   let shape = p.shapePath;
   if (shape === 'custom') {
     const v = validateCustomPath(p.customShapePath);
     if (!v.ok) { rc.diag(el.id, 'error', `${v.error}: using Rectangle`); shape = 'rectangle'; }
   }
-  const st = rc.state(el.id, () => ({ avgDt: 1 / 60, frame: -1 }));
+  const st = rc.state(el.id, () => ({ avgDt: 1 / 60, frame: -1, resampled: null }));
+  if (!st.resampled || st.resampled.length !== N) st.resampled = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    const at = (i / Math.max(1, N - 1)) * (source.length - 1);
+    const lo = Math.floor(at), hi = Math.min(source.length - 1, lo + 1), t = at - lo;
+    st.resampled[i] = source[lo] + (source[hi] - source[lo]) * t;
+  }
+  const samples = st.resampled;
   updateBars(rc, el, samples, st);
 
   const T = computeTransform(rc, el, BOX_W, BOX_H);
