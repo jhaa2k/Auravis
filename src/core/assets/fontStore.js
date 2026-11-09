@@ -10,7 +10,13 @@ export const BUILTIN_FONTS = [
 export const FONT_FALLBACK = 'system-ui, "Segoe UI", Roboto, Arial, sans-serif';
 
 class FontStore {
-  constructor() { this.imported = []; this.listeners = new Set(); this.version = 0; }
+  constructor() {
+    this.imported = []; this.listeners = new Set(); this.version = 0;
+    if (typeof document !== 'undefined' && document.fonts?.addEventListener) {
+      document.fonts.addEventListener('loadingdone', () => this.emit());
+      document.fonts.addEventListener('loadingerror', () => this.emit());
+    }
+  }
   subscribe = (fn) => { this.listeners.add(fn); return () => this.listeners.delete(fn); };
   emit() { this.version++; this.listeners.forEach((l) => l()); }
   families() { return [...BUILTIN_FONTS, ...this.imported]; }
