@@ -30,6 +30,8 @@ describe('elements render individually', () => {
     ['barsSegments', { segment2Enabled: true, shapePath: 'capsule' }],
     ['particles', { visible: true, spawnTime: 0.002, countLimit: 300, particleScale: 4, fadeInSize: 12, endSize: 12 }],
     ['text', { visible: true, text: 'Auravis visualizer', fontSize: 32, typeFace: 'Inter' }],
+    ['waveform', { visible: true, waveformMode: 'mirror', amplitude: 2 }],
+    ['radialSpectrum', { visible: true, barCount: 96, sensitivity: 2 }],
   ];
   for (const [type, over] of cases) {
     it(`${type} draws visible content`, () => {
