@@ -116,14 +116,14 @@ class NativeVisualizerPlugin : Plugin() {
 
     @PluginMethod
     fun seek(call: PluginCall) {
-        val position = call.getDouble("position", 0.0).coerceAtLeast(0.0)
+        val position = (call.getDouble("position") ?: 0.0).coerceAtLeast(0.0)
         engine?.player?.seekTo((position * 1000.0).toLong())
         resolveState(call)
     }
 
     @PluginMethod
     fun setVolume(call: PluginCall) {
-        val value = call.getDouble("volume", 1.0).toFloat().coerceIn(0f, 1f)
+        val value = (call.getDouble("volume") ?: 1.0).toFloat().coerceIn(0f, 1f)
         engine?.player?.volume = value
         call.resolve()
     }
