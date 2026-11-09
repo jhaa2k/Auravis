@@ -758,3 +758,25 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
   .android-app .position-pad { grid-template-columns: repeat(3,24px); grid-template-rows: repeat(3,24px); }
   .android-app .position-pad button, .android-app .position-pad span { min-width: 24px; min-height: 24px; }
 }
+
+
+/* Preset browser */
+.android-app .presets { display:flex; flex-direction:column; min-height:100%; gap:10px; padding:10px; }
+.android-app .presets-toolbar { display:flex; align-items:center; gap:8px; justify-content:space-between; flex-wrap:wrap; }
+.android-app .presets-toolbar > div { display:flex; flex-direction:column; gap:2px; }
+.android-app .presets-toolbar b { font-size:13px; }
+.android-app .presets-toolbar small,.android-app .preset-card-meta small { color:var(--muted); font-size:10px; }
+.android-app .preset-categories { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+.android-app .preset-categories button { flex:0 0 auto; border:1px solid var(--line); border-radius:6px; padding:5px 11px; background:transparent; color:var(--muted); font-size:11px; }
+.android-app .preset-categories button.active { color:var(--text); background:#343434; border-color:#666; }
+.android-app .preset-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+.android-app .preset-card { display:flex; flex-direction:column; min-width:0; overflow:hidden; padding:0; border:1px solid var(--line); border-radius:8px; background:#202020; text-align:left; }
+.android-app .preset-card.selected { border-color:#aaa; box-shadow:0 0 0 1px #aaa; }
+.android-app .preset-art { position:relative; display:flex; align-items:center; justify-content:center; gap:4px; height:62px; overflow:hidden; background:var(--preset-bg); }
+.android-app .preset-art i { width:5px; height:var(--bar-h,24px); border-radius:4px; background:var(--preset-a); box-shadow:0 0 10px color-mix(in srgb,var(--preset-a),transparent 45%); }
+.android-app .preset-art i:nth-child(1){height:17px}.android-app .preset-art i:nth-child(2){height:34px}.android-app .preset-art i:nth-child(3){height:25px}.android-app .preset-art i:nth-child(4){height:43px}
+.android-app .preset-art b { position:absolute; width:22px; height:22px; border:2px solid var(--preset-b); border-radius:50%; box-shadow:0 0 12px var(--preset-b); }
+.android-app .preset-card-meta { display:flex; flex-direction:column; gap:2px; padding:7px 8px; }
+.android-app .preset-card-meta b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; font-weight:600; }
+.android-app .preset-note { margin:0; color:var(--muted); font-size:10px; line-height:1.45; }
+@media (min-width:520px) { .android-app .preset-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
