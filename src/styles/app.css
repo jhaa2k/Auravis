@@ -494,3 +494,123 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
 .android-app .position-step { grid-column: 1 / -1; display: flex; justify-content: center; gap: 5px; }
 .android-app .position-step button { min-height: 26px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 5px; color: var(--muted); background: transparent; font-size: 10px; }
 .android-app .position-pad button:active, .android-app .position-step button:active { border-color: var(--accent); color: var(--accent); }
+
+
+/* Final responsive pass: one clear tool panel, with a dedicated collapsed transform area. */
+.android-app .workspace.expanded { grid-template-rows: minmax(0, min(40dvh, 420px)) minmax(0, 1fr); }
+.android-app .workspace.compact { grid-template-rows: minmax(0, 1fr) 62px; }
+.android-app .tool-panel:not(.open):not(.quick) { display: none; }
+.android-app .tool-panel.open,
+.android-app .tool-panel.quick { display: flex; flex: 1 1 auto; min-height: 0; visibility: visible; opacity: 1; }
+.android-app .tool-panel.quick { overflow: hidden; }
+.android-app .tool-dock.closed { min-height: 62px; }
+.android-app .tool-dock.quick { min-height: 0; }
+.android-app .quick-position {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 9px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: hidden;
+}
+.android-app .quick-position-head { flex: none; min-height: 24px; }
+.android-app .quick-position-head > span { font-size: 13px; }
+.android-app .quick-position-head small { max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.android-app .quick-position-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 116px;
+  gap: 12px;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+}
+.android-app .quick-position-values { display: flex; flex-direction: column; justify-content: center; gap: 8px; min-width: 0; }
+.android-app .position-fields,
+.android-app .position-adjustments { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; min-width: 0; }
+.android-app .position-adjustments { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.android-app .quick-number { display: flex; flex-direction: column; gap: 3px; min-width: 0; color: var(--muted); font-size: 10px; }
+.android-app .quick-number input {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel2);
+  color: var(--text);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.android-app .position-step { display: flex; justify-content: flex-start; gap: 6px; }
+.android-app .position-step button {
+  min-width: 54px;
+  min-height: 30px;
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel2);
+  color: var(--muted);
+  font-size: 11px;
+}
+.android-app .position-step button.active { border-color: var(--accent); color: var(--accent); background: #49352a55; }
+.android-app .position-direction { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
+.android-app .position-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 36px);
+  grid-template-rows: repeat(3, 36px);
+  gap: 3px;
+  justify-content: center;
+}
+.android-app .position-pad button,
+.android-app .position-pad span {
+  display: grid;
+  place-items: center;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel2);
+  color: var(--text);
+}
+.android-app .position-pad button:disabled { opacity: .35; }
+.android-app .position-pad button:first-child { grid-column: 2; grid-row: 1; }
+.android-app .position-pad button:nth-child(2) { grid-column: 1; grid-row: 2; }
+.android-app .position-pad span { grid-column: 2; grid-row: 2; color: var(--accent); border-style: dashed; }
+.android-app .position-pad button:nth-child(4) { grid-column: 3; grid-row: 2; }
+.android-app .position-pad button:nth-child(5) { grid-column: 2; grid-row: 3; }
+.android-app .position-pad button:active { border-color: var(--accent); color: var(--accent); }
+.android-app .music-track-list { overflow-y: auto; scrollbar-width: none; }
+.android-app .music-track-list::-webkit-scrollbar,
+.android-app .tool-panel-content::-webkit-scrollbar { display: none; }
+.android-app input[type="text"],
+.android-app input[type="number"],
+.android-app textarea { -webkit-user-select: text; user-select: text; }
+.android-app .preview-meta { min-height: 26px; }
+.android-app .preview-live { min-height: 26px; padding-inline: 10px; }
+
+@media (max-width: 360px) {
+  .android-app .quick-position { padding: 8px; gap: 7px; }
+  .android-app .quick-position-layout { grid-template-columns: minmax(0, 1fr) 104px; gap: 7px; }
+  .android-app .position-pad { grid-template-columns: repeat(3, 32px); grid-template-rows: repeat(3, 32px); gap: 2px; }
+  .android-app .position-pad button,
+  .android-app .position-pad span { min-width: 32px; min-height: 32px; }
+  .android-app .quick-number input { height: 34px; padding-inline: 5px; font-size: 13px; }
+  .android-app .position-fields,
+  .android-app .position-adjustments { gap: 5px; }
+  .android-app .position-step button { min-width: 48px; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .android-app .workspace.expanded { grid-template-rows: minmax(0, min(32dvh, 180px)) minmax(0, 1fr); }
+  .android-app .quick-position { padding: 6px 10px; gap: 5px; }
+  .android-app .quick-position-layout { grid-template-columns: minmax(0, 1fr) 108px; gap: 8px; }
+  .android-app .quick-number input { height: 30px; }
+  .android-app .position-pad { grid-template-columns: repeat(3, 30px); grid-template-rows: repeat(3, 30px); }
+  .android-app .position-pad button,
+  .android-app .position-pad span { min-width: 30px; min-height: 30px; }
+}
