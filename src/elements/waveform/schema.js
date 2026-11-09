@@ -4,6 +4,7 @@ import { general } from '../shared/general.js';
 export const sections = [
   general({ tag: 'Waveform', blendMode: 'add', scaleIsUniform: true }),
   section('Waveform', [
+    int('audioProviderIndex', 'Audio Provider Index', 1, 1, 16, 1, { dynamic: 'providers' }),
     sel('waveformMode', 'Waveform Mode', 'mirror', [
       { value: 'line', label: 'Single Line' }, { value: 'mirror', label: 'Mirrored' }, { value: 'filled', label: 'Filled' },
     ]),
