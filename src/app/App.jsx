@@ -3,7 +3,7 @@ import { useApp } from './hooks.js';
 import { actions, audio, store, toast } from './services.js';
 import LayerList from '../ui/LayerList.jsx';
 import MusicPanel from '../ui/MusicPanel.jsx';
-import PropertiesPanel from '../ui/PropertiesPanel.jsx';
+import PropertiesPanel, { PositionControls } from '../ui/PropertiesPanel.jsx';
 import PreviewPanel from '../ui/PreviewPanel.jsx';
 import SettingsPanel from '../ui/SettingsPanel.jsx';
 import ProjectDialog from '../ui/ProjectDialog.jsx';
@@ -29,6 +29,7 @@ function readPreferences() {
 export default function App() {
   const name = useApp((s) => s.project.name);
   const dirty = useApp((s) => s.dirty);
+  const selectedElement = useApp((s) => s.elements.find((e) => e.id === s.selectedId) || null);
   const canUndo = useApp((s) => s.past.length > 0), canRedo = useApp((s) => s.future.length > 0);
   const [tool, setTool] = useState('music');
   const [dialog, setDialog] = useState(false);
@@ -83,6 +84,7 @@ export default function App() {
         </section>
         <section className={`tool-dock ${tool ? 'open' : ''}`} aria-label="Editor tools">
           <div id="active-tool-panel" className={`tool-panel ${tool ? 'open' : ''}`} aria-hidden={!tool}>
+            {!tool && selectedElement && <PositionControls element={selectedElement} />}
             {tool && (
               <>
                 <header className="tool-panel-head">
