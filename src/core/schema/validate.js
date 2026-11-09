@@ -47,6 +47,7 @@ export function sanitizeValue(p, v) {
       return { value: c };
     }
     case 'bool': {
+      if (p.key === 'autoDetectColorKey' && typeof v === 'number') return { value: true };
       if (p.key === 'relativeMotionMode' && typeof v === 'string') return { value: v !== 'absolute' };
       if (p.key === 'vectorRelativeToCenter' && typeof v === 'string') return { value: v !== 'off' };
       return { value: !!v };
