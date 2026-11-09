@@ -87,7 +87,7 @@ button:disabled { opacity: .4; cursor: default; }
 .layer-list { list-style: none; margin: 0; padding: 6px; overflow-y: auto; flex: 1; }
 .layer { display: flex; align-items: center; gap: 6px; padding: 6px 6px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; }
 .layer:hover { background: var(--panel2); }
-.layer.selected { background: #3a2c25; border-color: #6b4331; }
+.layer.selected { background: #29252a; border-color: #705044; }
 .layer.off .layer-name { opacity: .45; }
 .grip { color: #5d5b54; cursor: grab; display: flex; }
 .layer-icon { color: var(--accent); display: flex; }
@@ -110,7 +110,7 @@ button:disabled { opacity: .4; cursor: default; }
 .type-badge { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-weight: 600; }
 .empty { padding: 24px; color: var(--muted); text-align: center; }
 .problems { list-style: none; margin: 8px 12px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.problems li { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 8px; font-size: 12.5px; background: #3a2a22; }
+.problems li { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 8px; font-size: 12.5px; background: color-mix(in srgb,var(--warn) 12%,var(--panel)); }
 .problems li.error { background: #4a2420; color: #ffb3a8; } .problems li.warning { background: #433617; color: #f6d58a; } .problems li.info { background: #1f3340; color: #a6cde6; }
 .section { border-bottom: 1px solid var(--line); }
 .section-head { width: 100%; display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: none; border: 0; text-align: left; font-weight: 600; color: var(--text); }
@@ -214,7 +214,7 @@ html,body,#root{width:100%;min-width:0;overflow:hidden}
 .move-adjust-grid input{grid-column:1/-1;width:100%;accent-color:var(--accent);height:15px;margin:0}
 .bottom-nav{flex:0 0 auto;min-height:62px;padding:5px 5px max(5px,env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;background:#15171d;border-top:1px solid var(--line);z-index:25}
 .bottom-nav button{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 2px;border:0;border-radius:9px;color:var(--muted);background:transparent;font-size:10px}
-.bottom-nav button.active{color:var(--accent);background:#ff9a6b12}.bottom-nav button span{white-space:nowrap}
+.bottom-nav button.active{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}.bottom-nav button span{white-space:nowrap}
 .panel-overlay-root{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center;background:#05060ab8;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
 .panel-overlay{width:min(760px,100%);max-height:min(78dvh,760px);display:flex;flex-direction:column;overflow:hidden;background:#171920;border:1px solid #333743;border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -18px 60px #0008;padding-bottom:env(safe-area-inset-bottom)}
 .overlay-grabber{flex:0 0 auto;width:36px;height:4px;border-radius:8px;background:#555b68;margin:8px auto 4px}
@@ -228,7 +228,7 @@ html,body,#root{width:100%;min-width:0;overflow:hidden}
 .overlay-content input.num,.overlay-content select,.overlay-content input[type=text],.overlay-content textarea{min-height:36px}
 .overlay-content .mrow{grid-template-columns:minmax(105px,34%) minmax(0,1fr)}
 .music-library{padding:12px}.music-import{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
-.music-import-icon,.track-art{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;color:var(--accent);background:#ff9a6b14}
+.music-import-icon,.track-art{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
 .music-import-copy{display:flex;flex-direction:column;gap:4px;min-width:0}.music-import-copy b{font-size:12px}.music-import-copy small{font-size:10px;line-height:1.4;color:var(--muted)}
 .music-import .btn{padding:8px 10px;white-space:nowrap}.music-list-head{display:flex;justify-content:space-between;align-items:center;margin:17px 2px 7px;font-size:12px}
 .music-list-head span{color:var(--muted);font-size:10px}.music-track-list{list-style:none;margin:0;padding:0}
