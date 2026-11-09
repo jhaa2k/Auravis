@@ -264,8 +264,11 @@ export class AudioEngine {
   // ---- analysis: called once per rendered frame ----
   analyze() {
     const f = this.frame;
-    if (!this.ctx || !this.playing) {
-      // keep decaying towards silence when paused
+    // The media element is the source of truth. Android WebView can miss a
+    // transient "playing" event while audio is already advancing.
+    const mediaActive = this.mode === 'file' && this.el && !this.el.paused && !this.el.ended;
+    if (mediaActive && !this.playing) { this.playing = true; this.startMediaSync(); }
+    if (!this.ctx || !mediaActive) {
       f.td.fill(0); f.rms01 = f.peak01 = f.left01 = f.right01 = f.level01 = 0;
       f.sampleRate = this.ctx?.sampleRate || 48000;
       return f;
