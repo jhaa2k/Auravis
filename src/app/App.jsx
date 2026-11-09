@@ -7,6 +7,7 @@ import PropertiesPanel, { PositionControls } from '../ui/PropertiesPanel.jsx';
 import PreviewPanel from '../ui/PreviewPanel.jsx';
 import SettingsPanel from '../ui/SettingsPanel.jsx';
 import PresetPanel from '../ui/PresetPanel.jsx';
+import { importProjectFile } from '../core/project/persistence.js';
 import ProjectDialog from '../ui/ProjectDialog.jsx';
 import Toasts from '../ui/Toasts.jsx';
 import Icon from '../ui/Icon.jsx';
@@ -45,6 +46,18 @@ export default function App() {
   useEffect(() => {
     const onNotificationPermissionDenied = () => toast('Media notification permission is off. Enable it in Android Settings → Apps → Auravis → Notifications.', 'warning');
     const onPlaybackError = (event) => toast(event.detail?.message || 'Could not play this audio file.', 'error');
+    const onImportProject = async (event) => {
+      try {
+        const file = event.detail?.file;
+        if (!file) return;
+        if (file.name.toLowerCase().endsWith('.viz')) throw new Error('Avee .viz files use a proprietary scene package. Please share one sample .viz file so its scene structure can be mapped safely; this importer will not discard layers or settings.');
+        const p = await importProjectFile(file);
+        actions.loadProject({ id: null, name: p.name, version: 1, settings: p.settings }, p.elements);
+        toast(p.warnings.length ? `Imported with ${p.warnings.length} repaired value(s)` : `Imported “${p.name}”`, p.warnings.length ? 'warning' : 'info');
+        setTool('music');
+      } catch (error) { toast(error.message || 'Could not import this project.', 'error'); }
+    };
+    window.addEventListener('auravis:import-project-file', onImportProject);
     window.addEventListener('auravis:notification-permission-denied', onNotificationPermissionDenied);
     window.addEventListener('auravis:playback-error', onPlaybackError);
     const onKey = (e) => {
@@ -64,6 +77,7 @@ export default function App() {
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('beforeunload', warn);
       window.removeEventListener('auravis:notification-permission-denied', onNotificationPermissionDenied);
+      window.removeEventListener('auravis:import-project-file', onImportProject);
       window.removeEventListener('auravis:playback-error', onPlaybackError);
     };
   }, [tool]);
