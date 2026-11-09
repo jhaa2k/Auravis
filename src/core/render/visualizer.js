@@ -121,7 +121,7 @@ export class Visualizer {
     if (!canvas || typeof document === 'undefined') return;
     const w = canvas.width, h = canvas.height;
     if (!w || !h) return;
-    const e = Object.fromEntries(keys.map((key) => [key, Math.max(0, Math.min(100, Number(effects[key]) || 0))]));
+    const e = Object.fromEntries(keys.map((key) => { const value = Number(effects[key]) || 0; const min = ['saturation','warmth'].includes(key) ? -100 : key === 'contrast' ? -50 : 0; return [key, Math.max(min, Math.min(100, value))]; }));
     const state = this.effectState;
     const td = audio?.td;
     let low = 0;
@@ -154,7 +154,7 @@ export class Visualizer {
         ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,w,h);
         ctx.translate(w/2 + (Math.sin(time*73)*shake), h/2 + (Math.cos(time*61)*shake));
         ctx.scale(zoom, zoom);
-        if ('filter' in ctx) ctx.filter = `hue-rotate(${hue}deg) saturate(${Math.max(0,1+e.saturation/100)}) contrast(${Math.max(0.1,1+e.contrast/100)}) sepia(${e.warmth/100})`;
+        if ('filter' in ctx) ctx.filter = `hue-rotate(${hue + Math.min(0,e.warmth)*0.22}deg) saturate(${Math.max(0,1+e.saturation/100)}) contrast(${Math.max(0.1,1+e.contrast/100)}) sepia(${Math.max(0,e.warmth)/100})`;
         ctx.drawImage(copy, -w/2, -h/2, w, h);
         ctx.restore();
         if ('filter' in ctx) ctx.filter = 'none';
