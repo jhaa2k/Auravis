@@ -5,84 +5,6 @@ import { getDefinition } from '../core/schema/registry.js';
 import FieldRenderer from './fields/FieldRenderer.jsx';
 import Icon from './Icon.jsx';
 
-export function PositionControls({ element }) {
-  const [step, setStep] = useState(1);
-  if (!element) return (
-    <section className="quick-position quick-position-empty" aria-label="Move and adjust">
-      <div className="quick-position-head"><span><Icon name="move" size={16} />Move & Adjust</span><small>No layer selected</small></div>
-      <p>Select a visual layer in Elements to edit its position, size, rotation and anchor point.</p>
-    </section>
-  );
-  if (!Array.isArray(element.props.position)) return (
-    <section className="quick-position quick-position-empty" aria-label="Move and adjust">
-      <div className="quick-position-head"><span><Icon name="move" size={16} />Move & Adjust</span><small>{element.type || 'Selected layer'}</small></div>
-      <p>This layer does not have a visual transform. Its settings remain available in Properties.</p>
-    </section>
-  );
-  const position = Array.isArray(element.props.position) ? element.props.position : [0, 0];
-  const scale = Array.isArray(element.props.scale) ? element.props.scale : [1, 1];
-  const rotation = Number(element.props.rotation) || 0;
-  const anchorX = Number.isFinite(element.props.anchorX) ? element.props.anchorX : 0.5;
-  const anchorY = Number.isFinite(element.props.anchorY) ? element.props.anchorY : 0.5;
-  const locked = Boolean(element.locked);
-  const update = (patch) => actions.updateProps(element.id, patch);
-  const nudge = (dx, dy) => update({ position: [Math.max(-200, Math.min(200, position[0] + dx * step)), Math.max(-200, Math.min(200, position[1] + dy * step))] });
-  const number = (value, patch, label, min, max, stepValue = 1) => (
-    <label className="quick-number"><span>{label}</span><input type="number" value={value} min={min} max={max} step={stepValue} disabled={locked}
-      onChange={(event) => { const next = Number(event.target.value); if (event.target.value !== '' && Number.isFinite(next)) update(patch(Math.max(min, Math.min(max, next)))); }} /></label>
-  );
-  return (
-    <section className="quick-position" aria-label="Move and adjust selected element">
-      <div className="quick-position-head">
-        <span><Icon name="move" size={16} />Move & Adjust</span>
-        <small>{element.props.tag || element.type || 'Selected element'}{locked ? ' · Locked' : ' · Live controls'}</small>
-      </div>
-      <div className="quick-position-layout">
-        <div className="quick-position-values">
-          <div className="position-fields">
-            {number(position[0], (v) => ({ position: [v, position[1]] }), 'X · Left / Centre / Right', -200, 200)}
-            {number(position[1], (v) => ({ position: [position[0], v] }), 'Y · Up / Centre / Down', -200, 200)}
-            {Object.prototype.hasOwnProperty.call(element.props, 'rotation') && number(rotation, (v) => ({ rotation: v }), 'Rotation', -720, 720, 0.1)}
-          </div>
-          <div className="position-adjustments">
-            {number(scale[0], (v) => ({ scale: [Math.max(0.01, v), scale[1]] }), 'Width', 0.01, 12, 0.01)}
-            {number(scale[1], (v) => ({ scale: [scale[0], Math.max(0.01, v)] }), 'Height', 0.01, 12, 0.01)}
-          </div>
-          <div className="position-step" aria-label="Movement step">
-            <button type="button" className={step === 1 ? 'active' : ''} aria-pressed={step === 1} disabled={locked} onClick={() => setStep(1)}>1</button>
-            <button type="button" className={step === 10 ? 'active' : ''} aria-pressed={step === 10} disabled={locked} onClick={() => setStep(10)}>10</button>
-            <button type="button" className={step === 25 ? 'active' : ''} aria-pressed={step === 25} disabled={locked} onClick={() => setStep(25)}>25</button>
-            <button type="button" disabled={locked} onClick={() => update({ position: [0, 0] })}>Center</button>
-          </div>
-          <div className="center-point-control">
-            <span>Center Point</span>
-            <div className="center-point-grid" role="group" aria-label="Set element anchor point">
-              {[0, 0.5, 1].map((y) => [0, 0.5, 1].map((x) => (
-                <button key={`${x}-${y}`} type="button" disabled={locked}
-                  className={Math.abs(anchorX - x) < 0.001 && Math.abs(anchorY - y) < 0.001 ? 'active' : ''}
-                  aria-label={`Anchor ${x * 100}% horizontal, ${y * 100}% vertical`}
-                  aria-pressed={Math.abs(anchorX - x) < 0.001 && Math.abs(anchorY - y) < 0.001}
-                  onClick={() => update({ anchorX: x, anchorY: y })}>
-                  <i />
-                </button>
-              )))}
-            </div>
-            <small>{anchorX.toFixed(2)} · {anchorY.toFixed(2)}</small>
-          </div>
-        </div>
-        <div className="position-direction">
-          <div className="position-pad" aria-label="Nudge position">
-            <button type="button" title={"Move −Y " + step + " units"} disabled={locked} onClick={() => nudge(0, -1)}><Icon name="chevron-up" size={18} /></button>
-            <button type="button" title={"Move −X " + step + " units"} disabled={locked} onClick={() => nudge(-1, 0)}><Icon name="chevron-left" size={18} /></button>
-            <span aria-hidden="true"><Icon name="move" size={14} /></span>
-            <button type="button" title={"Move +X " + step + " units"} disabled={locked} onClick={() => nudge(1, 0)}><Icon name="chevron-right" size={18} /></button>
-            <button type="button" title={"Move +Y " + step + " units"} disabled={locked} onClick={() => nudge(0, 1)}><Icon name="chevron-down" size={18} /></button>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 function Section({ section, open, onToggle, children }) {
   return (
     <section className={`section ${open ? 'open' : ''}`}>
@@ -96,7 +18,7 @@ export default function PropertiesPanel() {
   const elements = useApp((s) => s.elements);
   const selectedId = useApp((s) => s.selectedId);
   const diags = useStore(diagStore);
-  const [openSection, setOpenSection] = useState(null);
+  const [closed, setClosed] = useState({});
   const el = elements.find((e) => e.id === selectedId);
   if (!el) return <div className="empty">Select an element to edit its properties.</div>;
   const def = getDefinition(el.type);
@@ -112,6 +34,7 @@ export default function PropertiesPanel() {
     if (patch._error) return toast(patch._error, 'warning');
     actions.updateProps(el.id, patch);
   };
+  const key = (i) => `${el.type}:${i}`;
   return (
     <div className="props">
       <header className="props-head">
@@ -123,16 +46,13 @@ export default function PropertiesPanel() {
           {problems.map((p, i) => <li key={i} className={p.level}><Icon name={p.level === 'error' ? 'error' : p.level === 'warning' ? 'warn' : 'info'} size={15} />{p.message}</li>)}
         </ul>
       )}
-      {def.sections.map((section) => {
-        const sectionKey = `${el.type}:${section.name}`;
-        return (
-        <Section key={section.name} section={section} open={openSection === sectionKey} onToggle={() => setOpenSection((current) => current === sectionKey ? null : sectionKey)}>
+      {def.sections.map((section, i) => (
+        <Section key={section.name} section={section} open={!closed[key(i)] && (closed[key(i)] === false || i < 2)} onToggle={() => setClosed((c) => ({ ...c, [key(i)]: c[key(i)] === undefined ? (i < 2) : !c[key(i)] }))}>
           {section.props.map((p) => (
             <FieldRenderer key={p.key} def={p} el={el} elements={elements} onChange={onChange} onReset={(k) => actions.resetProps(el.id, [k])} onAction={onAction} />
           ))}
         </Section>
-        );
-      })}
+      ))}
     </div>
   );
 }
