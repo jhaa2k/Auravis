@@ -51,6 +51,8 @@ export function PositionControls({ element }) {
           <div className="position-step" aria-label="Movement step">
             <button type="button" className={step === 1 ? 'active' : ''} aria-pressed={step === 1} disabled={locked} onClick={() => setStep(1)}>1</button>
             <button type="button" className={step === 10 ? 'active' : ''} aria-pressed={step === 10} disabled={locked} onClick={() => setStep(10)}>10</button>
+            <button type="button" className={step === 25 ? 'active' : ''} aria-pressed={step === 25} disabled={locked} onClick={() => setStep(25)}>25</button>
+            <button type="button" disabled={locked} onClick={() => update({ position: [0, 0] })}>Center</button>
           </div>
           <div className="center-point-control">
             <span>Center Point</span>
