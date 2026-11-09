@@ -53,8 +53,8 @@ describe('measurement mapping', () => {
 });
 
 describe('schema', () => {
-  it('registers all 8 element types with unique, valid property definitions', () => {
-    expect(listDefinitions().map((d) => d.type).sort()).toEqual(['audioProvider', 'barsSegments', 'blurEffect', 'image', 'motionBlur', 'particles', 'rgbSplit', 'text']);
+  it('registers all 10 element types with unique, valid property definitions', () => {
+    expect(listDefinitions().map((d) => d.type).sort()).toEqual(['audioProvider', 'barsSegments', 'blurEffect', 'image', 'motionBlur', 'particles', 'radialSpectrum', 'rgbSplit', 'text', 'waveform']);
     for (const def of listDefinitions()) {
       for (const p of allProps(def)) {
         expect(p.label, `${def.type}.${p.key} label`).toBeTruthy();
