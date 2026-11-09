@@ -2,7 +2,7 @@ import { computeTransform, applyTransform } from '../../core/render/transform.js
 import { tintBuffer, setBlend } from '../../core/render/effectUtils.js';
 import { parseColor, mixColor, toHex } from '../../core/utils/color.js';
 import { clamp } from '../../core/utils/math.js';
-import { buildTexture, TEX } from './pipeline.js';
+import { buildTexture, detectKeyColor, TEX } from './pipeline.js';
 import { generateAlbumArt } from './albumArt.js';
 
 export const BOX = 1080;
@@ -18,11 +18,11 @@ export function resolveSource(rc, el) {
   }
   const title = rc.meta?.title || 'Auravis', artist = rc.meta?.artist || '';
   const nonce = p.generatedAlbumArtHintForceGen;
-  const key = `art:${title}|${artist}|${nonce}|${p.generatedAlbumArtHintShiftHue}|${p.generatedAlbumArtHintNoText}|${p.generatedAlbumArtColor}`;
+  const key = `art:${title}|${artist}|${nonce}|${p.generatedAlbumArtHintShiftHue}|${p.generatedAlbumArtHueShift}|${p.generatedAlbumArtHintNoText}|${p.generatedAlbumArtColor}`;
   let art = rc.cache.get(key);
   if (!art) {
     for (const k of rc.cache.keys()) if (k.startsWith('art:')) rc.cache.delete(k); // keep only the newest artwork
-    art = generateAlbumArt({ seed: `${title}|${artist}`, color: p.generatedAlbumArtColor, shiftHue: p.generatedAlbumArtHintShiftHue, noText: p.generatedAlbumArtHintNoText, title, artist, nonce });
+    art = generateAlbumArt({ seed: `${title}|${artist}`, color: p.generatedAlbumArtColor, shiftHue: p.generatedAlbumArtHintShiftHue ? p.generatedAlbumArtHueShift : 0, noText: p.generatedAlbumArtHintNoText, title, artist, nonce });
     rc.cache.set(key, art);
   }
   return { drawable: art, w: art.width, h: art.height, key };
@@ -42,11 +42,21 @@ function getTexture(rc, el) {
   if (src === 'keep') return rc.cache.get(`tex:${el.id}`)?.canvas || null;
   if (!src) return null;
   const mask = resolveMask(rc, el);
+  let colorKey = p.colorKey;
+  if (p.colorKeyEnabled && p.autoDetectColorKey) {
+    const autoKey = `autokey:${src.key}`;
+    colorKey = rc.cache.get(autoKey);
+    if (!colorKey) {
+      colorKey = detectKeyColor(src.drawable, src.w, src.h) || p.colorKey;
+      rc.cache.set(autoKey, colorKey);
+    }
+  }
+  const textureProps = colorKey === p.colorKey ? p : { ...p, colorKey };
   const sig = JSON.stringify([src.key, mask?.key, p.keepAspectRatioAndCropToFit, p.keepAspectRatio, p.blurredBorder, p.blurredBorderRadius, p.shape, p.maskMode,
-    p.colorKeyEnabled, p.colorKey, p.transparencyStrength, p.saturation, p.blurEnabled, p.blurDivider, p.blurRadius]);
+    p.colorKeyEnabled, colorKey, p.transparencyStrength, p.saturation, p.blurEnabled, p.blurDivider, p.blurRadius]);
   let entry = rc.cache.get(`tex:${el.id}`);
   if (!entry || entry.sig !== sig) {
-    entry = { sig, canvas: buildTexture(src, p, mask) };
+    entry = { sig, canvas: buildTexture(src, textureProps, mask) };
     rc.cache.set(`tex:${el.id}`, entry);
   }
   return entry.canvas;
