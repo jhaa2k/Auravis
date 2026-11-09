@@ -75,7 +75,14 @@ export default function App() {
       <button className="project-name" onClick={()=>setDialog(true)}>{name}{dirty?' •':''}</button>
       <div className="row-gap"><button className="icon-btn" title="Undo" disabled={!canUndo} onClick={()=>actions.undo()}><Icon name="undo"/></button><button className="icon-btn" title="Redo" disabled={!canRedo} onClick={()=>actions.redo()}><Icon name="redo"/></button><button className="icon-btn" title="Projects" onClick={()=>setDialog(true)}><Icon name="folder"/></button></div>
     </header>
-    <main className="modern-workspace"><section className="modern-preview"><PreviewPanel/><TransportBar/></section><MoveAdjust/></main>
+    <main className="modern-workspace">
+      <section className="modern-preview" aria-label="Video preview"><PreviewPanel/></section>
+      <section className="modern-controls" aria-label="Editor controls">
+        <TransportBar/>
+        <MoveAdjust/>
+        <div className="controls-hint"><Icon name="sliders" size={14}/><span>Choose a tool below to edit your visualizer</span></div>
+      </section>
+    </main>
     <nav className="bottom-nav" aria-label="Main tools">{NAV.map(([k,label,icon])=><button key={k} className={overlay===k?'active':''} aria-pressed={overlay===k} onClick={()=>openPanel(k)}><Icon name={icon} size={19}/><span>{label}</span></button>)}</nav>
     {overlay&&<div className="panel-overlay-root" onMouseDown={e=>{if(e.target===e.currentTarget)setOverlay('');}}>
       <section className="panel-overlay" role="dialog" aria-modal="true" aria-label={TITLES[overlay]}><div className="overlay-grabber"/>
