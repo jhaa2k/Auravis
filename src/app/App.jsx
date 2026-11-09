@@ -77,10 +77,14 @@ export default function App() {
     </header>
     <main className="modern-workspace">
       <section className="modern-preview" aria-label="Video preview"><PreviewPanel/></section>
-      <section className="modern-controls" aria-label="Editor controls">
-        <TransportBar/>
-        <MoveAdjust/>
-        <div className="controls-hint"><Icon name="sliders" size={14}/><span>Choose a tool below to edit your visualizer</span></div>
+      <section className="modern-controls" aria-label="Editor control dock">
+        <div className="dock-section-label"><span>PLAYBACK & TIMELINE</span><span className="dock-live"><i/> LIVE PREVIEW</span></div>
+        <div className="dock-playback"><TransportBar/></div>
+        <div className="dock-inspector">
+          <div className="dock-section-label"><span>QUICK INSPECTOR</span><span>SELECTED LAYER</span></div>
+          <MoveAdjust/>
+        </div>
+        <div className="dock-footer"><span>TOOLS & PROPERTIES</span><span>Use the dock below to open editor panels</span></div>
       </section>
     </main>
     <nav className="bottom-nav" aria-label="Main tools">{NAV.map(([k,label,icon])=><button key={k} className={overlay===k?'active':''} aria-pressed={overlay===k} onClick={()=>openPanel(k)}><Icon name={icon} size={19}/><span>{label}</span></button>)}</nav>
