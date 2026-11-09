@@ -97,5 +97,9 @@ export function sanitizeProps(def, input = {}) {
     props[p.key] = r.value;
     if (r.error) errors.push(r.error);
   }
+  if (typeof input.generatedAlbumArtHintShiftHue === 'number' && input.generatedAlbumArtHintShiftHue > 0) {
+    props.generatedAlbumArtHintShiftHue = true;
+    props.generatedAlbumArtHueShift = range(input.generatedAlbumArtHintShiftHue, 0, 360, 0);
+  }
   return { props, errors };
 }
