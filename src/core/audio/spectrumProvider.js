@@ -19,6 +19,8 @@ export class SpectrumProvider {
     this.target = new Float32Array(0);
     this.bass = 0; this.mid = 0; this.treble = 0; this.beat = 0;
     this.beatBase = 0;
+    this.bassBase = 0;
+    this.beatCooldown = 0;
     this.issues = [];
     this.pre = new Float32Array(0);
     this.binHz = 1;
@@ -160,14 +162,21 @@ export class SpectrumProvider {
     let avg = 0;
     for (let i = first; i <= last; i++) avg += tg[i];
     avg /= last - first + 1;
-    const flux = Math.max(0, avg - this.beatBase);
+    const rangeFlux = Math.max(0, avg - this.beatBase);
     this.beatBase += (avg - this.beatBase) * (1 - Math.pow(0.97, dt * 60));
+    // Add a low-frequency transient detector. It catches kick/bass attacks even
+    // when the configured sample window starts above the strongest bass bins.
+    const bassFlux = Math.max(0, this.bass - this.bassBase);
+    this.bassBase += (this.bass - this.bassBase) * (1 - Math.pow(0.985, dt * 60));
+    const flux = Math.max(rangeFlux, bassFlux * 1.35);
     const thresholdScale = props.beatRangeValueHigher > 2 ? 0.01 : 1;
     const vl = props.beatRangeValueLower * thresholdScale;
     const vh = Math.max(props.beatRangeValueHigher * thresholdScale, vl + 1e-4);
     const raw = clamp((flux - vl) / (vh - vl), 0, 1);
-    const bs = props.beatSmooth;
-    this.beat = raw > this.beat ? this.beat + (raw - this.beat) * (1 - bs * 0.5) : Math.max(raw, this.beat * Math.pow(bs, dt * 60));
+    const bs = clamp(props.beatSmooth ?? 0.4, 0, 0.99);
+    const attack = 1 - Math.pow(0.02 + bs * 0.35, dt * 60);
+    const release = Math.pow(Math.max(0.08, bs), dt * 60);
+    this.beat = raw > this.beat ? this.beat + (raw - this.beat) * attack : Math.max(raw, this.beat * release);
     return this;
   }
 
