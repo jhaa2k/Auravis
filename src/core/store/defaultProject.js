@@ -10,16 +10,26 @@ export function defaultElements() {
   const list = [];
   const add = (type, over = {}) => { const e = createElementData(type, list, over); list.push(e); return e; };
   add('audioProvider', { tag: 'Audio Provider' });
-  add('particles', { tag: 'Particles' });
-  add('barsSegments', {
-    tag: 'Bars',
-    measureScale: makeMeasure({ enabled: true, source: 'bass', outMin: 1, outMax: 1.06, smoothing: 0.7 }),
+  add('radialSpectrum', {
+    tag: 'Radial Spectrum',
+    radius: 270,
+    barLength: 210,
+    barCount: 128,
+    sensitivity: 2.2,
+    measureScale: makeMeasure({ enabled: true, source: 'bass', outMin: 1, outMax: 1.04, smoothing: 0.7 }),
+  });
+  add('waveform', {
+    tag: 'Waveform',
+    position: [0, 350],
+    waveformMode: 'mirror',
+    amplitude: 1.7,
+    glow: 18,
   });
   add('image', {
-    tag: 'Album Art', shape: 'circle', position: [0, 0], scale: [0.4, 0.4],
+    tag: 'Album Art', shape: 'circle', position: [0, 0], scale: [0.34, 0.34],
     measureScale: makeMeasure({ enabled: true, source: 'bass', outMin: 1, outMax: 1.12, smoothing: 0.6 }),
   });
-  add('text', { tag: 'Title', text: '{title}', position: [0, 0], fontSize: 54 });
+  add('text', { tag: 'Title', text: '{title}', position: [0, 465], fontSize: 48 });
   return list;
 }
 
