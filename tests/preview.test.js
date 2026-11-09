@@ -8,7 +8,7 @@ describe('preview layer hit testing', () => {
     const definitions = listDefinitions().filter((def) => def.kind !== 'provider');
     expect(definitions.length).toBeGreaterThan(0);
     for (const def of definitions) {
-      const element = createElementData(def.type, []);
+      const element = createElementData(def.type, [], { visible: true });
       expect(isPreviewHittable(element), def.type).toBe(true);
     }
   });
