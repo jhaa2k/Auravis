@@ -31,7 +31,7 @@ export default function FieldRenderer({ def, el, elements, onChange, onReset, on
           <InAppSelect value={value} onChange={(v) => set(+v, false)} ariaLabel={def.label} options={[...providers.map((p, i) => ({value:i+1,label:(i+1)+' · '+p.props.tag})), ...(value>providers.length?[{value,label:value+' · missing'}]:[])]} />
         ) : <span className="warn-text">No Audio Provider in the project</span>);
       }
-      return row(<div className="num-row"><Slider value={value} min={def.min} max={def.max} step={def.step} onChange={set} /><NumberInput value={value} min={def.min} max={def.max} step={def.step} onChange={set} /></div>);
+      return row(<div className="num-row"><Slider value={value} min={def.min} max={def.max} step={def.step} resetValue={def.default} onChange={set} /><NumberInput value={value} min={def.min} max={def.max} step={def.step} onChange={set} /></div>);
     case 'bool': return row(<Toggle checked={value} onChange={(v) => set(v, false)} label={def.label} />);
     case 'select':
       if (def.dynamic === 'fonts') return row(<FontField value={value} onChange={(v) => set(v, false)} sample={el.props.text?.split('\n')[0]?.slice(0, 24)} />, true);
