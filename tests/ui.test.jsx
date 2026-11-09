@@ -57,7 +57,7 @@ describe('React UI renders without runtime errors', () => {
     expect(transport).toContain('No audio loaded');
     expect(transport).toContain('aria-label="Seek track"');
     expect(transport).toContain('class="now"');
-    expect(renderToString(<SettingsPanel />)).toContain('Canvas helpers');
-    expect(renderToString(<SettingsPanel mode="export" />)).toContain('Export video');
+    expect(renderToString(<SettingsPanel />)).toContain('Canvas defaults');
+    expect(renderToString(<SettingsPanel mode="export" />)).toContain('Live visual effects');
   });
 });
