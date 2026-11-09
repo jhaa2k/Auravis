@@ -29,7 +29,7 @@ export function general({
     txt('tag', 'Tag', tag),
     bool('visible', 'Visible', visible),
     sel('blendMode', 'Blend Mode', blendMode, BLEND_MODES),
-    vec2('position', 'Position', position, -4000, 4000, 1, { unit: 'px' }),
+    vec2('position', 'Position', position, -200, 200, 1, { unit: 'px', hint: '0 = canvas centre; negative and positive values move left/right and up/down' }),
     num('anchorX', 'Anchor X', 0.5, 0, 1, 0.01),
     num('anchorY', 'Anchor Y', 0.5, 0, 1, 0.01),
     meas('measurePos', 'Measure Pos', { axis: true, outMin: 0, outMax: 80, labels: posLabels, ...measurePos }),
