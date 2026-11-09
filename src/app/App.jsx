@@ -105,7 +105,7 @@ export default function App() {
   const openPanel=key=>{if(key==='properties'&&!store.getState().selectedId)setOverlay('elements');else setOverlay(v=>v===key?'':key);};
   return <div className="app modern-app">
     <header className="topbar modern-topbar">
-      <div className="brand"><svg viewBox="0 0 64 64" width="27" height="27" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#282b32"/><path d="M14 40V24M24 50V14M34 38V26M44 46V18M52 38V26" stroke="#ff9a6b" strokeWidth="5" strokeLinecap="round"/></svg><span>Auravis</span></div>
+      <div className="brand"><svg viewBox="0 0 64 64" width="27" height="27" aria-hidden="true"><rect width="64" height="64" rx="12" fill="#101114"/><path d="M32 10 12 54h9l11-25 11 25h9L32 10Z" fill="#f1f2f4"/><path d="M23 42h5v8h-5zm8-7h5v15h-5zm8 5h5v10h-5z" fill="#ff9675"/></svg><span>Auravis</span></div>
       <button className="project-name" onClick={()=>setDialog(true)}>{name}{dirty?' •':''}</button>
       <div className="row-gap"><button className="icon-btn" title="Undo" disabled={!canUndo} onClick={()=>actions.undo()}><Icon name="undo"/></button><button className="icon-btn" title="Redo" disabled={!canRedo} onClick={()=>actions.redo()}><Icon name="redo"/></button><button className="btn small primary top-export" title="Export video" onClick={()=>setOverlay('export')}><Icon name="download" size={14}/>Export</button></div>
     </header>
