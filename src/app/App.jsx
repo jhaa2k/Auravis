@@ -10,7 +10,7 @@ import ProjectDialog from '../ui/ProjectDialog.jsx';
 import Toasts from '../ui/Toasts.jsx';
 import Icon from '../ui/Icon.jsx';
 
-const NAV = [['music','Music','music'],['elements','Elements','layers'],['properties','Properties','sliders'],['scene','Scene','sliders-horizontal'],['export','Export','download']];
+const NAV = [['music','Music','music'],['elements','Elements','bars'],['properties','Properties','settings'],['scene','Scene','settings'],['export','Export','download']];
 const TITLES = { music:'Music Library', elements:'Elements & Tools', properties:'Properties', scene:'Scene Settings', export:'Export Video' };
 
 function MusicLibrary() {
@@ -28,7 +28,7 @@ function MusicLibrary() {
     {state.tracks.length ? <ul className="music-track-list">{state.tracks.map((t,i)=><li key={t.name+':'+i} className={i===state.index?'current':''}>
       <button className="track-select" onClick={()=>audio.load(i,false)}><span className="track-art"><Icon name={i===state.index&&state.playing?'volume':'music'} size={17}/></span><span className="track-info"><b>{t.title||t.name}</b><small>{t.artist||t.name}</small></span>{i===state.index&&<span className="track-playing">{state.playing?'PLAYING':'SELECTED'}</span>}</button>
       <button className="icon-btn danger" title="Remove track" aria-label={'Remove '+t.name} onClick={()=>audio.removeTrack(i)}><Icon name="trash" size={17}/></button>
-    </li>)}</ul> : <div className="music-empty"><Icon name="audio" size={28}/><b>No tracks imported</b><span>Import music to start creating audio-reactive visuals.</span></div>}
+    </li>)}</ul> : <div className="music-empty"><Icon name="wave" size={28}/><b>No tracks imported</b><span>Import music to start creating audio-reactive visuals.</span></div>}
     <div className="music-library-note">Removing a track removes it from this session's library. The original file on your device is not deleted.</div>
   </div>;
 }
@@ -41,7 +41,7 @@ function MoveAdjust() {
   const y = Math.max(0,Math.min(1,0.5+el.props.position[1]/Math.max(1,settings.height)));
   const update = (nx,ny)=>actions.updateProps(el.id,{position:[(nx-.5)*settings.width,(ny-.5)*settings.height]},'position');
   return <section className="move-adjust">
-    <div className="move-adjust-title"><span><Icon name="move" size={15}/>Move & Adjust</span><button onClick={()=>actions.updateProps(el.id,{position:[0,0]})}><Icon name="crosshair" size={14}/>Center</button></div>
+    <div className="move-adjust-title"><span><Icon name="motion" size={15}/>Move & Adjust</span><button onClick={()=>actions.updateProps(el.id,{position:[0,0]})}><Icon name="reset" size={14}/>Center</button></div>
     <div className="move-adjust-grid">
       <label><span>HORIZONTAL</span><input type="range" min="0" max="1" step=".001" value={x} onChange={e=>update(+e.target.value,y)}/><output>{x.toFixed(3)}</output></label>
       <label><span>VERTICAL</span><input type="range" min="0" max="1" step=".001" value={y} onChange={e=>update(x,+e.target.value)}/><output>{y.toFixed(3)}</output></label>
