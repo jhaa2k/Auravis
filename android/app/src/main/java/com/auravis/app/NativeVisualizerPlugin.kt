@@ -32,8 +32,11 @@ class NativeVisualizerPlugin : Plugin() {
             val frame = current.analyzer.snapshot(barCount = 96)
             val bars = JSArray()
             frame.bars.forEach { bars.put(it.toDouble()) }
+            val magnitudes = JSArray()
+            frame.magnitudes.forEach { magnitudes.put(it.toDouble()) }
             val event = JSObject()
             event.put("bars", bars)
+            event.put("magnitudes", magnitudes)
             event.put("bass", frame.bass.toDouble())
             event.put("mid", frame.mid.toDouble())
             event.put("treble", frame.treble.toDouble())
