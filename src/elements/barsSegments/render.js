@@ -66,7 +66,7 @@ export function renderBars(rc, el) {
     const mirror = p[`segment${k}Mirror`], flip = p[`segment${k}FlipEveryOther`];
     const baseline = mirror || flip ? BOX_H / 2 : BOX_H;
     for (let i = 0; i < N; i++) {
-      const custom = p.barOverrides?.[i] || {};
+      const custom = p.barOverrides?.[i]?.[`segment${k}`] || p.barOverrides?.[i] || {};
       if (custom.enabled === false) continue;
       const h01 = (fixedHeight > 0 ? fixedHeight : st.heights[i] * mult) * (Number.isFinite(custom.height) ? custom.height : 1);
       const hpx = h01 * BOX_H;
