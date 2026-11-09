@@ -636,3 +636,45 @@ html,body,#root{width:100%;min-width:0;overflow:hidden}
 }
 .modern-preview .stage .handle{z-index:4}
 .modern-preview .stage .hud{z-index:5}
+
+
+/* Precise editor interaction: suppress Android WebView's blue tap flash. */
+.modern-app,.modern-app *{-webkit-tap-highlight-color:transparent}
+.modern-app button,.modern-app .hit,.modern-app .scene-card{-webkit-tap-highlight-color:transparent}
+.modern-app button:focus:not(:focus-visible),.modern-app .inapp-select-trigger:focus:not(:focus-visible){outline:none;box-shadow:none}
+.modern-app ::selection{background:color-mix(in srgb,var(--accent) 24%,transparent);color:inherit}
+.modern-app button{-webkit-touch-callout:none;user-select:none}
+
+/* Move & Adjust: cross-position controller, paired transform rows, full-width field. */
+.move-adjust{display:flex;flex-direction:column;gap:8px}
+.move-adjust-title{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.move-adjust-title>span{display:flex;align-items:center;gap:7px}
+.move-adjust-title>small{max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:9px}
+.move-position-grid{display:grid;grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr);grid-template-rows:auto 30px auto;grid-template-areas:" . top ." "left cross right" ". bottom .";align-items:center;justify-items:stretch;gap:5px 7px;padding:7px;border:1px solid var(--line);background:var(--panel2)}
+.move-edge{min-width:0;display:flex;align-items:center;gap:6px;padding:4px 6px;border:1px solid var(--line);background:var(--panel)}
+.move-edge span{font-size:8px;letter-spacing:.08em;color:var(--muted)}
+.move-edge .num{width:100%;min-width:0;height:28px;padding:3px 5px;text-align:center}
+.move-edge.left{grid-area:left}.move-edge.top{grid-area:top}.move-edge.right{grid-area:right}.move-edge.bottom{grid-area:bottom}
+.move-cross{grid-area:cross;position:relative;width:30px;height:30px;display:grid;place-items:center}
+.move-cross i{position:absolute;background:var(--muted);opacity:.65}
+.move-cross i:first-child{width:1px;height:100%}.move-cross i:nth-child(2){height:1px;width:100%}
+.move-cross b{position:relative;width:7px;height:7px;border:1px solid var(--accent);border-radius:50%;background:var(--panel2);font-size:0}
+.move-wide-select{display:grid;grid-template-columns:90px minmax(0,1fr);align-items:center;gap:8px}
+.move-wide-select>span{font-size:8px;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.move-wide-select .inapp-select-trigger{min-height:31px}
+.move-subhead{display:flex;align-items:center;justify-content:space-between;padding-top:6px;border-top:1px solid var(--line)}
+.move-subhead b{font-size:9px;letter-spacing:.12em;color:var(--muted)}
+.move-subhead button{width:26px;height:24px;display:grid;place-items:center;border:1px solid var(--line);background:var(--panel2);color:var(--text)}
+.move-transform-row{display:grid;grid-template-columns:minmax(70px,.8fr) minmax(72px,.8fr) minmax(110px,1.4fr);align-items:center;gap:7px}
+.move-transform-row>span{font-size:10px;color:var(--text)}
+.move-transform-row .num{width:100%;min-width:0;height:32px;text-align:center}
+.move-transform-row .inapp-select-trigger{min-height:32px;font-size:10px}
+.bar-customizer .section-head.static{font-size:11px;font-weight:700}
+.bar-editor-intro{margin-bottom:9px;color:var(--muted);font-size:10px;line-height:1.45}
+.bar-editor-toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:11px}
+.bar-editor-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin:10px 0}
+.bar-editor-pair label{display:flex;flex-direction:column;gap:5px;min-width:0}
+.bar-editor-pair label>span{font-size:9px;color:var(--muted)}
+.bar-editor-pair .num{width:100%;min-width:0}
+.bar-editor-actions{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+@media(max-width:360px){.move-wide-select{grid-template-columns:75px minmax(0,1fr)}.move-transform-row{grid-template-columns:58px 68px minmax(95px,1fr);gap:5px}.move-position-grid{gap:4px}.move-edge{padding:3px}.move-edge span{font-size:7px}}
