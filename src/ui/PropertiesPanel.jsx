@@ -20,5 +20,6 @@ export default function PropertiesPanel() {
     <header className="props-head"><span className="type-badge"><Icon name={def.icon} size={16}/>{def.label}</span></header>
     {problems.length>0&&<ul className="problems" aria-label="Problems">{problems.map((p,i)=><li key={i} className={p.level}><Icon name={p.level==='error'?'error':p.level==='warning'?'warn':'info'} size={15}/>{p.message}</li>)}</ul>}
     {def.sections.map((section,i)=>{const k=`${el.type}:${i}`;return <Section key={section.name} section={section} open={openKey===k} onToggle={()=>setOpenKey(v=>v===k?'':k)}>{section.props.map(p=><FieldRenderer key={p.key} def={p} el={el} elements={elements} onChange={onChange} onReset={k=>actions.resetProps(el.id,[k])} onAction={onAction}/>)}</Section>;})}
+    {el.type==='barsSegments'&&<BarCustomizer element={el}/>}
   </div>;
 }
