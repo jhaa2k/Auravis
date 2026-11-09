@@ -14,7 +14,7 @@ export function resolveText(template, meta = {}, now = new Date()) {
     date: now.toLocaleDateString(), clock: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     ArtistOrTitle: meta.artist && meta.title ? `${meta.artist} - ${meta.title}` : meta.title || meta.artist || '',
   };
-  return template.replace(/\{(\w+)\}/g, (m, k) => (k in map ? map[k] : m));
+  return template.replace(/\{(\w+)\}/g, (match, key) => (key in map ? map[key] : match));
 }
 
 export function renderText(rc, el) {
@@ -30,14 +30,31 @@ export function renderText(rc, el) {
     const k = Math.max(rc.scale, 0.5);
     const meas = get2d(createCanvas(8, 8));
     meas.font = font;
-    const lines = str.split('\n'), lh = p.fontSize * 1.25, pad = p.fontSize * 0.3;
-    const w = Math.ceil(Math.max(...lines.map((l) => meas.measureText(l).width)) + pad * 2), h = Math.ceil(lines.length * lh + pad * 2);
-    const c = createCanvas(w * k, h * k), x = get2d(c);
-    x.scale(k, k);
-    x.font = font; x.fillStyle = cssOf(p.color); x.textBaseline = 'middle'; x.textAlign = p.textAlign;
+    const lh = p.fontSize * 1.25, pad = p.fontSize * 0.3;
+    const availableWidth = Math.max(16, maxLineWidth - pad * 2);
+    const lines = [];
+    str.split('\n').forEach((paragraph) => {
+      const words = paragraph.split(/\s+/).filter(Boolean);
+      if (!words.length) { lines.push(''); return; }
+      let line = '';
+      words.forEach((word) => {
+        const candidate = line ? `${line} ${word}` : word;
+        if (line && meas.measureText(candidate).width > availableWidth) {
+          lines.push(line);
+          line = word;
+        } else line = candidate;
+      });
+      lines.push(line);
+    });
+    const measuredWidth = Math.max(...lines.map((line) => meas.measureText(line).width));
+    const w = Math.ceil(Math.min(maxLineWidth, measuredWidth) + pad * 2);
+    const h = Math.ceil(lines.length * lh + pad * 2);
+    const canvas = createCanvas(w * k, h * k), ctx = get2d(canvas);
+    ctx.scale(k, k);
+    ctx.font = font; ctx.fillStyle = cssOf(p.color); ctx.textBaseline = 'middle'; ctx.textAlign = p.textAlign;
     const ox = p.textAlign === 'left' ? pad : p.textAlign === 'right' ? w - pad : w / 2;
-    lines.forEach((l, i) => x.fillText(l, ox, pad + lh * (i + 0.5), Math.max(1, w - pad * 2)));
-    e = { sig, canvas: c, w, h };
+    lines.forEach((line, i) => ctx.fillText(line, ox, pad + lh * (i + 0.5), availableWidth));
+    e = { sig, canvas, w, h };
     rc.cache.set(`txt:${el.id}`, e);
   }
   const T = computeTransform(rc, el, e.w, e.h);
