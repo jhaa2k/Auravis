@@ -60,7 +60,7 @@ export function renderBars(rc, el) {
   const path = getShapePath(shape, p.customShapePath);
   const barW = BOX_W / N, w = barW * (1 - GAP);
   for (const k of [1, 2]) {
-    if (!p[`segment${k}Enabled`]) continue;
+    if (!p[`segment${k}Enabled`] || p[`segment${k}Type`] === 'none') continue;
     const cf = parseColor(p[`segment${k}ColorFrom`]), ct = parseColor(p[`segment${k}ColorTo`]);
     const fixedHeight = p[`segment${k}FixedHeight`], mult = p[`segment${k}BarHeightMultiplier`];
     const mirror = p[`segment${k}Mirror`], flip = p[`segment${k}FlipEveryOther`];
