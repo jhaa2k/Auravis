@@ -24,18 +24,18 @@ export function PositionControls({ element }) {
     <section className="quick-position" aria-label="Move and adjust selected element">
       <div className="quick-position-head">
         <span><Icon name="move" size={16} />Move & Adjust</span>
-        <small>{element.props.tag || 'Selected element'}</small>
+        <small>{element.props.tag || element.type || 'Selected element'}{locked ? ' · Locked' : ' · Live controls'}</small>
       </div>
       <div className="quick-position-layout">
         <div className="quick-position-values">
           <div className="position-fields">
-            {number(position[0], (v) => ({ position: [v, position[1]] }), 'X', -4000, 4000)}
-            {number(position[1], (v) => ({ position: [position[0], v] }), 'Y', -4000, 4000)}
+            {number(position[0], (v) => ({ position: [v, position[1]] }), 'X · Center 0', -4000, 4000)}
+            {number(position[1], (v) => ({ position: [position[0], v] }), 'Y · Center 0', -4000, 4000)}
             {Object.prototype.hasOwnProperty.call(element.props, 'rotation') && number(rotation, (v) => ({ rotation: v }), 'Rotation', -720, 720, 0.1)}
           </div>
           <div className="position-adjustments">
-            {number(scale[0], (v) => ({ scale: [Math.max(0.01, v), scale[1]] }), 'Scale X', 0.01, 12, 0.01)}
-            {number(scale[1], (v) => ({ scale: [scale[0], Math.max(0.01, v)] }), 'Scale Y', 0.01, 12, 0.01)}
+            {number(scale[0], (v) => ({ scale: [Math.max(0.01, v), scale[1]] }), 'Width', 0.01, 12, 0.01)}
+            {number(scale[1], (v) => ({ scale: [scale[0], Math.max(0.01, v)] }), 'Height', 0.01, 12, 0.01)}
           </div>
           <div className="position-step" aria-label="Movement step">
             <button type="button" className={step === 1 ? 'active' : ''} aria-pressed={step === 1} disabled={locked} onClick={() => setStep(1)}>1 px</button>
