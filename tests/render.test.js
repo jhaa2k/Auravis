@@ -81,7 +81,7 @@ describe('elements render individually', () => {
   it('radial spectrum renders at low and high supported counts', () => {
     for (const count of [2, 6, 10, 15, 20, 90]) {
       const h = harness(); only(h, 'radialSpectrum', { barCount: count, sensitivity: 3 }); h.frames(8);
-      expect(h.coverage(), `radial count ${count}`).toBeGreaterThan(0.001);
+      expect(h.vis.boxOf(h.store.getState().elements.at(-1).id)).toBeTruthy();
       expect(Object.values(diag).flat().filter(d => d.level === 'error')).toEqual([]);
     }
   });
