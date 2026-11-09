@@ -41,11 +41,11 @@ export function PositionControls({ element }) {
         </div>
         <div className="position-direction">
           <div className="position-pad" aria-label="Nudge position">
-            <button type="button" title={\`Move up \${step} px\`} disabled={locked} onClick={() => nudge(0, -1)}><Icon name="chevron-up" size={18} /></button>
-            <button type="button" title={\`Move left \${step} px\`} disabled={locked} onClick={() => nudge(-1, 0)}><Icon name="chevron-left" size={18} /></button>
+            <button type="button" title={"Move up " + step + " px"} disabled={locked} onClick={() => nudge(0, -1)}><Icon name="chevron-up" size={18} /></button>
+            <button type="button" title={"Move left " + step + " px"} disabled={locked} onClick={() => nudge(-1, 0)}><Icon name="chevron-left" size={18} /></button>
             <span aria-hidden="true"><Icon name="move" size={14} /></span>
-            <button type="button" title={\`Move right \${step} px\`} disabled={locked} onClick={() => nudge(1, 0)}><Icon name="chevron-right" size={18} /></button>
-            <button type="button" title={\`Move down \${step} px\`} disabled={locked} onClick={() => nudge(0, 1)}><Icon name="chevron-down" size={18} /></button>
+            <button type="button" title={"Move right " + step + " px"} disabled={locked} onClick={() => nudge(1, 0)}><Icon name="chevron-right" size={18} /></button>
+            <button type="button" title={"Move down " + step + " px"} disabled={locked} onClick={() => nudge(0, 1)}><Icon name="chevron-down" size={18} /></button>
           </div>
         </div>
       </div>
