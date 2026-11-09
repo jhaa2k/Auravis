@@ -43,7 +43,7 @@ export default function FieldRenderer({ def, el, elements, onChange, onReset, on
     case 'vec2': {
       const uniform = def.uniformKey && el.props[def.uniformKey];
       return row(uniform ? (
-        <div className="num-row"><Slider value={value[0]} min={def.min} max={Math.min(def.max, 6)} step={def.step} onChange={(v) => set([v, v])} /><NumberInput value={value[0]} min={def.min} max={def.max} step={def.step} onChange={(v) => set([v, v])} /></div>
+        <div className="num-row"><Slider value={value[0]} min={def.min} max={Math.min(def.max, 6)} step={def.step} resetValue={def.default[0]} onChange={(v) => set([v, v])} /><NumberInput value={value[0]} min={def.min} max={def.max} step={def.step} onChange={(v) => set([v, v])} /></div>
       ) : (
         <div className="vec2"><span>X</span><NumberInput value={value[0]} min={def.min} max={def.max} step={def.step} onChange={(v) => set([v, value[1]])} /><span>Y</span><NumberInput value={value[1]} min={def.min} max={def.max} step={def.step} onChange={(v) => set([value[0], v])} /></div>
       ));
