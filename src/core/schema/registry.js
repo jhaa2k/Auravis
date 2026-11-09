@@ -33,6 +33,7 @@ export function createElementData(type, elements = [], overrides = {}) {
   const def = getDefinition(type);
   if (!def) throw new Error(`Unknown element type "${type}"`);
   const props = { ...defaultProps(def), ...structuredClone(overrides) };
-  props.tag = uniqueTag(overrides.tag || def.label, elements);
+  const requestedTag = overrides.tag ?? props.tag;
+  if (requestedTag) props.tag = uniqueTag(requestedTag, elements);
   return { id: uid(type), type, locked: false, props };
 }
