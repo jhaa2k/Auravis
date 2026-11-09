@@ -79,7 +79,7 @@ export function sanitizeValue(p, v) {
       const out = {};
       const allowedShapes = new Set(['rectangle','rounded','capsule','triangle','diamond','circle','chevron','hexagon','star','heart','line','horizontalLine']);
       for (const [key, raw] of Object.entries(v).slice(0, 1024)) {
-        if (!/^\\d{1,4}$/.test(key) || !raw || typeof raw !== 'object' || Array.isArray(raw)) continue;
+        if (!/^[0-9]{1,4}$/.test(key) || !raw || typeof raw !== 'object' || Array.isArray(raw)) continue;
         const item = {};
         if (typeof raw.enabled === 'boolean') item.enabled = raw.enabled;
         if (isValidColor(raw.color)) item.color = normalizeColor(raw.color);
