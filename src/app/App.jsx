@@ -15,8 +15,8 @@ import Toasts from '../ui/Toasts.jsx';
 import Icon from '../ui/Icon.jsx';
 import { importProjectFile } from '../core/project/persistence.js';
 
-const NAV = [['music','Music','music'],['elements','Elements','bars'],['properties','Properties','settings'],['scene','Scene','layers'],['settings','Settings','settings']];
-const TITLES = { music:'Music Library', elements:'Elements & Tools', properties:'Properties', scene:'Visual Scenes & Presets', settings:'App Settings', export:'Export Video' };
+const NAV = [['music','Music','music'],['elements','Elements','bars'],['properties','Properties','settings'],['scene','Filters','layers'],['settings','Settings','settings']];
+const TITLES = { music:'Music Library', elements:'Elements & Tools', properties:'Properties', scene:'Cinematic Filters', settings:'App Settings', export:'Export Video' };
 
 function MusicLibrary() {
   const state = useStore({ subscribe: audio.subscribe, getState: audio.getSnapshot });
