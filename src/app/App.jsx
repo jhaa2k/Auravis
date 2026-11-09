@@ -78,12 +78,12 @@ export default function App() {
           <button className="btn small export-btn" onClick={() => setTool('export')}><Icon name="download" size={15} />Export</button>
         </div>
       </header>
-      <main className="workspace android-workspace">
+      <main className={`workspace android-workspace ${!tool && !selectedElement ? "compact" : "expanded"}`}>
         <section className="col-preview" aria-label="Fixed preview">
-          <PreviewPanel onOpenSettings={() => setTool('project')} preferences={preferences} />
+          <PreviewPanel preferences={preferences} />
         </section>
-        <section className={`tool-dock ${tool ? 'open' : ''}`} aria-label="Editor tools">
-          <div id="active-tool-panel" className={`tool-panel ${tool ? 'open' : ''}`} aria-hidden={!tool}>
+        <section className={`tool-dock ${tool ? 'open' : selectedElement ? 'quick' : 'closed'}`} aria-label="Editor tools">
+          <div id="active-tool-panel" className={`tool-panel ${tool ? 'open' : selectedElement ? 'quick' : ''}`} aria-hidden={!tool && !selectedElement}>
             {!tool && selectedElement && <PositionControls element={selectedElement} />}
             {tool && (
               <>
