@@ -1,5 +1,4 @@
 import { useMemo, useRef, useState } from 'react';
-import { useApp } from '../app/hooks.js';
 import { actions, toast } from '../app/services.js';
 import Icon from './Icon.jsx';
 
