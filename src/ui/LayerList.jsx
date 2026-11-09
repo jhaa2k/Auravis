@@ -30,18 +30,14 @@ export default function LayerList() {
   return (
     <div className="layers">
       <div className="panel-title">
-        <label className="layer-type-select-wrap">
-          <select className="layer-type-select" aria-label="Select layer" value={sel?.id || ''} onChange={(event) => actions.select(event.target.value)}>
-            {rows.map(({ e }) => <option key={e.id} value={e.id}>{(e.props.tag || getDefinition(e.type).label).toLowerCase()}</option>)}
-          </select>
-        </label>
+        <span>Elements</span>
         <div className="row-gap">
+          <button className="icon-btn" title="Duplicate" disabled={!sel} onClick={() => actions.duplicateElement(sel.id)}><Icon name="copy" /></button>
           <button className="icon-btn" title="Move up" disabled={!sel} onClick={() => actions.moveElement(sel.id, 1)}><Icon name="up" /></button>
           <button className="icon-btn" title="Move down" disabled={!sel} onClick={() => actions.moveElement(sel.id, -1)}><Icon name="down" /></button>
-          <button className="icon-btn" title="Duplicate" disabled={!sel} onClick={() => actions.duplicateElement(sel.id)}><Icon name="copy" /></button>
           <button className="icon-btn danger" title="Delete" disabled={!sel} onClick={() => actions.deleteElement(sel.id)}><Icon name="trash" /></button>
           <div className="menu-wrap">
-            <button className="btn small primary" onClick={() => setMenu(!menu)} aria-haspopup="menu" aria-expanded={menu}><Icon name="plus" size={15} />Add layer</button>
+            <button className="btn small primary" onClick={() => setMenu(!menu)} aria-haspopup="menu" aria-expanded={menu}><Icon name="plus" size={15} />Add</button>
             {menu && <><div className="scrim" onClick={() => setMenu(false)} /><AddMenu onClose={() => setMenu(false)} /></>}
           </div>
         </div>
@@ -57,7 +53,7 @@ export default function LayerList() {
               onClick={() => actions.select(e.id)}>
               <span className="grip"><Icon name="drag" size={14} /></span>
               <span className="layer-icon"><Icon name={def.icon} size={17} /></span>
-              <span className="layer-name"><b>{e.props.tag || def.label}</b><small>{def.label}</small></span>
+              <span className="layer-name"><b>{e.props.tag}</b><small>{def.label}</small></span>
               {worst && <span className={`badge ${worst}`} title={probs.map((p) => p.message).join('\n')}><Icon name={worst === 'error' ? 'error' : 'warn'} size={14} /></span>}
               <button className="icon-btn" title={e.locked ? 'Unlock' : 'Lock (protect from canvas dragging)'} onClick={(ev) => { ev.stopPropagation(); actions.setLocked(e.id, !e.locked); }}><Icon name={e.locked ? 'lock' : 'unlock'} size={16} /></button>
               {def.kind !== 'provider' && (
