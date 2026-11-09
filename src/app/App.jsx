@@ -12,6 +12,7 @@ import ProjectDialog from '../ui/ProjectDialog.jsx';
 import Toasts from '../ui/Toasts.jsx';
 import Icon from '../ui/Icon.jsx';
 import { importProjectFile } from '../core/project/persistence.js';
+import { nativeVisualizer, isNativeVisualizerAvailable } from '../core/audio/nativeVisualizer.js';
 
 const NAV = [['music','Music','music'],['elements','Elements','bars'],['properties','Properties','settings'],['scene','Scene','layers'],['settings','Settings','settings']];
 const TITLES = { music:'Music Library', elements:'Elements & Tools', properties:'Properties', scene:'Visual Scenes & Presets', settings:'App Settings', export:'Export Video' };
@@ -19,14 +20,40 @@ const TITLES = { music:'Music Library', elements:'Elements & Tools', properties:
 function MusicLibrary() {
   const state = useStore({ subscribe: audio.subscribe, getState: audio.getSnapshot });
   const picker = useRef(null);
+  const [nativeTrack, setNativeTrack] = useState('');
+  const [nativePlaying, setNativePlaying] = useState(false);
+  useEffect(() => {
+    if (!isNativeVisualizerAvailable) return;
+    let subscription;
+    nativeVisualizer.addListener('nativePlaybackState', (event) => setNativePlaying(!!event.playing))
+      .then((handle) => { subscription = handle; })
+      .catch((error) => console.error('Native playback listener failed:', error));
+    return () => subscription?.remove();
+  }, []);
+  const importNativeAudio = async () => {
+    try {
+      const selected = await nativeVisualizer.pickAudio();
+      await nativeVisualizer.load(selected.uri, true);
+      setNativeTrack(selected.name || 'Selected audio');
+      toast('Native audio loaded. Spectrum is connected to the visualizer.', 'info');
+    } catch (error) {
+      if (!/cancel|no audio file/i.test(error?.message || '')) toast(error?.message || 'Could not load native audio', 'error');
+    }
+  };
   const importFiles = (files) => { const n = audio.addFiles(files); toast(n ? n + (n === 1 ? ' track imported' : ' tracks imported') : 'No supported audio files found', n ? 'info' : 'warning'); };
   return <div className="music-library">
     <div className="music-import">
       <div className="music-import-icon"><Icon name="music" size={23}/></div>
       <div className="music-import-copy"><b>Your music library</b><small>Import audio from your device. MP3, WAV, OGG, FLAC, M4A and AAC supported.</small></div>
       <button className="btn primary" onClick={() => picker.current?.click()}><Icon name="plus" size={15}/>Import</button>
+      {isNativeVisualizerAvailable && <button className="btn" onClick={importNativeAudio}><Icon name="audio-waveform" size={15}/>Native audio</button>}
       <input ref={picker} type="file" accept="audio/*,.mp3,.wav,.ogg,.flac,.m4a,.aac,.opus" multiple hidden onChange={(e)=>{importFiles([...e.target.files]);e.target.value='';}}/>
     </div>
+    {nativeTrack && isNativeVisualizerAvailable && <div className="music-library-note">
+      <b>Native player:</b> {nativeTrack}
+      <button className="btn small" onClick={() => nativePlaying ? nativeVisualizer.pause() : nativeVisualizer.play()}>{nativePlaying ? 'Pause' : 'Play'}</button>
+      <button className="btn small" onClick={async () => { await nativeVisualizer.release(); setNativeTrack(''); setNativePlaying(false); }}>Stop</button>
+    </div>}
     <div className="music-list-head"><b>Tracks</b><span>{state.tracks.length} {state.tracks.length===1?'track':'tracks'}</span></div>
     {state.tracks.length ? <ul className="music-track-list">{state.tracks.map((t,i)=><li key={t.name+':'+i} className={i===state.index?'current':''}>
       <button className="track-select" onClick={()=>audio.load(i,false)}><span className="track-art"><Icon name={i===state.index&&state.playing?'volume':'music'} size={17}/></span><span className="track-info"><b>{t.title||t.name}</b><small>{t.artist||t.name}</small></span>{i===state.index&&<span className="track-playing">{state.playing?'PLAYING':'SELECTED'}</span>}</button>
