@@ -106,7 +106,7 @@ export function createActions(store) {
 
     /** Replaces the whole project (load / import / reset). Clears undo history. */
     loadProject: (project, elements) => store.setState((s) => ({
-      ...s, project, elements, selectedId: elements[0]?.id ?? null, past: [], future: [], lastKey: null, dirty: false,
+      ...s, project, elements, selectedId: elements.find((e) => getDefinition(e.type)?.kind !== 'provider')?.id ?? elements[0]?.id ?? null, past: [], future: [], lastKey: null, dirty: false,
     })),
     resetProject: () => store.setState(() => defaultProjectState()),
     markSaved: (id) => store.setState((s) => ({ ...s, project: { ...s.project, id: id ?? s.project.id }, dirty: false })),
