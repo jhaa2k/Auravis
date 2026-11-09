@@ -30,11 +30,15 @@ export default function LayerList() {
   return (
     <div className="layers">
       <div className="panel-title">
-        <span>Layer stack</span>
+        <label className="layer-type-select-wrap">
+          <select className="layer-type-select" aria-label="Select layer" value={sel?.id || ''} onChange={(event) => actions.select(event.target.value)}>
+            {rows.map(({ e }) => <option key={e.id} value={e.id}>{(e.props.tag || getDefinition(e.type).label).toLowerCase()}</option>)}
+          </select>
+        </label>
         <div className="row-gap">
-          <button className="icon-btn" title="Duplicate" disabled={!sel} onClick={() => actions.duplicateElement(sel.id)}><Icon name="copy" /></button>
           <button className="icon-btn" title="Move up" disabled={!sel} onClick={() => actions.moveElement(sel.id, 1)}><Icon name="up" /></button>
           <button className="icon-btn" title="Move down" disabled={!sel} onClick={() => actions.moveElement(sel.id, -1)}><Icon name="down" /></button>
+          <button className="icon-btn" title="Duplicate" disabled={!sel} onClick={() => actions.duplicateElement(sel.id)}><Icon name="copy" /></button>
           <button className="icon-btn danger" title="Delete" disabled={!sel} onClick={() => actions.deleteElement(sel.id)}><Icon name="trash" /></button>
           <div className="menu-wrap">
             <button className="btn small primary" onClick={() => setMenu(!menu)} aria-haspopup="menu" aria-expanded={menu}><Icon name="plus" size={15} />Add layer</button>
