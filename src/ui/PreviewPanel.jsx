@@ -7,7 +7,7 @@ import { getDefinition } from '../core/schema/registry.js';
 export function isPreviewHittable(el) {
   if (!el || !el.props?.visible) return false;
   const def = getDefinition(el.type);
-  return !!def?.render && def.kind !== 'provider';
+  return !!def?.render && def.kind !== 'provider' && def.kind !== 'effect';
 }
 
 /** Screen-space (logical px) corners of an element box. */
@@ -46,7 +46,7 @@ export default function PreviewPanel() {
       const state = store.getState();
       const el = state.elements.find((e) => e.id === state.selectedId);
       const def = el && getDefinition(el.type);
-      const T = def?.kind !== 'provider' && def?.render ? visualizer.boxOf(el.id) : null;
+      const T = def?.kind !== 'provider' && def?.kind !== 'effect' && def?.render ? visualizer.boxOf(el.id) : null;
       const pts = T ? corners(T).map((p) => p.map((v) => +v.toFixed(1))) : null;
       const key = JSON.stringify(pts);
       if (key !== last) { last = key; setBox(pts); }
@@ -109,7 +109,7 @@ export default function PreviewPanel() {
             <polygon points={pts} vectorEffect="non-scaling-stroke" />
           </svg>
         )}
-        {box && !selectedEl?.locked && selectedDef?.kind !== 'provider' && selectedDef?.render && (
+        {box && !selectedEl?.locked && selectedDef?.kind !== 'provider' && selectedDef?.kind !== 'effect' && selectedDef?.render && (
           <div className="handle" style={{ left: `${(box[2][0] / width) * 100}%`, top: `${(box[2][1] / height) * 100}%` }}
             onPointerDown={onHandleDown} onPointerMove={onMove} onPointerUp={onUp} title="Drag to scale" />
         )}
