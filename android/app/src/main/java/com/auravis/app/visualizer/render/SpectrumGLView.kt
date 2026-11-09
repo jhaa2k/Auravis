@@ -22,6 +22,7 @@ class SpectrumGLView(
         setEGLContextClientVersion(2)
         setEGLConfigChooser(8, 8, 8, 8, 16, 0)
         holder.setFormat(PixelFormat.TRANSLUCENT)
+        setZOrderOnTop(true)
         setRenderer(SpectrumRenderer(analyzer, barCount.coerceIn(8, 256)))
         renderMode = RENDERMODE_CONTINUOUSLY
         isClickable = false
