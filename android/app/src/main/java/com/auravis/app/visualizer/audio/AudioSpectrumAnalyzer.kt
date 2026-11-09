@@ -2,7 +2,6 @@ package com.auravis.app.visualizer.audio
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import android.os.SystemClock
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -30,7 +29,7 @@ data class SpectrumFrame(
  */
 class AudioSpectrumAnalyzer(private val fftSize: Int = 2048) {
     init {
-        require(fftSize >= 256 && fftSize and (fftSize - 1) == 0) {
+        require(fftSize >= 256 && (fftSize and (fftSize - 1)) == 0) {
             "FFT size must be a power of two and at least 256"
         }
     }
@@ -81,7 +80,7 @@ class AudioSpectrumAnalyzer(private val fftSize: Int = 2048) {
         val count = barCount.coerceIn(8, 512)
         if (smoothedBars.size != count) smoothedBars = FloatArray(count)
 
-        val now = SystemClock.elapsedRealtimeNanos()
+        val now = System.nanoTime()
         val dt = if (previousSnapshotNs == 0L) 1f / 60f
             else ((now - previousSnapshotNs) / 1_000_000_000f).coerceIn(1f / 240f, 0.1f)
         previousSnapshotNs = now
