@@ -8,8 +8,12 @@ export function download(blob, fileName) {
   const anchor = document.createElement('a');
   anchor.href = url;
   anchor.download = fileName;
+  anchor.style.display = 'none';
+  document.body.appendChild(anchor);
   anchor.click();
-  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10 * 60 * 1000);
+  return url;
 }
 
 function readBase64(blob) {
@@ -28,8 +32,8 @@ function throwIfAborted(signal) {
 export async function saveExport(blob, fileName, onProgress = () => {}, { useSaf = false, signal } = {}) {
   throwIfAborted(signal);
   if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') {
-    download(blob, fileName);
-    return { location: 'browser downloads', uri: URL.createObjectURL(blob), mimeType: blob.type.split(';')[0] };
+    const uri = download(blob, fileName);
+    return { location: 'browser downloads', uri, mimeType: blob.type.split(';')[0] };
   }
 
   let id;
