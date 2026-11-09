@@ -1,6 +1,6 @@
 const P = {
   play: 'M7 4.5v15l12-7.5z', pause: 'M7 4h3.5v16H7zM13.5 4H17v16h-3.5z', prev: 'M6 5v14M19 5.5v13L8.5 12z', next: 'M18 5v14M5 5.5v13L15.5 12z',
-  plus: 'M12 5v14M5 12h14', trash: 'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6', copy: 'M8 8h11v12H8zM5 16V4h11',
+  plus: 'M12 5v14M5 12h14', left: 'M19 12H5M12 5l-7 7 7 7', right: 'M5 12h14M12 5l7 7-7 7', refresh: 'M20 7v5h-5M4 17v-5h5M5.6 9a7 7 0 0112-2L20 12M4 12l2.4 5a7 7 0 0012-2', crosshair: 'M12 2v5M12 17v5M2 12h5M17 12h5M12 9a3 3 0 100 6 3 3 0 000-6z', move: 'M12 2l3 3h-2v4h4V7l3 3-3 3v-2h-4v4h2l-3 3-3-3h2v-4H7v2l-3-3 3-3v2h4V5H9z', trash: 'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6', copy: 'M8 8h11v12H8zM5 16V4h11',
   up: 'M12 19V5M6 11l6-6 6 6', down: 'M12 5v14M6 13l6 6 6-6', eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 100-6 3 3 0 000 6z',
   eyeOff: 'M3 3l18 18M10.6 6.1A9.7 9.7 0 0112 6c6 0 10 6 10 6a17 17 0 01-3.2 3.7M6.6 6.7A17 17 0 002 12s4 7 10 7c1.6 0 3-.4 4.3-1M9.9 9.9a3 3 0 004.2 4.2',
   lock: 'M6 11h12v9H6zM8 11V8a4 4 0 018 0v3', unlock: 'M6 11h12v9H6zM8 11V8a4 4 0 017.5-2', undo: 'M9 14L4 9l5-5M4 9h10a6 6 0 010 12h-3',
