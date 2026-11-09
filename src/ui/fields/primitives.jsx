@@ -36,14 +36,14 @@ export function Toggle({ checked, onChange, label }) {
   );
 }
 
-export function ColorInput({ value, onChange }) {
+export function ColorInput({ value, onChange, resetValue }) {
   const c = parseColor(value);
   const rgb = hex6(value);
   const setRgb = (h) => { const n = parseColor(h); onChange(toHex({ r: n.r, g: n.g, b: n.b, a: c.a })); };
   return (
     <div className="color-row">
       <input type="color" value={rgb} onChange={(e) => setRgb(e.target.value)} aria-label="Color" />
-      <Slider value={c.a} min={0} max={1} step={0.01} onChange={(a) => onChange(toHex({ r: c.r, g: c.g, b: c.b, a }))} />
+      <Slider value={c.a} min={0} max={1} step={0.01} resetValue={resetValue===undefined?undefined:parseColor(resetValue).a} onChange={(a) => onChange(toHex({ r: c.r, g: c.g, b: c.b, a }))} />
       <span className="alpha">{Math.round(c.a * 100)}%</span>
     </div>
   );
