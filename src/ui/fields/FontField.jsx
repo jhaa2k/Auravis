@@ -7,12 +7,11 @@ export default function FontField({ value, onChange, sample }) {
   const [err, setErr] = useState('');
   useSyncExternalStore(fontStore.subscribe, () => fontStore.version, () => fontStore.version);
   const families = fontStore.families();
-  const missing = Boolean(value) && !families.includes(value);
+  const missing = !families.includes(value);
   return (
     <div>
       <div className="font-row">
         <select value={value} onChange={(e) => onChange(e.target.value)}>
-          {!value && <option value="">Default Font</option>}
           {missing && <option value={value}>{value} (missing)</option>}
           {families.map((f) => <option key={f} value={f}>{f}</option>)}
         </select>
