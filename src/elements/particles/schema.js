@@ -42,9 +42,9 @@ export const sections = [
   ]),
   section('Behaviour', [
     num('spawnTime', 'Spawn Time', 0.02, 0.001, 5, 0.001, { unit: 's', hint: 'Seconds between spawns' }),
-    meas('measureOverallSpeed', 'Measure Overall Speed', { enabled: true, source: 'nothing', a: 1.5, b: 1.5, labels: { a: 'A (X Amount)', b: 'B (Y Amount)' } }),
+    meas('measureOverallSpeed', 'Measure Overall Speed', { enabled: false, source: 'nothing', a: 1.5, b: 1.5, labels: { a: 'A (X Amount)', b: 'B (Y Amount)' } }),
     num('speed', 'Speed', 100, 0, 3000, 1, { unit: 'px/s' }),
-    num('speedRandom', 'Speed Random', 0.6, 0, 1, 0.01),
+    num('speedRandom', 'Speed Random', 0.6, 0, 1, 0.01, { unit: '%', hint: 'Avee default: 60.000%' }),
     num('lifetime', 'Lifetime', 8, 0.1, 30, 0.1, { unit: 's' }),
     vec2('gravity', 'Gravity', [0, 0], -3000, 3000, 1, { unit: 'px/s²' }),
   ]),
