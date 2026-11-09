@@ -22,7 +22,7 @@ export function ColorInput({value,onChange,resetValue}) {
  const [hex,setHex]=useState(rgb);
  useEffect(()=>setHex(hex6(value)),[value]);
  const updateChannel=(key,v)=>onChange(toHex({...c,[key]:Number(v)}));
- const commitHex=()=>{try{const next=parseColor(hex);onChange(toHex({...next,a:c.a}));setHex(hex6(hex));}catch{}};
+ const commitHex=()=>{if(!/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(hex))return;const next=parseColor(hex);onChange(toHex({...next,a:c.a}));setHex(hex6(hex));};
  return <div className="color-control">
   <div className="color-row">
    <button type="button" className="color-swatch-trigger" style={{'--swatch':rgb}} onClick={()=>setOpen(true)} aria-label="Open color picker"><i/>{rgb.toUpperCase()} <span>EDIT</span></button>
