@@ -9,7 +9,7 @@ export class FftService {
     this.results = new Map();
     this.pending = new Set();
     this.worker = null;
-    this.workerStartedAt = Date.now();
+    this.workerStartedAt = 0;
     this.lastWorkerAt = 0;
     this.workerFailed = false;
     if (useWorker && typeof Worker !== 'undefined') {
@@ -24,6 +24,7 @@ export class FftService {
   request(size, td) {
     if (this.worker && !this.workerFailed) {
       const now = Date.now();
+      if (!this.workerStartedAt && !this.lastWorkerAt) this.workerStartedAt = now;
       const stalledSince = this.lastWorkerAt || this.workerStartedAt;
       if (now - stalledSince < 220) {
         if (!this.pending.has(size)) {
