@@ -18,6 +18,7 @@ export const sections = [
   section('Bars', [
     bool('flipInput', 'Flip Input', false),
     num('heightScale', 'Height Scale', 10, 0, 20, 0.01),
+    int('barCount', 'Bar Count', 90, 2, 90, 1, { hint: 'Every value from 2 to 90 is supported' }),
     num('minHeightScale', 'Min Height Scale', 0, 0, 1, 0.005),
     num('maxHeightScale', 'Max Height Scale', 1, 0, 2, 0.01),
     sel('shapePath', 'Shape Path', 'horizontalLine', BAR_SHAPES),
