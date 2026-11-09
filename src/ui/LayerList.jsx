@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useApp, useStore } from '../app/hooks.js';
-import { actions, diagStore } from '../app/services.js';
+import { actions, diagStore, toast } from '../app/services.js';
 import { getDefinition, listDefinitions } from '../core/schema/registry.js';
 import Icon from './Icon.jsx';
 
@@ -10,7 +10,7 @@ function AddMenu({ onClose }) {
   return (
     <div className="menu" role="menu">
       {listDefinitions().map((d) => (
-        <button key={d.type} role="menuitem" onClick={() => { actions.addElement(d.type); onClose(); }}>
+        <button key={d.type} role="menuitem" onClick={() => { const created = actions.addElement(d.type); onClose(); toast(d.kind === 'provider' ? `${d.label} added. It supplies audio data to visual elements.` : `${d.label} added and selected. Open Properties to configure it.`, 'info'); }}>
           <Icon name={d.icon} size={18} /><span><b>{d.label}</b><small>{KIND[d.kind]}</small></span>
         </button>
       ))}
