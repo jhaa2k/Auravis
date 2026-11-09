@@ -110,10 +110,10 @@ export default function SettingsPanel({ mode = 'settings', preferences = DEFAULT
       blob.current = null;
       saved.current = null;
       finishing.current = false;
-      const captureDuration = Math.min(duration, audio.duration || duration);
       setExportState({ status: 'recording', progress: 0, message: 'Preparing project…' });
       if (!await audio.play()) throw new Error('Could not start audio playback for the video export.');
       if (token !== startToken.current || !rec.current) return;
+      const captureDuration = Math.min(duration, audio.duration || duration);
       startedAt.current = performance.now();
       setExportState({ status: 'recording', progress: 0, message: 'Rendering frames and encoding audio/video…' });
       timer.current = setInterval(() => {
