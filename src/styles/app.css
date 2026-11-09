@@ -614,3 +614,54 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
   .android-app .position-pad button,
   .android-app .position-pad span { min-width: 30px; min-height: 30px; }
 }
+
+
+/* Nine-point object anchor / centre-point control in the collapsed adjustment dock. */
+.android-app .center-point-control {
+  display: grid;
+  grid-template-columns: auto 54px auto;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+.android-app .center-point-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 16px);
+  grid-template-rows: repeat(3, 16px);
+  gap: 2px;
+}
+.android-app .center-point-grid button {
+  display: grid;
+  place-items: center;
+  min-width: 16px;
+  min-height: 16px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--panel2);
+}
+.android-app .center-point-grid button i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.android-app .center-point-grid button.active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 22%, var(--panel2));
+}
+.android-app .center-point-grid button.active i {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+}
+.android-app .center-point-control small {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+@media (max-width: 360px) {
+  .android-app .center-point-control { grid-template-columns: auto 54px auto; gap: 5px; }
+}
