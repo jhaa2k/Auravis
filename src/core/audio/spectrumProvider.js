@@ -81,7 +81,17 @@ export class SpectrumProvider {
       return lf + (nf - lf) * lin;
     };
     let base = new Float32Array(M);
-    if (sampleProvider.startsWith('waveform')) {
+    let hasTimeDomain = false;
+    if (timeDomain?.length) {
+      const from = Math.max(0, timeDomain.length - 1024);
+      for (let i = from; i < timeDomain.length; i++) {
+        if (Math.abs(timeDomain[i]) > 0.00001) { hasTimeDomain = true; break; }
+      }
+    }
+    // Native Media3 currently exposes FFT magnitudes but not the PCM waveform
+    // buffer to JavaScript. If a waveform sample mode is selected on that path,
+    // use the live spectrum as an envelope instead of silently outputting zeros.
+    if (sampleProvider.startsWith('waveform') && hasTimeDomain) {
       const td = timeDomain || [];
       for (let j = 0; j < M; j++) {
         const from = Math.floor((j * td.length) / M), to = Math.max(from + 1, Math.floor(((j + 1) * td.length) / M));
