@@ -5,6 +5,7 @@ import { createActions } from '../core/store/actions.js';
 import { defaultProjectState } from '../core/store/defaultProject.js';
 import { AudioEngine } from '../core/audio/audioEngine.js';
 import { FftService } from '../core/audio/fftService.js';
+import { nativeVisualizer, isNativeVisualizerAvailable } from '../core/audio/nativeVisualizer.js';
 import { Visualizer } from '../core/render/visualizer.js';
 import { session } from '../core/project/persistence.js';
 import { fontStore } from '../core/assets/fontStore.js';
@@ -27,6 +28,16 @@ export const diagStore = createStore({});
 export const toastStore = createStore([]);
 export const audio = new AudioEngine();
 export const fft = new FftService();
+
+// Android's Media3 audio processor supplies real PCM-derived FFT bins to the
+// same provider pipeline used by the editor's existing visual layers.
+if (isNativeVisualizerAvailable) {
+  nativeVisualizer.addListener('nativeSpectrum', (frame) => {
+    if (Array.isArray(frame?.magnitudes) && frame.magnitudes.length === 1024) {
+      fft.setExternalSpectrum(2048, frame.magnitudes);
+    }
+  }).catch((error) => console.error('Could not attach native spectrum feed:', error));
+}
 export const visualizer = new Visualizer({
   canvas: null, store, audio, fft,
   onDiagnostics: (d) => diagStore.setState(d),
