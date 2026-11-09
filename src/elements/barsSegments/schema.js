@@ -3,6 +3,7 @@ import { general } from '../shared/general.js';
 import { BAR_SHAPES } from '../../core/render/shapes.js';
 
 const segment = (n, def) => section(`Segment ${n}`, [
+  sel(`segment${n}Type`, 'Segment Type', def.type, [{ value: 'line', label: 'Line' }, { value: 'none', label: 'None' }]),
   bool(`segment${n}Enabled`, 'Enabled', def.enabled),
   col(`segment${n}ColorFrom`, 'Color From', def.from),
   col(`segment${n}ColorTo`, 'Color To', def.to),
@@ -23,8 +24,8 @@ export const sections = [
     area('customShapePath', 'Custom Shape Path', 'M0 100L50 0L100 100Z', { hint: 'SVG path data in a 100×100 box (used when Shape Path = Custom)' }),
     num('colorBlendOffset', 'Color Blend Offset', 0, -2, 2, 0.01),
   ]),
-  segment(1, { enabled: true, from: '#ffffffff', to: '#ffffffff', fixedHeight: 0, mult: 1, mirror: false }),
-  segment(2, { enabled: false, from: '#ffffff33', to: '#ffffff11', fixedHeight: 0, mult: 0.12, mirror: true }),
+  segment(1, { type: 'line', enabled: true, from: '#ffffffff', to: '#ffffffff', fixedHeight: 0, mult: 1, mirror: false }),
+  segment(2, { type: 'none', enabled: false, from: '#ffffff33', to: '#ffffff11', fixedHeight: 0, mult: 0.12, mirror: true }),
   section('Behaviour', [
     num('softness', 'Softness', 8, 0, 9.8, 0.1, { hint: 'Avee scale 0–10; higher values smooth the bar response more' }),
     num('reactionDelay', 'Reaction Delay', 0, 0, 1000, 1, { unit: 'ms' }),
