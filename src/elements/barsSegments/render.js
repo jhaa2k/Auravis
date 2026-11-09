@@ -25,7 +25,7 @@ export function updateBars(rc, el, samples, st) {
   st.head = (st.head + 1) % st.frames;
   st.hist.set(samples, st.head * N);
   st.filled = Math.min(st.frames, st.filled + 1);
-  const a = expAlpha(clamp(p.softness / 10, 0, 0.98), rc.dt);
+  const a = expAlpha(p.softness, rc.dt);
   for (let i = 0; i < N; i++) {
     const delay = (p.reactionDelay + i * p.reactionAccumulatedDelay) / 1000;
     const back = Math.min(st.filled - 1, Math.round(delay / st.avgDt));
