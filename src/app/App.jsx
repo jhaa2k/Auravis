@@ -10,7 +10,7 @@ import ProjectDialog from '../ui/ProjectDialog.jsx';
 import Toasts from '../ui/Toasts.jsx';
 import Icon from '../ui/Icon.jsx';
 
-const TOOLS = [['music', 'Music', 'music'], ['layers', 'Elements', 'bars'], ['props', 'Properties', 'settings'], ['project', 'Settings', 'settings']];
+const TOOLS = [['music', 'Music', 'music'], ['layers', 'Elements', 'layers'], ['props', 'Properties', 'sliders'], ['project', 'Settings', 'settings']];
 const DEFAULT_PREFERENCES = { theme: 'dark', guides: true, safeArea: false, snap: false };
 function readPreferences() {
   try {
