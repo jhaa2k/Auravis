@@ -30,14 +30,14 @@ export default function LayerList() {
   return (
     <div className="layers">
       <div className="panel-title">
-        <span>Elements</span>
+        <span>Layer stack</span>
         <div className="row-gap">
           <button className="icon-btn" title="Duplicate" disabled={!sel} onClick={() => actions.duplicateElement(sel.id)}><Icon name="copy" /></button>
           <button className="icon-btn" title="Move up" disabled={!sel} onClick={() => actions.moveElement(sel.id, 1)}><Icon name="up" /></button>
           <button className="icon-btn" title="Move down" disabled={!sel} onClick={() => actions.moveElement(sel.id, -1)}><Icon name="down" /></button>
           <button className="icon-btn danger" title="Delete" disabled={!sel} onClick={() => actions.deleteElement(sel.id)}><Icon name="trash" /></button>
           <div className="menu-wrap">
-            <button className="btn small primary" onClick={() => setMenu(!menu)} aria-haspopup="menu" aria-expanded={menu}><Icon name="plus" size={15} />Add</button>
+            <button className="btn small primary" onClick={() => setMenu(!menu)} aria-haspopup="menu" aria-expanded={menu}><Icon name="plus" size={15} />Add layer</button>
             {menu && <><div className="scrim" onClick={() => setMenu(false)} /><AddMenu onClose={() => setMenu(false)} /></>}
           </div>
         </div>
