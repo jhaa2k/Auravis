@@ -10,6 +10,7 @@ export function PositionControls({ element }) {
   const scale = Array.isArray(element.props.scale) ? element.props.scale : [1, 1];
   const rotation = Number(element.props.rotation) || 0;
   const [step, setStep] = useState(1);
+  if (!Array.isArray(element.props.position)) return null;
   const locked = Boolean(element.locked);
   const update = (patch) => actions.updateProps(element.id, patch);
   const nudge = (dx, dy) => update({ position: [position[0] + dx * step, position[1] + dy * step] });
@@ -28,7 +29,7 @@ export function PositionControls({ element }) {
           <div className="position-fields">
             {number(position[0], (v) => ({ position: [v, position[1]] }), 'X', -4000, 4000)}
             {number(position[1], (v) => ({ position: [position[0], v] }), 'Y', -4000, 4000)}
-            {number(rotation, (v) => ({ rotation: v }), 'Rotation', -720, 720, 0.1)}
+            {Object.prototype.hasOwnProperty.call(element.props, 'rotation') && number(rotation, (v) => ({ rotation: v }), 'Rotation', -720, 720, 0.1)}
           </div>
           <div className="position-adjustments">
             {number(scale[0], (v) => ({ scale: [Math.max(0.01, v), scale[1]] }), 'Scale X', 0.01, 12, 0.01)}
