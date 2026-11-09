@@ -13,6 +13,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      AURAVIS_KEYSTORE_BASE64: ${{ secrets.AURAVIS_KEYSTORE_BASE64 }}
     steps:
       - uses: actions/checkout@v4
 
