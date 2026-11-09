@@ -4,7 +4,11 @@ import { actions, store, visualizer } from '../app/services.js';
 import { QUALITY } from '../core/render/quality.js';
 import { getDefinition } from '../core/schema/registry.js';
 
-const HITTABLE = new Set(['image', 'barsSegments', 'text', 'particles']);
+export function isPreviewHittable(el) {
+  if (!el || !el.props?.visible) return false;
+  const def = getDefinition(el.type);
+  return !!def?.render && def.kind !== 'provider';
+}
 
 /** Screen-space (logical px) corners of an element box. */
 function corners(T) {
@@ -39,8 +43,10 @@ export default function PreviewPanel() {
   useEffect(() => {
     let last = '';
     const fn = () => {
-      const el = store.getState().elements.find((e) => e.id === store.getState().selectedId);
-      const T = el && getDefinition(el.type).kind !== 'provider' ? visualizer.boxOf(el.id) : null;
+      const state = store.getState();
+      const el = state.elements.find((e) => e.id === state.selectedId);
+      const def = el && getDefinition(el.type);
+      const T = def?.kind !== 'provider' && def?.render ? visualizer.boxOf(el.id) : null;
       const pts = T ? corners(T).map((p) => p.map((v) => +v.toFixed(1))) : null;
       const key = JSON.stringify(pts);
       if (key !== last) { last = key; setBox(pts); }
@@ -61,7 +67,7 @@ export default function PreviewPanel() {
     const cur = st.elements.find((e) => e.id === st.selectedId);
     let hit = cur && !cur.locked && visualizer.boxOf(cur.id) && inside(visualizer.boxOf(cur.id), p.x, p.y) ? cur : null;
     if (!hit) for (let i = st.elements.length - 1; i >= 0; i--) {
-      const e = st.elements[i], T = HITTABLE.has(e.type) && e.props.visible && visualizer.boxOf(e.id);
+      const e = st.elements[i], T = isPreviewHittable(e) && visualizer.boxOf(e.id);
       if (T && inside(T, p.x, p.y)) { hit = e; break; }
     }
     if (!hit) return actions.select(null);
@@ -72,8 +78,10 @@ export default function PreviewPanel() {
   };
   const onHandleDown = (ev) => {
     ev.stopPropagation();
-    const st = store.getState(), el = st.elements.find((e) => e.id === st.selectedId), T = visualizer.boxOf(el.id);
-    if (!el || el.locked || !T) return;
+    const st = store.getState(), el = st.elements.find((e) => e.id === st.selectedId);
+    if (!el || el.locked) return;
+    const T = visualizer.boxOf(el.id);
+    if (!T) return;
     const p = toLogical(ev);
     drag.current = { id: el.id, mode: 'scale', origin: [T.x, T.y], d0: Math.hypot(p.x - T.x, p.y - T.y) || 1, scale: [...el.props.scale] };
     ev.currentTarget.setPointerCapture(ev.pointerId);
@@ -88,6 +96,8 @@ export default function PreviewPanel() {
   const onUp = () => { drag.current = null; };
 
   const { width, height, quality } = settings;
+  const selectedEl = store.getState().elements.find((e) => e.id === selectedId);
+  const selectedDef = selectedEl && getDefinition(selectedEl.type);
   const pts = box ? box.map((p) => `${(p[0] / width) * 100},${(p[1] / height) * 100}`).join(' ') : null;
   return (
     <div className="preview" ref={wrapRef}>
@@ -99,7 +109,7 @@ export default function PreviewPanel() {
             <polygon points={pts} vectorEffect="non-scaling-stroke" />
           </svg>
         )}
-        {box && !store.getState().elements.find((e) => e.id === selectedId)?.locked && getDefinition(store.getState().elements.find((e) => e.id === selectedId)?.type || 'image')?.kind === 'visual' && (
+        {box && !selectedEl?.locked && selectedDef?.kind !== 'provider' && selectedDef?.render && (
           <div className="handle" style={{ left: `${(box[2][0] / width) * 100}%`, top: `${(box[2][1] / height) * 100}%` }}
             onPointerDown={onHandleDown} onPointerMove={onMove} onPointerUp={onUp} title="Drag to scale" />
         )}
