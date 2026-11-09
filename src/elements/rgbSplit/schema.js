@@ -2,7 +2,7 @@ import { bool, sel, num, col, vec2, meas, section } from '../../core/schema/dsl.
 import { general, BLEND_MODES } from '../shared/general.js';
 
 export const sections = [
-  general({ rotation: true, measureRot: true, tag: 'viz file .com', visible: false, blendMode: 'screen' }),
+  general({ rotation: true, measureRot: true, tag: 'viz file .com', visible: true, blendMode: 'screen' }),
   section('Appearance', [
     sel('blendModeContent', 'Blend Mode Content', 'screen', BLEND_MODES),
     col('color', 'Color', '#ddddddff', { hint: 'RGB tint of the processed content; alpha = opacity' }),
@@ -11,8 +11,8 @@ export const sections = [
     bool('showUnblurredContentUnder', 'Show Unblurred Content Under', false),
   ]),
   section('Split Effect', [
-    num('splitMultiplier', 'Split Multiplier', 0, 0, 10, 0.01),
-    vec2('splitAmount', 'Split Amount', [0.5, 0.5], 0, 200, 0.1, { unit: 'px' }),
+    num('splitMultiplier', 'Split Multiplier', 1, 0, 10, 0.01),
+    vec2('splitAmount', 'Split Amount', [8, 0], 0, 200, 0.1, { unit: 'px' }),
     meas('measureSplitAmount', 'Measure Split Amount', { source: 'nothing', outMin: 0, outMax: 30 }),
     col('splitColor0', 'Split Color 0', '#ffffffff'),
     col('splitColor1', 'Split Color 1', '#ffffffff'),
