@@ -6,12 +6,25 @@ const BOX_W = 1600, BOX_H = 500;
 
 export function renderWaveform(rc, el) {
   const p = el.props, td = rc.audio?.td;
-  if (!td?.length) { rc.record(el, computeTransform(rc, el, BOX_W, BOX_H)); return; }
+  const provider = rc.providers[p.audioProviderIndex - 1];
+  let hasTimeData = false;
+  if (td?.length) {
+    const from = Math.max(0, td.length - 1024);
+    for (let i = from; i < td.length; i++) {
+      if (Math.abs(td[i]) > 0.00001) { hasTimeData = true; break; }
+    }
+  }
+  const spectrum = provider?.out?.samples;
+  const useSpectrumEnvelope = !hasTimeData && !!spectrum?.length;
+  if (!td?.length && !useSpectrumEnvelope) {
+    rc.record(el, computeTransform(rc, el, BOX_W, BOX_H));
+    return;
+  }
   const T = computeTransform(rc, el, BOX_W, BOX_H);
   rc.record(el, T);
   const ctx = rc.ctx;
-  const count = Math.min(p.sampleCount, td.length);
-  const offset = td.length - count;
+  const count = Math.min(p.sampleCount, useSpectrumEnvelope ? 1024 : td.length);
+  const offset = useSpectrumEnvelope ? 0 : td.length - count;
   const mid = BOX_H / 2;
   const amp = BOX_H * 0.42 * p.amplitude;
   const from = parseColor(p.colorFrom), to = parseColor(p.colorTo);
@@ -26,7 +39,15 @@ export function renderWaveform(rc, el) {
   const points = [];
   for (let i = 0; i < count; i++) {
     const x = (i / Math.max(1, count - 1)) * BOX_W;
-    const v = Math.max(-1, Math.min(1, td[offset + i] || 0));
+    let v;
+    if (useSpectrumEnvelope) {
+      const position = (i / Math.max(1, count - 1)) * (spectrum.length - 1);
+      const left = Math.floor(position), right = Math.min(spectrum.length - 1, left + 1);
+      const fraction = position - left;
+      v = Math.max(0, Math.min(1, spectrum[left] + (spectrum[right] - spectrum[left]) * fraction));
+    } else {
+      v = Math.max(-1, Math.min(1, td[offset + i] || 0));
+    }
     points.push([x, mid - v * amp]);
   }
   const draw = (mirror = false) => {
