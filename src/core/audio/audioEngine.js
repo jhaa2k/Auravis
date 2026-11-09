@@ -25,6 +25,7 @@ export class AudioEngine {
     this.playing = false;
     this.playGeneration = 0;
     this.playPromise = null;
+    this.mediaSyncTimer = null;
     this.volume = 0.9;
     this.shuffle = false;
     this.repeat = false;
@@ -38,6 +39,7 @@ export class AudioEngine {
       this.el.addEventListener('playing', () => {
         if (this.mode !== 'file' || this.el.paused || this.playing) return;
         this.playing = true;
+        this.startMediaSync();
         this.emit();
       });
       this.el.addEventListener('error', () => this.onMediaError());
@@ -65,6 +67,17 @@ export class AudioEngine {
     this.snapshot = this.makeSnapshot();
     this.syncMediaSession();
     this.listeners.forEach((l) => l());
+  }
+  startMediaSync() {
+    if (this.mediaSyncTimer) return;
+    this.mediaSyncTimer = setInterval(() => {
+      if (this.playing) this.syncMediaSession();
+      else this.stopMediaSync();
+    }, 1000);
+  }
+  stopMediaSync() {
+    if (this.mediaSyncTimer) clearInterval(this.mediaSyncTimer);
+    this.mediaSyncTimer = null;
   }
   syncMediaSession() {
     const track = this.tracks[this.index];
@@ -132,6 +145,7 @@ export class AudioEngine {
   }
   load(i, autoplay = false) {
     if (!this.tracks.length) return;
+    this.stopMediaSync();
     this.playGeneration++;
     this.playPromise = null;
     this.el.pause();
@@ -175,6 +189,7 @@ export class AudioEngine {
         await Promise.all([resume, playback]);
         if (generation !== this.playGeneration || this.mode === 'none') return false;
         this.playing = true;
+        this.startMediaSync();
         this.emit();
         return true;
       } catch (error) {
@@ -200,6 +215,7 @@ export class AudioEngine {
     if (!error || this.mode !== 'file') return;
     this.mediaError = true;
     this.playing = false;
+    this.stopMediaSync();
     this.emit();
     const messages = {
       1: 'Audio playback was interrupted.',
@@ -210,6 +226,7 @@ export class AudioEngine {
     this.reportPlaybackError({ message: messages[error.code] || 'Could not play this audio file.' });
   }
   pause() {
+    this.stopMediaSync();
     this.playGeneration++;
     this.playPromise = null;
     this.el?.pause();
@@ -235,7 +252,7 @@ export class AudioEngine {
   onEnded() {
     if (this.repeat) { this.el.currentTime = 0; this.play(); }
     else if (this.tracks.length > 1) this.next();
-    else { this.playing = false; this.emit(); }
+    else { this.playing = false; this.stopMediaSync(); this.emit(); }
   }
   get currentTime() { return this.el?.currentTime || 0; }
   get duration() { return Number.isFinite(this.el?.duration) ? this.el.duration : 0; }
