@@ -23,7 +23,7 @@ class AudioSpectrumAnalyzerTest {
         analyzer.acceptPcm16(pcm, channelCount = 1, rate = rate)
         val frame = analyzer.snapshot(barCount = 64, lowHz = 30f, highHz = 16000f)
 
-        assertTrue("Expected non-zero spectrum bars", frame.bars.maxOrNull() ?: 0f > 0.05f)
+        assertTrue("Expected non-zero spectrum bars", (frame.bars.maxOrNull() ?: 0f) > 0.05f)
         assertTrue("440 Hz should register in bass band", frame.bass > 0.01f)
         assertTrue("RMS level should be non-zero", frame.level > 0.01f)
         assertTrue("Spectrum must remain normalized", frame.bars.all { it in 0f..1f })
