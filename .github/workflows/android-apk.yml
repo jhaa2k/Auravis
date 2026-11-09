@@ -34,6 +34,30 @@ jobs:
       - run: npm test
       - run: npm run android:build
 
+      - name: Prepare release signing keystore
+        if: ${{ secrets.AURAVIS_KEYSTORE_BASE64 != '' }}
+        env:
+          AURAVIS_KEYSTORE_BASE64: ${{ secrets.AURAVIS_KEYSTORE_BASE64 }}
+        run: |
+          printf '%s' "$AURAVIS_KEYSTORE_BASE64" | base64 --decode > android/app/auravis-release.jks
+
+      - name: Build signed release APK
+        if: ${{ secrets.AURAVIS_KEYSTORE_BASE64 != '' }}
+        env:
+          AURAVIS_KEYSTORE_PATH: ${{ github.workspace }}/android/app/auravis-release.jks
+          AURAVIS_KEYSTORE_PASSWORD: ${{ secrets.AURAVIS_KEYSTORE_PASSWORD }}
+          AURAVIS_KEY_ALIAS: ${{ secrets.AURAVIS_KEY_ALIAS }}
+          AURAVIS_KEY_PASSWORD: ${{ secrets.AURAVIS_KEY_PASSWORD }}
+        run: cd android && ./gradlew assembleRelease
+
+      - name: Upload signed release APK
+        if: ${{ secrets.AURAVIS_KEYSTORE_BASE64 != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: auravis-signed-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+
       - uses: actions/upload-artifact@v4
         with:
           name: auravis-debug-apk
