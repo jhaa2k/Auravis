@@ -87,6 +87,18 @@ export function sanitizeValue(p, v) {
           if (isNum(raw[name])) item[name] = clamp(raw[name],lo,hi);
         }
         if (allowedShapes.has(raw.shape)) item.shape = raw.shape;
+        for (const segmentName of ['segment1','segment2']) {
+          const source = raw[segmentName];
+          if (!source || typeof source !== 'object' || Array.isArray(source)) continue;
+          const segment = {};
+          if (typeof source.enabled === 'boolean') segment.enabled = source.enabled;
+          if (isValidColor(source.color)) segment.color = normalizeColor(source.color);
+          for (const [name, lo, hi] of [['height',0,8],['width',0.05,2],['offsetX',-800,800],['offsetY',-800,800],['opacity',0,1],['rotation',-180,180]]) {
+            if (isNum(source[name])) segment[name] = clamp(source[name],lo,hi);
+          }
+          if (allowedShapes.has(source.shape)) segment.shape = source.shape;
+          if (Object.keys(segment).length) item[segmentName] = segment;
+        }
         if (Object.keys(item).length) out[key] = item;
       }
       return { value: out };
