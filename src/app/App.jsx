@@ -6,11 +6,12 @@ import MusicPanel from '../ui/MusicPanel.jsx';
 import PropertiesPanel, { PositionControls } from '../ui/PropertiesPanel.jsx';
 import PreviewPanel from '../ui/PreviewPanel.jsx';
 import SettingsPanel from '../ui/SettingsPanel.jsx';
+import PresetPanel from '../ui/PresetPanel.jsx';
 import ProjectDialog from '../ui/ProjectDialog.jsx';
 import Toasts from '../ui/Toasts.jsx';
 import Icon from '../ui/Icon.jsx';
 
-const TOOLS = [['move', 'Move & Adjust', 'move'], ['music', 'Music', 'music'], ['layers', 'Elements', 'layers'], ['props', 'Properties', 'sliders'], ['project', 'Settings', 'settings']];
+const TOOLS = [['music', 'Music', 'music'], ['layers', 'Elements', 'layers'], ['props', 'Properties', 'sliders'], ['presets', 'Presets', 'grid'], ['project', 'Settings', 'settings']];
 const DEFAULT_PREFERENCES = { theme: 'dark', guides: true, safeArea: false, snap: false };
 function readPreferences() {
   try {
@@ -31,7 +32,7 @@ export default function App() {
   const dirty = useApp((s) => s.dirty);
   const selectedElement = useApp((s) => s.elements.find((e) => e.id === s.selectedId) || null);
   const canUndo = useApp((s) => s.past.length > 0), canRedo = useApp((s) => s.future.length > 0);
-  const [tool, setTool] = useState('move');
+  const [tool, setTool] = useState('music');
   const [dialog, setDialog] = useState(false);
   const [preferences, setPreferences] = useState(readPreferences);
   const updatePreferences = (patch) => setPreferences((current) => {
@@ -49,7 +50,7 @@ export default function App() {
     const onKey = (e) => {
       const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '') && document.activeElement.type !== 'range' && document.activeElement.type !== 'checkbox';
       const mod = e.ctrlKey || e.metaKey;
-      if (e.key === 'Escape' && tool !== 'move') { setTool('move'); }
+      if (e.key === 'Escape' && tool !== 'music') { setTool('music'); }
       else if (mod && e.key.toLowerCase() === 'z' && !typing) { e.preventDefault(); e.shiftKey ? actions.redo() : actions.undo(); }
       else if (mod && e.key.toLowerCase() === 'y' && !typing) { e.preventDefault(); actions.redo(); }
       else if (mod && e.key.toLowerCase() === 'd' && !typing) { e.preventDefault(); const id = store.getState().selectedId; id && actions.duplicateElement(id); }
@@ -83,9 +84,9 @@ export default function App() {
           <PreviewPanel preferences={preferences} />
         </section>
         <section className={`tool-dock ${tool ? 'open' : selectedElement ? 'quick' : 'closed'}`} aria-label="Editor tools">
-          <div id="active-tool-panel" className={`tool-panel ${tool ? 'open' : selectedElement ? 'quick' : ''} ${tool === 'move' ? 'move-tool' : ''}`} aria-hidden={!tool && !selectedElement}>
+          <div id="active-tool-panel" className={`tool-panel ${tool ? 'open' : 'closed'}`} aria-hidden={!tool}>
             {<PositionControls element={selectedElement} />}
-            {tool && tool !== 'move' && (
+            {tool && (
               <>
                 <header className="tool-panel-head">
                   <strong><Icon name={TOOLS.find(([key]) => key === tool)?.[2] || 'download'} size={16} />{TOOLS.find(([key]) => key === tool)?.[1] || 'Export'}</strong>
@@ -94,6 +95,7 @@ export default function App() {
                   {tool === 'music' && <MusicPanel />}
                   {tool === 'layers' && <LayerList />}
                   {tool === 'props' && <PropertiesPanel />}
+                  {tool === 'presets' && <PresetPanel />}
                   {tool === 'project' && <SettingsPanel mode="settings" preferences={preferences} onPreferencesChange={updatePreferences} />}
                   {tool === 'export' && <SettingsPanel mode="export" />}
                 </div>
