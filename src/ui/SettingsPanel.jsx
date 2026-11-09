@@ -90,8 +90,6 @@ export default function SettingsPanel(){
    <div className="field"><label>Adaptive quality</label><Toggle checked={s.adaptive!==false} onChange={adaptive=>actions.setSettings({adaptive})} label="Adaptive quality"/></div>
    <div className="hint">Adaptive quality lowers preview resolution when rendering cannot keep up. Export uses the selected output scale.</div>
   </div></section>
-  <section className="section open"><div className="section-head static">Keyboard shortcuts</div><div className="section-body shortcuts">
-   <span><kbd>Space</kbd> Play / pause</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> Undo</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> Redo</span><span><kbd>Ctrl</kbd>+<kbd>Y</kbd> Redo</span><span><kbd>Ctrl</kbd>+<kbd>D</kbd> Duplicate layer</span><span><kbd>Delete</kbd> Remove selected layer</span><span><kbd>Esc</kbd> Close active panel</span><span>Drag a layer on the preview to reposition it</span>
-  </div></section>
+
  </div>;
 }
