@@ -28,6 +28,7 @@ export function sanitizeSettings(s = {}) {
     fps: s.fps === 30 ? 30 : 60,
     adaptive: s.adaptive !== false,
     theme: ['dark','midnight','graphite','light'].includes(s.theme) ? s.theme : d.theme,
+    effects: Object.fromEntries(Object.keys(d.effects).map((key) => [key, clamp(Math.round(Number(s.effects?.[key]) || 0), 0, 100)])),
   };
 }
 
