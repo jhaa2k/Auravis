@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { hex6, parseColor, toHex } from '../../core/utils/color.js';
 
 const decimals = (step) => (String(step).split('.')[1] || '').length;
@@ -13,10 +13,21 @@ export function NumberInput({ value, onChange, min, max, step = 0.01, className 
   );
 }
 
-export function Slider({ value, onChange, min, max, step }) {
-  return <input className="range" type="range" value={Math.min(max, Math.max(min, value))} min={min} max={max} step={step}
-    style={{ '--pct': `${((Math.min(max, Math.max(min, value)) - min) / (max - min || 1)) * 100}%` }}
-    onChange={(e) => onChange(parseFloat(parseFloat(e.target.value).toFixed(decimals(step) + 1)))} />;
+export function Slider({ value, onChange, min, max, step, resetValue }) {
+  const lastTap=useRef(0);
+  const normalized=Math.min(max,Math.max(min,value));
+  const change=e=>onChange(parseFloat(parseFloat(e.target.value).toFixed(decimals(step)+1)));
+  const handlePointerUp=()=>{
+    if(resetValue===undefined)return;
+    const now=Date.now();
+    if(now-lastTap.current<340){onChange(resetValue);lastTap.current=0;}
+    else lastTap.current=now;
+  };
+  return <input className="range" type="range" value={normalized} min={min} max={max} step={step}
+    style={{ '--pct': `${((normalized-min)/(max-min||1))*100}%` }}
+    onChange={change} onPointerUp={handlePointerUp}
+    onDoubleClick={()=>{if(resetValue!==undefined)onChange(resetValue);}}
+    title={resetValue===undefined?'':'Double-tap to reset'} />;
 }
 
 export function Toggle({ checked, onChange, label }) {
