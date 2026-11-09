@@ -9,6 +9,8 @@ export function PositionControls({ element }) {
   const position = Array.isArray(element.props.position) ? element.props.position : [0, 0];
   const scale = Array.isArray(element.props.scale) ? element.props.scale : [1, 1];
   const rotation = Number(element.props.rotation) || 0;
+  const anchorX = Number.isFinite(element.props.anchorX) ? element.props.anchorX : 0.5;
+  const anchorY = Number.isFinite(element.props.anchorY) ? element.props.anchorY : 0.5;
   const [step, setStep] = useState(1);
   if (!Array.isArray(element.props.position)) return null;
   const locked = Boolean(element.locked);
@@ -38,6 +40,21 @@ export function PositionControls({ element }) {
           <div className="position-step" aria-label="Movement step">
             <button type="button" className={step === 1 ? 'active' : ''} aria-pressed={step === 1} disabled={locked} onClick={() => setStep(1)}>1 px</button>
             <button type="button" className={step === 10 ? 'active' : ''} aria-pressed={step === 10} disabled={locked} onClick={() => setStep(10)}>10 px</button>
+          </div>
+          <div className="center-point-control">
+            <span>Center Point</span>
+            <div className="center-point-grid" role="group" aria-label="Set element anchor point">
+              {[0, 0.5, 1].map((y) => [0, 0.5, 1].map((x) => (
+                <button key={`${x}-${y}`} type="button" disabled={locked}
+                  className={Math.abs(anchorX - x) < 0.001 && Math.abs(anchorY - y) < 0.001 ? 'active' : ''}
+                  aria-label={`Anchor ${x * 100}% horizontal, ${y * 100}% vertical`}
+                  aria-pressed={Math.abs(anchorX - x) < 0.001 && Math.abs(anchorY - y) < 0.001}
+                  onClick={() => update({ anchorX: x, anchorY: y })}>
+                  <i />
+                </button>
+              )))}
+            </div>
+            <small>{anchorX.toFixed(2)} · {anchorY.toFixed(2)}</small>
           </div>
         </div>
         <div className="position-direction">
