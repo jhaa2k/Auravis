@@ -10,7 +10,7 @@ export const sections = [
     num('barWidth', 'Bar Width', 5, 1, 40, 0.5, { unit: 'px' }),
     num('gap', 'Bar Gap', 0.25, 0, 0.9, 0.01),
     num('sensitivity', 'Sensitivity', 1.8, 0.01, 12, 0.01),
-    int('barCount', 'Bar Count', 128, 16, 512, 1),
+    int('barCount', 'Bar Count', 90, 2, 90, 1, { hint: 'Every value from 2 to 90 is supported' }),
     num('rotationOffset', 'Rotation Offset', -90, -360, 360, 0.1, { unit: '°' }),
     bool('mirror', 'Mirror Opposite Side', false),
   ]),
