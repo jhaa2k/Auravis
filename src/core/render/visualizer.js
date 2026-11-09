@@ -66,7 +66,7 @@ export class Visualizer {
       if (!inst) this.providers.set(el.id, (inst = new SpectrumProvider()));
       const size = FFT_SIZES.includes(el.props.fftSize) ? el.props.fftSize : 2048;
       const mags = this.fft.request(size, frame.td);
-      inst.update(el.props, mags, frame.sampleRate, dt, frame.td);
+      inst.update(el.props, mags, this.fft.externalSampleRate || frame.sampleRate, dt, frame.td);
       for (const [lvl, msg] of inst.issues) this.diagnostics.add(el.id, lvl, msg);
       list.push({ id: el.id, el, out: inst });
     }
