@@ -16,10 +16,10 @@ export function defaultElements() {
     measureScale: makeMeasure({ enabled: true, source: 'bass', outMin: 1, outMax: 1.06, smoothing: 0.7 }),
   });
   add('image', {
-    tag: 'Album Art', shape: 'circle', position: [0, -90], scale: [0.4, 0.4],
+    tag: 'Album Art', shape: 'circle', position: [0, 0], scale: [0.4, 0.4],
     measureScale: makeMeasure({ enabled: true, source: 'bass', outMin: 1, outMax: 1.12, smoothing: 0.6 }),
   });
-  add('text', { tag: 'Title', text: '{title}', position: [0, 400], fontSize: 54 });
+  add('text', { tag: 'Title', text: '{title}', position: [0, 0], fontSize: 54 });
   return list;
 }
 
