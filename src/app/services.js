@@ -33,10 +33,14 @@ export const fft = new FftService();
 // same provider pipeline used by the editor's existing visual layers.
 if (isNativeVisualizerAvailable) {
   nativeVisualizer.addListener('nativeSpectrum', (frame) => {
-    if (Array.isArray(frame?.magnitudes) && frame.magnitudes.length === 1024) {
-      fft.setExternalSpectrum(2048, frame.magnitudes);
+    const magnitudes = frame?.magnitudes;
+    if (magnitudes && typeof magnitudes.length === 'number' && magnitudes.length === 1024) {
+      fft.setExternalSpectrum(2048, magnitudes, Number(frame.sampleRate) || 0);
     }
   }).catch((error) => console.error('Could not attach native spectrum feed:', error));
+  nativeVisualizer.addListener('nativePlaybackState', (state) => {
+    if (!state?.playing) fft.clearExternalSpectrum();
+  }).catch((error) => console.error('Could not attach native playback state:', error));
 }
 export const visualizer = new Visualizer({
   canvas: null, store, audio, fft,
