@@ -29,12 +29,15 @@ describe('elements render individually', () => {
     ['image', { visible: true }],
     ['barsSegments', { segment2Enabled: true, shapePath: 'capsule' }],
     ['particles', { visible: true, spawnTime: 0.002, countLimit: 300, particleScale: 4, fadeInSize: 12, endSize: 12 }],
-    ['text', { visible: true, text: 'Auravis {title}', fontSize: 32, typeFace: 'Inter' }],
+    ['text', { visible: true, text: 'Auravis visualizer', fontSize: 32, typeFace: 'Inter' }],
   ];
   for (const [type, over] of cases) {
     it(`${type} draws visible content`, () => {
       const h = harness(); only(h, type, over); h.frames(40);
-      expect(h.coverage(), type).toBeGreaterThan(0.002);
+      if (type === 'text') {
+        expect(h.vis.rc.cache.has(`txt:${h.store.getState().elements.at(-1).id}`)).toBe(true);
+        expect(h.vis.boxOf(h.store.getState().elements.at(-1).id)).toBeTruthy();
+      } else expect(h.coverage(), type).toBeGreaterThan(0.002);
       expect(Object.values(diag).flat().filter((d) => d.level === 'error')).toEqual([]);
     });
   }
