@@ -48,7 +48,7 @@ export class ParticleSystem {
     if (p.spawnArea === 'rectangle') { x = (r() - 0.5) * aw; y = (r() - 0.5) * ah; }
     else if (p.spawnArea === 'circle') { const a = r() * TAU, d = Math.sqrt(r()) * aw / 2; x = Math.cos(a) * d; y = Math.sin(a) * d; }
     this.x[i] = x; this.y[i] = y; this.z[i] = r() * p.perspectiveDepth;
-    const speed = p.speed * (1 + (r() * 2 - 1) * (p.speedRandom / 100));
+    const speed = p.speed * (1 + (r() * 2 - 1) * p.speedRandom);
     let dx, dy, el;
     if (p.useRandomVector) { const a = r() * TAU; dx = Math.cos(a); dy = Math.sin(a); el = Math.asin(r() * 2 - 1); }
     else if (p.vectorRelativeToCenter) {
