@@ -780,3 +780,114 @@ kbd { background: var(--bg); border: 1px solid var(--line); border-bottom-width:
 .android-app .preset-card-meta b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; font-weight:600; }
 .android-app .preset-note { margin:0; color:var(--muted); font-size:10px; line-height:1.45; }
 @media (min-width:520px) { .android-app .preset-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+
+
+/* Layered editor composition: Move & Adjust stays behind the active tool sheet. */
+.android-app .tool-panel.open {
+  position: absolute;
+  inset: 0 0 68px;
+  display: block;
+  overflow: hidden;
+  isolation: isolate;
+}
+.android-app .tool-panel.open > .quick-position {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 7px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background:
+    radial-gradient(ellipse at 18% 12%, #343434 0%, transparent 48%),
+    linear-gradient(145deg, #242424 0%, #171717 78%);
+  box-shadow: inset 0 1px #ffffff08;
+}
+.android-app .tool-panel.open > .quick-position .quick-position-head {
+  min-height: 22px;
+  padding: 0 0 6px;
+  border-bottom: 1px solid #ffffff18;
+}
+.android-app .tool-panel.open > .quick-position .quick-position-layout {
+  grid-template-columns: minmax(0, 1fr) 92px;
+  gap: 8px;
+  align-items: center;
+}
+.android-app .tool-panel.open > .quick-position .quick-position-values { gap: 5px; }
+.android-app .tool-panel.open > .quick-position .position-fields { gap: 6px; }
+.android-app .tool-panel.open > .quick-position .quick-number input {
+  height: 29px;
+  background: #111111b8;
+  border-color: #454545;
+}
+.android-app .tool-panel.open > .quick-position .position-pad {
+  grid-template-columns: repeat(3, 27px);
+  grid-template-rows: repeat(3, 27px);
+  gap: 3px;
+}
+.android-app .tool-panel.open > .quick-position .position-pad button,
+.android-app .tool-panel.open > .quick-position .position-pad span {
+  min-width: 27px;
+  min-height: 27px;
+  background: #111111b8;
+  border-color: #454545;
+}
+.android-app .tool-panel.open > .tool-panel-head {
+  position: absolute;
+  z-index: 5;
+  top: 43%;
+  left: 0;
+  right: 0;
+  height: 42px;
+  min-height: 42px;
+  margin: 0;
+  padding: 5px 13px;
+  background: rgba(27, 27, 27, .96);
+  border-top: 1px solid #ffffff20;
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.android-app .tool-panel.open > .tool-panel-content {
+  position: absolute;
+  z-index: 5;
+  top: calc(43% + 42px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 0;
+  padding: 0;
+  overflow-y: auto;
+  background: rgba(25, 25, 25, .97);
+  border-top: 0;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.android-app .tool-panel.open > .tool-panel-content .props { min-height: 100%; padding-bottom: 18px; }
+.android-app .tool-panel.open > .tool-panel-content .props-head { position: sticky; top: 0; z-index: 2; background: rgba(25,25,25,.98); }
+.android-app .tool-panel.open > .tool-panel-content > .layers { min-height: 100%; }
+.android-app .tool-panel.open > .tool-panel-content > .presets { min-height: 100%; }
+.android-app .tool-panel.open > .tool-panel-head,
+.android-app .tool-panel.open > .tool-panel-content { box-shadow: 0 -12px 28px #0004; }
+.android-app .tool-bar { z-index: 22; }
+@media (max-width: 380px) {
+  .android-app .tool-panel.open > .quick-position { padding: 8px 9px; }
+  .android-app .tool-panel.open > .quick-position .quick-position-layout { grid-template-columns: minmax(0,1fr) 84px; gap: 6px; }
+  .android-app .tool-panel.open > .quick-position .quick-number input { height: 26px; font-size: 11px; }
+  .android-app .tool-panel.open > .quick-position .position-pad {
+    grid-template-columns: repeat(3,24px);
+    grid-template-rows: repeat(3,24px);
+  }
+  .android-app .tool-panel.open > .quick-position .position-pad button,
+  .android-app .tool-panel.open > .quick-position .position-pad span { min-width: 24px; min-height: 24px; }
+}
