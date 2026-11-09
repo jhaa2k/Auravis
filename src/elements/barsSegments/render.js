@@ -66,17 +66,24 @@ export function renderBars(rc, el) {
     const mirror = p[`segment${k}Mirror`], flip = p[`segment${k}FlipEveryOther`];
     const baseline = mirror || flip ? BOX_H / 2 : BOX_H;
     for (let i = 0; i < N; i++) {
-      const h01 = fixedHeight > 0 ? fixedHeight : st.heights[i] * mult;
+      const custom = p.barOverrides?.[i] || {};
+      if (custom.enabled === false) continue;
+      const h01 = (fixedHeight > 0 ? fixedHeight : st.heights[i] * mult) * (Number.isFinite(custom.height) ? custom.height : 1);
       const hpx = h01 * BOX_H;
       if (hpx < 0.5) continue;
       const odd = flip && i % 2 === 1;
-      const top = mirror ? baseline - hpx / 2 : odd ? baseline : baseline - hpx;
-      ctx.fillStyle = toCss(mixColor(cf, ct, pingpong(i / Math.max(1, N - 1) + p.colorBlendOffset)));
+      const top = (mirror ? baseline - hpx / 2 : odd ? baseline : baseline - hpx) + (Number(custom.offsetY) || 0);
+      const customPath = custom.shape ? getShapePath(custom.shape, p.customShapePath) : path;
+      ctx.fillStyle = custom.color || toCss(mixColor(cf, ct, pingpong(i / Math.max(1, N - 1) + p.colorBlendOffset)));
       ctx.save();
-      ctx.translate(i * barW + (barW - w) / 2, top);
-      ctx.scale(w / 100, hpx / 100);
+      ctx.globalAlpha *= Number.isFinite(custom.opacity) ? clamp(custom.opacity, 0, 1) : 1;
+      const widthFactor = Number.isFinite(custom.width) ? clamp(custom.width, 0.05, 2) : 1;
+      const barX = i * barW + (barW - w * widthFactor) / 2 + (Number(custom.offsetX) || 0);
+      ctx.translate(barX, top);
+      ctx.rotate((Number(custom.rotation) || 0) * Math.PI / 180);
+      ctx.scale((w * widthFactor) / 100, hpx / 100);
       if (odd) { ctx.translate(0, 100); ctx.scale(1, -1); }
-      ctx.fill(path);
+      ctx.fill(customPath);
       ctx.restore();
     }
   }
