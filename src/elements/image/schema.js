@@ -14,7 +14,7 @@ export const sections = [
   section('Image', [
     img('customImage', 'Custom Image'),
     meas('measureAnimationSpeed', 'Measure Animation Speed', { source: 'nothing', a: 0.5, b: 0.5, labels: { a: 'A (Speed)', b: 'B (Beat Amount)' } }),
-    bool('keepAspectRatioAndCropToFit', 'Keep Aspect Ratio And Crop To Fit', true),
+    bool('keepAspectRatioAndCropToFit', 'Keep Aspect Ratio And Crop To Fit', false),
     bool('keepAspectRatio', 'Keep Aspect Ratio', true),
     bool('blurredBorder', 'Blurred Border', false),
     num('blurredBorderRadius', 'Blurred Border Radius', 40, 0, 200, 1, { hint: 'Blur intensity of the border fill' }),
@@ -37,7 +37,7 @@ export const sections = [
     num('opacityStrength', 'Opacity Strength', 1, 0, 1, 0.01),
   ]),
   section('Blur', [
-    bool('blurEnabled', 'Blur Enabled', true),
+    bool('blurEnabled', 'Blur Enabled', false),
     int('blurDivider', 'Blur Divider', 10, 1, 16, 1),
     num('blurRadius', 'Blur Radius', 9, 0, 200, 1),
   ]),
