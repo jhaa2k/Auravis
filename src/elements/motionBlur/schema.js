@@ -15,8 +15,7 @@ export const sections = [
     sel('motionSource', 'Motion Source', 'transform', [
       { value: 'transform', label: 'EffectTransform' }, { value: 'measured', label: 'Measured Movement' },
       { value: 'target', label: 'Target Motion' }, { value: 'composition', label: 'Composition Motion' }]),
-    sel('relativeMotionMode', 'Relative Motion Mode', 'relativeToComposition', [
-      { value: 'absolute', label: 'Absolute' }, { value: 'relativeToComposition', label: 'Relative To Composition' }, { value: 'relativeToTarget', label: 'Relative To Target' }]),
+    bool('relativeMotionMode', 'Relative Motion Mode', true),
     int('sampleCount', 'Sample Count', 12, 2, 48, 1),
   ]),
 ];
