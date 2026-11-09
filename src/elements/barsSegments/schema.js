@@ -14,7 +14,7 @@ const segment = (n, def) => section(`Segment ${n}`, [
 ]);
 
 export const sections = [
-  general({ position: [-96, 54], blendMode: 'alpha', scaleIsUniform: true, tag: 'Viz File .Com' }),
+  general({ position: [0, 0], blendMode: 'alpha', scaleIsUniform: true, tag: 'Viz File .Com' }),
   section('Bars', [
     bool('flipInput', 'Flip Input', false),
     num('heightScale', 'Height Scale', 10, 0, 20, 0.01),
