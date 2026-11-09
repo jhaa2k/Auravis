@@ -62,11 +62,11 @@ export function renderBars(rc, el) {
   for (const k of [1, 2]) {
     if (!p[`segment${k}Enabled`]) continue;
     const cf = parseColor(p[`segment${k}ColorFrom`]), ct = parseColor(p[`segment${k}ColorTo`]);
-    const fixed = p[`segment${k}FixedHeight`], mult = p[`segment${k}BarHeightMultiplier`];
+    const fixedHeight = p[`segment${k}FixedHeight`], mult = p[`segment${k}BarHeightMultiplier`];
     const mirror = p[`segment${k}Mirror`], flip = p[`segment${k}FlipEveryOther`];
     const baseline = mirror || flip ? BOX_H / 2 : BOX_H;
     for (let i = 0; i < N; i++) {
-      const h01 = fixed ? mult * p.maxHeightScale : st.heights[i] * mult;
+      const h01 = fixedHeight > 0 ? fixedHeight : st.heights[i] * mult;
       const hpx = h01 * BOX_H;
       if (hpx < 0.5) continue;
       const odd = flip && i % 2 === 1;
