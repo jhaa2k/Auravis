@@ -60,14 +60,16 @@ export function renderBars(rc, el) {
   const path = getShapePath(shape, p.customShapePath);
   const barW = BOX_W / N, w = barW * (1 - GAP);
   for (const k of [1, 2]) {
-    if (!p[`segment${k}Enabled`] || p[`segment${k}Type`] === 'none') continue;
+    const hasIndividualLine = Object.values(p.barOverrides || {}).some((bar) => bar?.[`segment${k}`]?.enabled === true);
+    const globallyEnabled = !!p[`segment${k}Enabled`] && p[`segment${k}Type`] !== 'none';
+    if (!globallyEnabled && !hasIndividualLine) continue;
     const cf = parseColor(p[`segment${k}ColorFrom`]), ct = parseColor(p[`segment${k}ColorTo`]);
     const fixedHeight = p[`segment${k}FixedHeight`], mult = p[`segment${k}BarHeightMultiplier`];
     const mirror = p[`segment${k}Mirror`], flip = p[`segment${k}FlipEveryOther`];
     const baseline = mirror || flip ? BOX_H / 2 : BOX_H;
     for (let i = 0; i < N; i++) {
       const custom = p.barOverrides?.[i]?.[`segment${k}`] || p.barOverrides?.[i] || {};
-      if (custom.enabled === false) continue;
+      if (custom.enabled === false || (!globallyEnabled && custom.enabled !== true)) continue;
       const h01 = (fixedHeight > 0 ? fixedHeight : st.heights[i] * mult) * (Number.isFinite(custom.height) ? custom.height : 1);
       const hpx = h01 * BOX_H;
       if (hpx < 0.5) continue;
