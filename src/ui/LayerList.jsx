@@ -3,26 +3,16 @@ import { useApp, useStore } from '../app/hooks.js';
 import { actions, diagStore, toast } from '../app/services.js';
 import { getDefinition, listDefinitions } from '../core/schema/registry.js';
 import Icon from './Icon.jsx';
+import InAppSelect from './InAppSelect.jsx';
 
 const KIND = { provider: 'Audio analysis', visual: 'Visual element', effect: 'Effect' };
 
-function AddMenu({ onClose }) {
-  return (
-    <div className="menu" role="menu">
-      {listDefinitions().map((d) => (
-        <button key={d.type} role="menuitem" onClick={() => { const created = actions.addElement(d.type); onClose(); toast(d.kind === 'provider' ? `${d.label} added. It supplies audio data to visual elements.` : `${d.label} added and selected. Open Properties to configure it.`, 'info'); }}>
-          <Icon name={d.icon} size={18} /><span><b>{d.label}</b><small>{KIND[d.kind]}</small></span>
-        </button>
-      ))}
-    </div>
-  );
-}
 
 export default function LayerList() {
   const elements = useApp((s) => s.elements);
   const selectedId = useApp((s) => s.selectedId);
   const diags = useStore(diagStore);
-  const [menu, setMenu] = useState(false);
+  const [addChoice, setAddChoice] = useState('__placeholder__');
   const [dragFrom, setDragFrom] = useState(null);
   const sel = elements.find((e) => e.id === selectedId);
   const rows = elements.map((e, i) => ({ e, i })).reverse(); // top of the stack first
@@ -36,9 +26,8 @@ export default function LayerList() {
           <button className="icon-btn" title="Move up" disabled={!sel} onClick={() => actions.moveElement(sel.id, 1)}><Icon name="up" /></button>
           <button className="icon-btn" title="Move down" disabled={!sel} onClick={() => actions.moveElement(sel.id, -1)}><Icon name="down" /></button>
           <button className="icon-btn danger" title="Delete" disabled={!sel} onClick={() => actions.deleteElement(sel.id)}><Icon name="trash" /></button>
-          <div className="menu-wrap">
-            <button className="btn small primary" onClick={() => setMenu(!menu)} aria-haspopup="menu" aria-expanded={menu}><Icon name="plus" size={15} />Add</button>
-            {menu && <><div className="scrim" onClick={() => setMenu(false)} /><AddMenu onClose={() => setMenu(false)} /></>}
+          <div className="layer-add-select">
+            <InAppSelect value={addChoice} ariaLabel="Add an element" options={[{value:'__placeholder__',label:'＋ Add element…'},...listDefinitions().map(d=>({value:d.type,label:d.label+' · '+KIND[d.kind]}))]} onChange={type=>{if(type==='__placeholder__')return;const def=getDefinition(type);actions.addElement(type);setAddChoice('__placeholder__');toast(def?.kind==='provider'?def.label+' added. It supplies audio data to visual elements.':def.label+' added and selected. Open Properties to configure it.','info');}}/>
           </div>
         </div>
       </div>
