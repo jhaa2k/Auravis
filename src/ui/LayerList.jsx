@@ -53,7 +53,7 @@ export default function LayerList() {
               onClick={() => actions.select(e.id)}>
               <span className="grip"><Icon name="drag" size={14} /></span>
               <span className="layer-icon"><Icon name={def.icon} size={17} /></span>
-              <span className="layer-name"><b>{e.props.tag}</b><small>{def.label}</small></span>
+              <span className="layer-name"><b>{e.props.tag || def.label}</b><small>{def.label}</small></span>
               {worst && <span className={`badge ${worst}`} title={probs.map((p) => p.message).join('\n')}><Icon name={worst === 'error' ? 'error' : 'warn'} size={14} /></span>}
               <button className="icon-btn" title={e.locked ? 'Unlock' : 'Lock (protect from canvas dragging)'} onClick={(ev) => { ev.stopPropagation(); actions.setLocked(e.id, !e.locked); }}><Icon name={e.locked ? 'lock' : 'unlock'} size={16} /></button>
               {def.kind !== 'provider' && (
