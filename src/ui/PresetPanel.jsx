@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useApp } from '../app/hooks.js';
 import { actions, toast } from '../app/services.js';
 import Icon from './Icon.jsx';
@@ -22,7 +22,7 @@ const FILTERS=[
 ];
 const KEYS=['contrast','saturation','warmth','fade','vignette','filmGrain','scanlines','hueJump','background','cameraZoom','beatFlash','beatShake'];
 export default function PresetPanel(){
- const settings=useApp(s=>s.project.settings);
+ const fileRef=useRef(null);
  const [group,setGroup]=useState('All'),[active,setActive]=useState('');
  const groups=['All','Cinematic','Film','Warm','Cool','Creative','Natural'];
  const visible=useMemo(()=>FILTERS.filter(f=>group==='All'||f.group===group),[group]);
@@ -35,7 +35,7 @@ export default function PresetPanel(){
  const reset=()=>{actions.setSettings({effects:Object.fromEntries(KEYS.map(k=>[k,0]))});setActive('');toast('Video filters reset');};
  const current=active||'Original';
  return <div className="filter-library">
-  <header className="filter-head"><div><span className="scene-eyebrow">AURAVIS / VIDEO LOOKS</span><h2>Cinematic Filters</h2><p>Apply a finished color mood to the entire composition and exported video.</p></div><button className="btn small" onClick={reset}><Icon name="refresh" size={13}/>Reset</button></header>
+  <header className="filter-head"><div><span className="scene-eyebrow">AURAVIS / VIDEO LOOKS</span><h2>Cinematic Filters</h2><p>Apply a finished color mood to the entire composition and exported video.</p></div><div className="filter-head-actions"><button className="btn small" onClick={()=>fileRef.current?.click()}><Icon name="upload" size={13}/>Import</button><button className="btn small" onClick={reset}><Icon name="refresh" size={13}/>Reset</button><input ref={fileRef} type="file" accept=".json,.viz,application/json,application/octet-stream" hidden onChange={e=>{const f=e.target.files?.[0];if(f)window.dispatchEvent(new CustomEvent('auravis:import-project-file',{detail:{file:f}}));e.target.value='';}}/></div></header>
   <div className="filter-active"><span>ACTIVE LOOK</span><b>{current}</b><small>Filters remain editable in Settings → Live visual effects.</small></div>
   <div className="filter-categories">{groups.map(g=><button key={g} className={group===g?'active':''} onClick={()=>setGroup(g)}>{g}</button>)}</div>
   <div className="filter-grid">{visible.map(f=><button type="button" key={f.name} className={'filter-card '+(active===f.name?'active':'')} onClick={()=>apply(f)}>
