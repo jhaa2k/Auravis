@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { actions, toast } from '../app/services.js';
 import { defaultElements, DEFAULT_SETTINGS } from '../core/store/defaultProject.js';
+import { createElementData } from '../core/schema/registry.js';
 import Icon from './Icon.jsx';
 
 const PRESETS = [
@@ -61,7 +62,7 @@ function makePreset(preset, index) {
   if (text) Object.assign(text.props, {
     tag: 'Track Title', visible: true, text: '{ArtistOrTitle}',
     color: primary, fontSize: 32 + (index % 4) * 4,
-    position: [0, 390], anchorX: 0.5, anchorY: 0.5, textAlign: 'center',
+    position: [0, 0], anchorX: 0.5, anchorY: 0.5, textAlign: 'center',
   });
   if (index % 5 === 0) {
     const fx = createElementData('rgbSplit', elements, { tag: 'RGB Accent', visible: true, splitMultiplier: 0.12, color: secondary });
