@@ -528,3 +528,18 @@ html,body,#root{width:100%;min-width:0;overflow:hidden}
 :root[data-auravis-theme="light"] .panel-overlay{background:var(--panel);color:var(--text)}
 :root[data-auravis-theme="light"] .dock-playback .modern-transport,:root[data-auravis-theme="light"] .dock-inspector,:root[data-auravis-theme="light"] .move-adjust{background:var(--panel2)}
 :root[data-auravis-theme="light"] .inapp-select-menu{box-shadow:0 14px 38px #17203322}
+
+
+.move-adjust-actions{display:flex;align-items:center;gap:8px}
+.move-adjust-actions button{display:flex;align-items:center;gap:4px;padding:2px 4px;border:0;background:transparent;color:var(--accent);font-size:10px}
+.move-adjust-actions button.active{color:#78d9a5}
+.move-adjust-extra{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.move-adjust-extra label{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;min-width:0}
+.move-adjust-extra label span{color:var(--muted);font-size:9px;letter-spacing:.07em}
+.move-adjust-extra output{color:var(--text);font-size:10px;font-variant-numeric:tabular-nums}
+.move-adjust-extra input{grid-column:1/-1;width:100%;margin:0;height:14px}
+.effect-slider{display:grid;gap:4px;padding:6px 0;border-bottom:1px solid var(--line)}
+.effect-slider>div{display:flex;justify-content:space-between;align-items:center}
+.effect-slider label{font-size:11px;color:var(--text)}
+.effect-slider output{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+.effect-slider input{width:100%}
