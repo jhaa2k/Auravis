@@ -295,8 +295,9 @@ export default function SettingsPanel({ mode = 'settings', preferences = DEFAULT
             <button className="btn primary wide" onClick={start} disabled={!audio.snapshot.hasAudio || !format}><Icon name="record" size={15} fill />Export from start</button>
             {exportState.message && <div className="hint">{exportState.message}</div>}
           </>}
+          {format && !format.includes('video/mp4') && <div className="hint warn-text">MP4 H.264 is not available in this WebView. WebM is the fallback and may need a compatible video player on some devices.</div>}
           <div className="hint">{formats.length
-            ? 'Records the visualizer canvas and the original audio together at the selected frame rate. Android 10+ exports are finalized in Movies/Auravis.'
+            ? 'Exports use MP4 H.264/AAC when supported for the widest device compatibility. Android 10+ exports are finalized in Movies/Auravis.'
             : 'No video encoder is available in this browser/WebView. Android format support depends on the device encoder.'}</div>
         </div>
       </section>
