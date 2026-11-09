@@ -14,8 +14,8 @@ export const sections = [
     num('splitMultiplier', 'Split Multiplier', 0, 0, 10, 0.01),
     vec2('splitAmount', 'Split Amount', [0.5, 0.5], 0, 200, 0.1, { unit: 'px' }),
     meas('measureSplitAmount', 'Measure Split Amount', { source: 'nothing', outMin: 0, outMax: 30 }),
-    col('splitColor0', 'Split Color 0', '#ff0000ff'),
-    col('splitColor1', 'Split Color 1', '#00ff00ff'),
-    col('splitColor2', 'Split Color 2', '#0000ffff'),
+    col('splitColor0', 'Split Color 0', '#ffffffff'),
+    col('splitColor1', 'Split Color 1', '#ffffffff'),
+    col('splitColor2', 'Split Color 2', '#ffffffff'),
   ]),
 ];
