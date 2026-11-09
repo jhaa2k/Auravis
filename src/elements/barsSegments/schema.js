@@ -27,7 +27,7 @@ export const sections = [
   segment(1, { type: 'line', enabled: true, from: '#ffffffff', to: '#ffffffff', fixedHeight: 0, mult: 1, mirror: false }),
   segment(2, { type: 'none', enabled: false, from: '#ffffff33', to: '#ffffff11', fixedHeight: 0, mult: 0.12, mirror: true }),
   section('Behaviour', [
-    num('softness', 'Softness', 8, 0, 9.8, 0.1, { hint: 'Avee scale 0–10; higher values smooth the bar response more' }),
+    num('softness', 'Softness', 0.8, 0, 0.98, 0.01, { displayMultiplier: 10, hint: 'Avee scale 0–10; higher values smooth the bar response more' }),
     num('reactionDelay', 'Reaction Delay', 0, 0, 1000, 1, { unit: 'ms' }),
     num('reactionAccumulatedDelay', 'Reaction Accumulated Delay', 0, 0, 60, 0.1, { unit: 'ms/bar' }),
     int('audioProviderIndex', 'Audio Provider Index', 1, 1, 16, 1, { dynamic: 'providers' }),
