@@ -8,5 +8,7 @@ import text from './text/index.js';
 import rgbSplit from './rgbSplit/index.js';
 import blurEffect from './blurEffect/index.js';
 import motionBlur from './motionBlur/index.js';
+import waveform from './waveform/index.js';
+import radialSpectrum from './radialSpectrum/index.js';
 
-export const ELEMENTS = [audioProvider, image, barsSegments, particles, text, rgbSplit, blurEffect, motionBlur];
+export const ELEMENTS = [audioProvider, image, barsSegments, particles, text, rgbSplit, blurEffect, motionBlur, waveform, radialSpectrum];
