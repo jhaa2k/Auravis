@@ -7,6 +7,7 @@ import { magnitudeSpectrum } from './fft.js';
 export class FftService {
   constructor({ useWorker = true } = {}) {
     this.results = new Map();
+    this.externalResults = new Map();
     this.pending = new Set();
     this.worker = null;
     this.workerStartedAt = 0;
@@ -20,8 +21,16 @@ export class FftService {
       } catch { this.worker = null; }
     }
   }
+  setExternalSpectrum(size, magnitudes) {
+    if (!Number.isInteger(size) || size < 256 || (size & (size - 1)) !== 0) return;
+    if (!magnitudes || magnitudes.length !== size / 2) return;
+    this.externalResults.set(size, Float32Array.from(magnitudes));
+  }
+  clearExternalSpectrum() { this.externalResults.clear(); }
   /** Returns the newest magnitudes available for `size` (worker results lag by ~1 frame). */
   request(size, td) {
+    const external = this.externalResults.get(size);
+    if (external) return external;
     if (this.worker && !this.workerFailed) {
       const now = Date.now();
       if (!this.workerStartedAt && !this.lastWorkerAt) this.workerStartedAt = now;
