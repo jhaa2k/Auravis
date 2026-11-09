@@ -6,12 +6,14 @@ import PropertiesPanel from '../ui/PropertiesPanel.jsx';
 import PreviewPanel from '../ui/PreviewPanel.jsx';
 import TransportBar from '../ui/TransportBar.jsx';
 import SettingsPanel from '../ui/SettingsPanel.jsx';
+import ExportPanel from '../ui/ExportPanel.jsx';
+import PresetPanel from '../ui/PresetPanel.jsx';
 import ProjectDialog from '../ui/ProjectDialog.jsx';
 import Toasts from '../ui/Toasts.jsx';
 import Icon from '../ui/Icon.jsx';
 
-const NAV = [['music','Music','music'],['elements','Elements','bars'],['properties','Properties','settings'],['scene','Scene','settings'],['export','Export','download']];
-const TITLES = { music:'Music Library', elements:'Elements & Tools', properties:'Properties', scene:'Scene Settings', export:'Export Video' };
+const NAV = [['music','Music','music'],['elements','Elements','bars'],['properties','Properties','settings'],['scene','Scene','layers'],['settings','Settings','settings']];
+const TITLES = { music:'Music Library', elements:'Elements & Tools', properties:'Properties', scene:'Visual Scenes & Presets', settings:'App Settings', export:'Export Video' };
 
 function MusicLibrary() {
   const state = useStore({ subscribe: audio.subscribe, getState: audio.getSnapshot });
@@ -65,15 +67,17 @@ export default function App() {
       else if(e.key==='Escape')setOverlay('');
     };
     const warn=e=>{if(store.getState().dirty){e.preventDefault();e.returnValue='';}};
+    const openPanel=e=>setOverlay(e.detail||'music');
+    window.addEventListener('auravis:open-panel',openPanel);
     window.addEventListener('keydown',onKey);window.addEventListener('beforeunload',warn);
-    return()=>{window.removeEventListener('keydown',onKey);window.removeEventListener('beforeunload',warn);};
+    return()=>{window.removeEventListener('keydown',onKey);window.removeEventListener('beforeunload',warn);window.removeEventListener('auravis:open-panel',openPanel);};
   },[overlay]);
   const openPanel=key=>{if(key==='properties'&&!store.getState().selectedId)setOverlay('elements');else setOverlay(v=>v===key?'':key);};
   return <div className="app modern-app">
     <header className="topbar modern-topbar">
       <div className="brand"><svg viewBox="0 0 64 64" width="27" height="27" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#282b32"/><path d="M14 40V24M24 50V14M34 38V26M44 46V18M52 38V26" stroke="#ff9a6b" strokeWidth="5" strokeLinecap="round"/></svg><span>Auravis</span></div>
       <button className="project-name" onClick={()=>setDialog(true)}>{name}{dirty?' •':''}</button>
-      <div className="row-gap"><button className="icon-btn" title="Undo" disabled={!canUndo} onClick={()=>actions.undo()}><Icon name="undo"/></button><button className="icon-btn" title="Redo" disabled={!canRedo} onClick={()=>actions.redo()}><Icon name="redo"/></button><button className="icon-btn" title="Projects" onClick={()=>setDialog(true)}><Icon name="folder"/></button></div>
+      <div className="row-gap"><button className="icon-btn" title="Undo" disabled={!canUndo} onClick={()=>actions.undo()}><Icon name="undo"/></button><button className="icon-btn" title="Redo" disabled={!canRedo} onClick={()=>actions.redo()}><Icon name="redo"/></button><button className="btn small primary top-export" title="Export video" onClick={()=>setOverlay('export')}><Icon name="download" size={14}/>Export</button></div>
     </header>
     <main className="modern-workspace">
       <section className="modern-preview" aria-label="Video preview"><PreviewPanel/></section>
@@ -92,7 +96,7 @@ export default function App() {
       <section className="panel-overlay" role="dialog" aria-modal="true" aria-label={TITLES[overlay]}><div className="overlay-grabber"/>
         <header className="overlay-header"><div><b>{TITLES[overlay]}</b><small>{overlay==='properties'?'Edit the selected layer':overlay==='music'?'Import, select and manage tracks':'Editor controls'}</small></div><button className="icon-btn" onClick={()=>setOverlay('')} aria-label="Close panel"><Icon name="close"/></button></header>
         <div className="overlay-content">
-          {overlay==='music'&&<MusicLibrary/>}{overlay==='elements'&&<LayerList/>}{overlay==='properties'&&<PropertiesPanel/>}{(overlay==='scene'||overlay==='export')&&<SettingsPanel/>}
+          {overlay==='music'&&<MusicLibrary/>}{overlay==='elements'&&<LayerList/>}{overlay==='properties'&&<PropertiesPanel/>}{overlay==='scene'&&<PresetPanel/>}{overlay==='settings'&&<SettingsPanel/>}{overlay==='export'&&<ExportPanel/>}
         </div>
       </section>
     </div>}
