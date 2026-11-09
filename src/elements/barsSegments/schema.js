@@ -23,6 +23,7 @@ export const sections = [
     sel('shapePath', 'Shape Path', 'horizontalLine', BAR_SHAPES),
     area('customShapePath', 'Custom Shape Path', 'M0 100L50 0L100 100Z', { hint: 'SVG path data in a 100×100 box (used when Shape Path = Custom)' }),
     num('colorBlendOffset', 'Color Blend Offset', 0, -2, 2, 0.01),
+    { key: 'barOverrides', label: 'Individual Bar Overrides', type: 'object', default: {} },
   ]),
   segment(1, { type: 'line', enabled: true, from: '#ffffffff', to: '#ffffffff', fixedHeight: 0, mult: 1, mirror: false }),
   segment(2, { type: 'none', enabled: false, from: '#ffffff33', to: '#ffffff11', fixedHeight: 0, mult: 0.12, mirror: true }),
