@@ -102,7 +102,6 @@ export default function PreviewPanel({ onOpenSettings, preferences }) {
       </div>
       <div className="stage" style={{ aspectRatio: `${width} / ${height}`, '--ar': width / height }}>
         <canvas ref={canvasRef} aria-label="Visualization preview" />
-        <div className="hit" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} />
         {pts && (
           <svg className="sel" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
             <polygon points={pts} vectorEffect="non-scaling-stroke" />
@@ -114,11 +113,7 @@ export default function PreviewPanel({ onOpenSettings, preferences }) {
             {preferences.safeArea && <rect className="safe-area-line" x="10" y="10" width="80" height="80" />}
           </svg>
         )}
-        {box && !store.getState().elements.find((e) => e.id === selectedId)?.locked && getDefinition(store.getState().elements.find((e) => e.id === selectedId)?.type || 'image')?.kind === 'visual' && (
-          <div className="handle" style={{ left: `${(box[2][0] / width) * 100}%`, top: `${(box[2][1] / height) * 100}%` }}
-            onPointerDown={onHandleDown} onPointerMove={onMove} onPointerUp={onUp} title="Drag to scale" />
-        )}
-        <div className="hud">{fps} fps · {Math.round(width * (visualizer.scaleOverride || QUALITY[quality].scale))}×{Math.round(height * (visualizer.scaleOverride || QUALITY[quality].scale))}</div>
+       <div className="hud">{fps} fps · {Math.round(width * (visualizer.scaleOverride || QUALITY[quality].scale))}×{Math.round(height * (visualizer.scaleOverride || QUALITY[quality].scale))}</div>
       </div>
     </div>
   );
