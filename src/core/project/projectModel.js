@@ -27,6 +27,7 @@ export function sanitizeSettings(s = {}) {
     quality: QUALITY[s.quality] ? s.quality : d.quality,
     fps: s.fps === 30 ? 30 : 60,
     adaptive: s.adaptive !== false,
+    theme: ['dark','midnight','graphite','light'].includes(s.theme) ? s.theme : d.theme,
   };
 }
 
