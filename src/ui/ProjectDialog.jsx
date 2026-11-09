@@ -3,9 +3,13 @@ import { useApp } from '../app/hooks.js';
 import { actions, store, toast } from '../app/services.js';
 import { projectsApi, exportProjectFile, importProjectFile } from '../core/project/persistence.js';
 import { imageCache } from '../core/assets/imageCache.js';
-import { download } from '../core/export/download.js';
 import Icon from './Icon.jsx';
 
+export function download(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
 const safe = (n) => n.replace(/[^\w\- ]+/g, '').trim() || 'project';
 
 export default function ProjectDialog({ onClose }) {
