@@ -10,7 +10,7 @@ export const IMAGE_SHAPES = [
 ];
 
 export const sections = [
-  general({ scale: [1, 1], tag: 'Your image 1', visible: true, blendMode: 'alpha' }),
+  general({ scale: [1, 1], scaleIsUniform: true, tag: 'Your image 1', visible: true, blendMode: 'alpha' }),
   section('Image', [
     img('customImage', 'Custom Image'),
     meas('measureAnimationSpeed', 'Measure Animation Speed', { source: 'nothing', a: 0.5, b: 0.5, labels: { a: 'A (Speed)', b: 'B (Beat Amount)' } }),
