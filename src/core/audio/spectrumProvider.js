@@ -20,6 +20,8 @@ export class SpectrumProvider {
     this.bass = 0; this.mid = 0; this.treble = 0; this.beat = 0;
     this.beatBase = 0;
     this.bassBase = 0;
+    this.midBase = 0;
+    this.trebleBase = 0;
     this.beatCooldown = 0;
     this.issues = [];
     this.pre = new Float32Array(0);
@@ -177,16 +179,33 @@ export class SpectrumProvider {
     // Add a low-frequency transient detector. It catches kick/bass attacks even
     // when the configured sample window starts above the strongest bass bins.
     const bassFlux = Math.max(0, this.bass - this.bassBase);
-    this.bassBase += (this.bass - this.bassBase) * (1 - Math.pow(0.985, dt * 60));
-    const flux = Math.max(rangeFlux, bassFlux * 1.35);
+    const midFlux = Math.max(0, this.mid - this.midBase);
+    const trebleFlux = Math.max(0, this.treble - this.trebleBase);
+    const baselineAlpha = 1 - Math.pow(0.985, dt * 60);
+    this.bassBase += (this.bass - this.bassBase) * baselineAlpha;
+    this.midBase += (this.mid - this.midBase) * baselineAlpha;
+    this.trebleBase += (this.treble - this.trebleBase) * baselineAlpha;
+    const source = props.beatSource || 'adaptive';
+    const flux = source === 'bass' ? bassFlux * 1.35
+      : source === 'mid' ? midFlux * 1.25
+        : source === 'treble' ? trebleFlux * 1.25
+          : source === 'spectrum' ? rangeFlux
+            : Math.max(rangeFlux, bassFlux * 1.35, midFlux * 1.25, trebleFlux * 1.25);
     const thresholdScale = props.beatRangeValueHigher > 2 ? 0.01 : 1;
     const vl = props.beatRangeValueLower * thresholdScale;
     const vh = Math.max(props.beatRangeValueHigher * thresholdScale, vl + 1e-4);
-    const raw = clamp((flux - vl) / (vh - vl), 0, 1);
+    const sensitivity = clamp(Number(props.beatSensitivity) || 1, 0.1, 6);
+    const threshold = clamp(Number(props.beatThreshold) || 0, 0, 0.8);
+    const normalizedFlux = Math.max(0, flux * sensitivity - threshold);
+    const raw = clamp((normalizedFlux - vl) / (vh - vl), 0, 1);
+    this.beatCooldown = Math.max(0, this.beatCooldown - dt * 1000);
+    const cooldown = Math.max(0, Number(props.beatCooldownMs) || 0);
+    const gatedRaw = this.beatCooldown > 0 ? 0 : raw;
+    if (raw > 0.45 && this.beatCooldown <= 0) this.beatCooldown = cooldown;
     const bs = clamp(props.beatSmooth ?? 0.4, 0, 0.99);
     const attack = 1 - Math.pow(0.02 + bs * 0.35, dt * 60);
     const release = Math.pow(Math.max(0.08, bs), dt * 60);
-    this.beat = raw > this.beat ? this.beat + (raw - this.beat) * attack : Math.max(raw, this.beat * release);
+    this.beat = gatedRaw > this.beat ? this.beat + (gatedRaw - this.beat) * attack : Math.max(gatedRaw, this.beat * release);
     return this;
   }
 
