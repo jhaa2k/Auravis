@@ -539,9 +539,9 @@ html,body,#root{width:100%;min-width:0;overflow:hidden}
 .move-adjust-extra output{color:var(--text);font-size:10px;font-variant-numeric:tabular-nums}
 .move-adjust-extra input{grid-column:1/-1;width:100%;margin:0;height:14px}
 .effect-slider{display:grid;gap:4px;padding:6px 0;border-bottom:1px solid var(--line)}
-.effect-slider>div{display:flex;justify-content:space-between;align-items:center}
+.effect-slider>div{display:grid;grid-template-columns:minmax(0,1fr) 76px;align-items:center;gap:8px}
 .effect-slider label{font-size:11px;color:var(--text)}
-.effect-slider output{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+.effect-slider>div .num{width:76px;min-width:0;text-align:right;font-variant-numeric:tabular-nums}
 .effect-slider input{width:100%}
 
 
