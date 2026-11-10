@@ -27,6 +27,9 @@ const ADD_ITEMS = [
   { value: 'text', label: 'Text · Typography layer' },
   { value: 'image', label: 'Image · Artwork layer' },
   { value: 'bg', label: 'BG · Background image layer' },
+  { value: 'blurEffect', label: 'Blur Effect · Composition blur' },
+  { value: 'rgbSplit', label: 'RGB Split Effect · Chromatic split' },
+  { value: 'motionBlur', label: 'Motion Blur Effect · Motion trails' },
 ];
 function addPreset(key) {
   const map = {
@@ -50,6 +53,9 @@ function addPreset(key) {
     text: ['text', { tag: 'Text' }],
     image: ['image', { tag: 'Image' }],
     bg: ['image', { tag: 'Background', scale: [1.8, 1.8], shape: 'rectangle' }],
+    blurEffect: ['blurEffect', {}],
+    rgbSplit: ['rgbSplit', {}],
+    motionBlur: ['motionBlur', {}],
   };
   return map[key] || [key, {}];
 }
