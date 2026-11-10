@@ -49,7 +49,7 @@ button:disabled { opacity: .4; cursor: default; }
 
 /* preview */
 .col-preview > .preview { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
-.stage { --maxh: calc(100dvh - 230px); position: relative; width: min(100%, calc(var(--maxh) * var(--ar))); background: #000; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 40px #0008; touch-action: none; }
+.stage { --maxh: calc(100dvh - 230px); position: relative; flex: 0 0 auto; width: min(100%, calc(var(--maxh) * var(--ar))); max-width: 100%; max-height: var(--maxh); min-width: 0; aspect-ratio: var(--ar); height: auto; box-sizing: border-box; background: #000; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 40px #0008; touch-action: none; }
 .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .stage .hit { position: absolute; inset: 0; cursor: move; }
 .stage .sel { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
