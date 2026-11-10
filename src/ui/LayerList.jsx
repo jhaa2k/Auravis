@@ -7,57 +7,16 @@ import InAppSelect from './InAppSelect.jsx';
 
 const KIND = { provider: 'Audio analysis', visual: 'Visual element', effect: 'Effect' };
 const ADD_ITEMS = [
-  { value: 'audioProvider', label: 'Audio Provider · Frequency analysis' },
-  { value: 'bars', label: 'Bars · Vertical spectrum' },
-  { value: 'barsh', label: 'Bars H · Horizontal spectrum' },
-  { value: 'circle', label: 'Circle · Radial spectrum' },
-  { value: 'multiring', label: 'MultiRing · Layered radial' },
-  { value: 'concentric', label: 'Concentric · Nested rings' },
-  { value: 'ring', label: 'Ring · Radial bars' },
-  { value: 'pulse', label: 'Pulse · Bass-reactive ring' },
-  { value: 'wave', label: 'Wave · Mirrored waveform' },
-  { value: 'wavec', label: 'Wave C · Filled waveform' },
-  { value: 'scope', label: 'Scope · Single-line waveform' },
-  { value: 'dots', label: 'Dots · Particle field' },
-  { value: 'lines', label: 'Lines · Particle trails' },
-  { value: 'blocks', label: 'Blocks · Particle blocks' },
-  { value: 'grid', label: 'Grid · Particle grid field' },
-  { value: 'particles', label: 'Particles · Custom particle system' },
-  { value: 'shape', label: 'Shape · Customisable particle shape' },
-  { value: 'text', label: 'Text · Typography layer' },
-  { value: 'image', label: 'Image · Artwork layer' },
-  { value: 'bg', label: 'BG · Background image layer' },
-  { value: 'blurEffect', label: 'Blur Effect · Composition blur' },
-  { value: 'rgbSplit', label: 'RGB Split Effect · Chromatic split' },
-  { value: 'motionBlur', label: 'Motion Blur Effect · Motion trails' },
+  { value: 'text', label: 'Text' },
+  { value: 'barsSegments', label: 'Bars' },
+  { value: 'particles', label: 'Particles' },
+  { value: 'image', label: 'Image' },
+  { value: 'blurEffect', label: 'Blur' },
+  { value: 'rgbSplit', label: 'RGB Split' },
+  { value: 'motionBlur', label: 'Motion Blur' },
 ];
 function addPreset(key) {
-  const map = {
-    audioProvider: ['audioProvider', {}],
-    bars: ['barsSegments', { tag: 'Bars', shapePath: 'rectangle' }],
-    barsh: ['barsSegments', { tag: 'Bars Horizontal', rotation: 90, shapePath: 'rectangle' }],
-    circle: ['radialSpectrum', { tag: 'Circle', radius: 260, barLength: 160, barCount: 90 }],
-    multiring: ['radialSpectrum', { tag: 'MultiRing', radius: 180, barLength: 120, mirror: true, barCount: 90 }],
-    concentric: ['radialSpectrum', { tag: 'Concentric', radius: 300, barLength: 80, barCount: 90, gap: 0.1 }],
-    ring: ['radialSpectrum', { tag: 'Ring', radius: 240, barLength: 180, barCount: 90 }],
-    pulse: ['radialSpectrum', { tag: 'Pulse', radius: 260, barLength: 100, sensitivity: 3.2, barCount: 64 }],
-    wave: ['waveform', { tag: 'Wave', waveformMode: 'mirror' }],
-    wavec: ['waveform', { tag: 'Wave C', waveformMode: 'filled', fillArea: true }],
-    scope: ['waveform', { tag: 'Scope', waveformMode: 'line', fillArea: false }],
-    dots: ['particles', { tag: 'Dots', spawnArea: 'circle', particleScale: 1.4, countLimit: 1800, speed: 35 }],
-    lines: ['particles', { tag: 'Lines', trailLength: 0.45, particleScale: 0.65, speed: 120 }],
-    blocks: ['particles', { tag: 'Blocks', particleScale: 2.8, sizeAspectRatio: 1.8, speed: 80 }],
-    grid: ['particles', { tag: 'Grid', spawnArea: 'rectangle', spawnAreaSize: [900, 500], particleScale: 1.1, speed: 25 }],
-    particles: ['particles', { tag: 'Particles' }],
-    shape: ['particles', { tag: 'Shape', particleScale: 3, orientToVelocity: false }],
-    text: ['text', { tag: 'Text' }],
-    image: ['image', { tag: 'Image' }],
-    bg: ['image', { tag: 'Background', scale: [1.8, 1.8], shape: 'rectangle' }],
-    blurEffect: ['blurEffect', {}],
-    rgbSplit: ['rgbSplit', {}],
-    motionBlur: ['motionBlur', {}],
-  };
-  return map[key] || [key, {}];
+  return [key, {}];
 }
 
 
