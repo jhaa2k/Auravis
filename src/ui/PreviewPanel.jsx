@@ -73,7 +73,7 @@ export default function PreviewPanel() {
     if (!hit) return actions.select(null);
     actions.select(hit.id);
     if (hit.locked) return;
-    drag.current = { id: hit.id, p0: p, pos: [...hit.props.position], mode: 'move' };
+    drag.current = { id: hit.id, p0: p, pos: [...hit.props.position], mode: 'move', started: false };
     ev.currentTarget.setPointerCapture(ev.pointerId);
   };
   const onHandleDown = (ev) => {
@@ -83,13 +83,16 @@ export default function PreviewPanel() {
     const T = visualizer.boxOf(el.id);
     if (!T) return;
     const p = toLogical(ev);
-    drag.current = { id: el.id, mode: 'scale', origin: [T.x, T.y], d0: Math.hypot(p.x - T.x, p.y - T.y) || 1, scale: [...el.props.scale] };
+    drag.current = { id: el.id, mode: 'scale', origin: [T.x, T.y], p0: p, d0: Math.hypot(p.x - T.x, p.y - T.y) || 1, scale: [...el.props.scale], started: false };
     ev.currentTarget.setPointerCapture(ev.pointerId);
   };
   const onMove = (ev) => {
     const d = drag.current;
     if (!d) return;
     const p = toLogical(ev);
+    const distance = Math.hypot(p.x - d.p0.x, p.y - d.p0.y);
+    if (!d.started && distance < 8) return; // Ignore tiny finger jitter; require an intentional drag.
+    d.started = true;
     if (d.mode === 'move') actions.updateProps(d.id, { position: [Math.round(d.pos[0] + p.x - d.p0.x), Math.round(d.pos[1] + p.y - d.p0.y)] }, 'drag');
     else { const r = Math.hypot(p.x - d.origin[0], p.y - d.origin[1]) / d.d0; actions.updateProps(d.id, { scale: [d.scale[0] * r, d.scale[1] * r] }, 'drag'); }
   };
