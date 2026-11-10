@@ -1,14 +1,21 @@
 import { txt, bool, sel, num, vec2, meas, section } from '../../core/schema/dsl.js';
 
 export const BLEND_MODES = [
-  { value: 'alpha', label: 'Alpha' }, { value: 'preMulAlpha', label: 'PreMulAlpha' },
-  { value: 'normal', label: 'Normal' }, { value: 'add', label: 'Add' }, { value: 'multiply', label: 'Multiply' },
-  { value: 'screen', label: 'Screen' }, { value: 'overlay', label: 'Overlay' }, { value: 'softLight', label: 'Soft Light' },
-  { value: 'hardLight', label: 'Hard Light' }, { value: 'difference', label: 'Difference' }, { value: 'alphaBlend', label: 'Alpha Blend' },
+  { value: 'alpha', label: 'Alpha' },
+  { value: 'preMulAlpha', label: 'PreMulAlpha' },
+  { value: 'screen', label: 'Screen' },
+  { value: 'add', label: 'Add' },
+  { value: 'addAlpha', label: 'AddAlpha' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'multiply', label: 'Multiply' },
+  { value: 'overlay', label: 'Overlay' },
+  { value: 'softLight', label: 'Soft Light' },
+  { value: 'hardLight', label: 'Hard Light' },
+  { value: 'difference', label: 'Difference' },
 ];
 // Alpha Blend = source-over weighted by the element colour alpha (see renderers); Normal ignores colour alpha for blending.
 export const BLEND_OP = {
-  alpha: 'source-over', preMulAlpha: 'source-over', normal: 'source-over', add: 'lighter', multiply: 'multiply', screen: 'screen', overlay: 'overlay',
+  alpha: 'source-over', preMulAlpha: 'source-over', normal: 'source-over', add: 'lighter', addAlpha: 'lighter', multiply: 'multiply', screen: 'screen', overlay: 'overlay',
   softLight: 'soft-light', hardLight: 'hard-light', difference: 'difference', alphaBlend: 'source-over',
 };
 export const ALIGNMENTS = [
@@ -30,8 +37,8 @@ export function general({
     bool('visible', 'Visible', visible),
     sel('blendMode', 'Blend Mode', blendMode, BLEND_MODES),
     vec2('position', 'Position', position, -200, 200, 1, { unit: 'px', hint: '0 = canvas centre; negative and positive values move left/right and up/down' }),
-    num('anchorX', 'Anchor X', 0.5, 0, 1, 0.01),
-    num('anchorY', 'Anchor Y', 0.5, 0, 1, 0.01),
+    sel('anchorX', 'Anchor X', 0.5, [{ value: -1, label: 'Unset' }, { value: 0, label: 'Start' }, { value: 0.5, label: 'Centre' }, { value: 1, label: 'End' }]),
+    sel('anchorY', 'Anchor Y', 0.5, [{ value: -1, label: 'Unset' }, { value: 0, label: 'Start' }, { value: 0.5, label: 'Centre' }, { value: 1, label: 'End' }]),
     meas('measurePos', 'Measure Pos', { axis: true, outMin: 0, outMax: 80, labels: posLabels, ...measurePos }),
     sel('alignmentPosition', 'Alignment Position', 'center', ALIGNMENTS),
     bool('scaleIsUniform', 'Scale Is Uniform', scaleIsUniform),
