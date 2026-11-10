@@ -42,7 +42,7 @@ export const sections = [
       { value: 'treble', label: 'Treble · Hi-hats / high transients' },
     ]),
     num('beatSensitivity', 'Beat Sensitivity', 1.5, 0.1, 6, 0.05),
-    num('beatThreshold', 'Beat Threshold', 0.08, 0, 0.8, 0.005),
+    num('beatThreshold', 'Beat Threshold', 0.18, 0, 0.8, 0.005),
     num('beatCooldownMs', 'Beat Cooldown', 90, 0, 500, 5, { unit: 'ms' }),
     num('beatSmooth', 'Beat Smooth', 0.4, 0, 0.99, 0.01),
     num('beatRangeBarFirst', 'Beat Range Bar First', 0, 0, 1, 0.001),
