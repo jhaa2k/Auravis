@@ -32,7 +32,10 @@ export function computeTransform(rc, el, bw, bh, opts = {}) {
   const mr = p.measureRot ? rc.measure(el, 'measureRot') : null;
   if (mr != null) rot += mr;
   rot += opts.extraRotation || 0;
-  return { x, y, rot: rot * DEG, sx, sy, ax: p.anchorX, ay: p.anchorY, bw, bh, mox, moy };
+  // Unset anchors resolve to the element centre; Start/Centre/End map to 0/0.5/1.
+  const ax = Number.isFinite(p.anchorX) && p.anchorX >= 0 ? p.anchorX : 0.5;
+  const ay = Number.isFinite(p.anchorY) && p.anchorY >= 0 ? p.anchorY : 0.5;
+  return { x, y, rot: rot * DEG, sx, sy, ax, ay, bw, bh, mox, moy };
 }
 
 export function applyTransform(ctx, T) {
