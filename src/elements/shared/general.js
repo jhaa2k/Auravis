@@ -36,7 +36,7 @@ export function general({
     txt('tag', 'Tag', tag),
     bool('visible', 'Visible', visible),
     sel('blendMode', 'Blend Mode', blendMode, BLEND_MODES),
-    vec2('position', 'Position', position, -200, 200, 1, { unit: 'px', hint: '0 = canvas centre; negative and positive values move left/right and up/down' }),
+    vec2('position', 'Position', position, -5000, 5000, 1, { unit: 'px', hint: '0 = canvas centre; values can move layers beyond every canvas edge' }),
     sel('anchorX', 'Anchor X', 0.5, [{ value: -1, label: 'Unset' }, { value: 0, label: 'Start' }, { value: 0.5, label: 'Centre' }, { value: 1, label: 'End' }]),
     sel('anchorY', 'Anchor Y', 0.5, [{ value: -1, label: 'Unset' }, { value: 0, label: 'Start' }, { value: 0.5, label: 'Centre' }, { value: 1, label: 'End' }]),
     meas('measurePos', 'Measure Pos', { axis: true, outMin: 0, outMax: 80, labels: posLabels, ...measurePos }),
